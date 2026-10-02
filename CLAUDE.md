@@ -160,7 +160,7 @@ deliverables/     sản phẩm nộp (copy từ TEMPLATES_DIR rồi điền)
   ```
   Trang nào ra ~0 ký tự là trang trắng → phải rút gọn nội dung (giữ đúng 3–6 câu theo yêu cầu) rồi chạy lại.
 - **Kiểm tra bố cục bằng ảnh, không chỉ bằng text:** `pdftoppm -r 100 -png <file>.pdf pg` rồi mở từng ảnh. Text có thể đúng mà bố cục vẫn vỡ.
-- **Font nhúng của template là font làm mờ (obfuscated)**; script giải mã nằm ở `/tmp/pdfcheck/install_fonts.py`, font đã cài vào `~/.local/share/fonts/course-templates/`.
+- **Font nhúng của template là font làm mờ (obfuscated)**; script giải mã nằm ở `scripts/install_template_fonts.py`, font đã cài vào `~/.local/share/fonts/course-templates/`. Chỉ cần chạy lại nếu đổi máy.
 
 ---
 
