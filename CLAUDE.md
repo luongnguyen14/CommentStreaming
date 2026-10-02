@@ -144,7 +144,27 @@ deliverables/     sản phẩm nộp (copy từ TEMPLATES_DIR rồi điền)
 
 ---
 
-## 11. Tài liệu tham chiếu
+## 11. Soạn tài liệu nộp (bài học từ Task 2)
+
+Áp dụng cho mọi task tạo file `.docx`/`.pptx`/`.xlsx` từ template của cô (Task 2, 3, 4, 11, 14, 15).
+
+- **Không bao giờ sửa file trong `TEMPLATES_DIR`.** Luôn `shutil.copyfile` sang `deliverables/` rồi mới mở và điền.
+- **Điền nội dung bằng cách nhân bản paragraph gốc của template** (`copy.deepcopy` của `w:p`) rồi chỉ đổi text — giữ nguyên font, cỡ chữ, giãn dòng của cô.
+- **Xoá `w:spacing` trong `w:rPr` của các run do mình tạo.** Template của cô đặt letter-spacing co `-12` (0.6pt); khi in bằng LibreOffice nó làm **mất hết dấu cách** trên dòng dài ("Vàng A Ký (Team Leader)" → "VàngAKý(TeamLeader)"). Đây là lỗi của LibreOffice gặp template này, không phải do mình — bản gốc cũng bị. Xoá `w:spacing` chỉ đổi 0.6pt typography nhưng chữ hiện đúng.
+- **Màu chữ: ép `w:val="000000"` và xoá `w:themeColor`/`w:themeShade`/`w:themeTint`.** Chữ mẫu màu xám là do theme shade, không phải do `w:val`, nên chỉ so sánh `w:val` sẽ không thay được.
+- **Mỗi bảng của template bắt đầu bằng một page break cứng và mỗi dòng có `trHeight` tối thiểu.** Nội dung dài hơn mức tối thiểu sẽ làm bảng tràn trang và sinh **trang trắng** ở giữa. Sau khi điền **luôn** kiểm tra:
+  ```bash
+  soffice --headless --convert-to pdf --outdir /tmp/pdfcheck deliverables/<file>.docx
+  pdfinfo /tmp/pdfcheck/<file>.pdf | grep Pages
+  for p in $(seq 1 N); do pdftotext -f $p -l $p /tmp/pdfcheck/<file>.pdf - | tr -d '[:space:]' | wc -c; done
+  ```
+  Trang nào ra ~0 ký tự là trang trắng → phải rút gọn nội dung (giữ đúng 3–6 câu theo yêu cầu) rồi chạy lại.
+- **Kiểm tra bố cục bằng ảnh, không chỉ bằng text:** `pdftoppm -r 100 -png <file>.pdf pg` rồi mở từng ảnh. Text có thể đúng mà bố cục vẫn vỡ.
+- **Font nhúng của template là font làm mờ (obfuscated)**; script giải mã nằm ở `/tmp/pdfcheck/install_fonts.py`, font đã cài vào `~/.local/share/fonts/course-templates/`.
+
+---
+
+## 12. Tài liệu tham chiếu
 
 | File | Nội dung |
 |---|---|
