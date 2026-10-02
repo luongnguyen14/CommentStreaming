@@ -1,0 +1,32 @@
+# --- Dữ liệu ---
+# Không commit dữ liệu thô (nặng, có thể vướng điều khoản phân phối lại)
+data/raw/*
+!data/raw/README.md
+!data/raw/SOURCE.md
+data/processed/*
+!data/processed/README.md
+
+# --- Trạng thái chạy ---
+checkpoints/
+logs/
+*.log
+
+# --- Môi trường / bí mật ---
+.venv/
+venv/
+__pycache__/
+*.pyc
+.env
+*.key
+*.pem
+
+# --- Tài liệu mẫu của giảng viên (bản quyền Samsung, không phân phối lại) ---
+templates/
+
+# --- File tạm của Office ---
+~$*
+.tmp/
+
+# --- Ghi chú ---
+# outputs/ ĐƯỢC commit: mọi con số trong báo cáo phải truy vết được về file thật.
+# Nhưng ảnh/CSV quá lớn thì cân nhắc Git LFS.
