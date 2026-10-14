@@ -17,6 +17,11 @@ Phải dừng sạch bằng một lệnh.
   Spark ghi event log lên `hdfs://localhost:9000/spark-logs`; HDFS tắt thì Spark báo lỗi kết nối `localhost:9000`.
 - `start-dfs.sh` cần ssh không mật khẩu tới localhost. Khóa `~/.ssh/id_rsa` có passphrase nên không dùng được ở chế độ
   tự động — đã tạo thêm khóa `~/.ssh/id_ed25519` (không passphrase, 14/10/2026) và thêm vào `~/.ssh/authorized_keys`.
+- **Push GitHub** (`git@github.com:luongnguyen14/CommentStreaming`) cần khóa `~/.ssh/id_rsa` — khóa này có passphrase,
+  mà agent của GNOME keyring (`/run/user/1002/gcr/ssh`) từ chối ký khi lệnh chạy không có phiên đồ họa
+  (`agent refused operation`). Cách chạy được: mở terminal user `hadoop`, `ssh-add ~/.ssh/id_rsa` (nhập passphrase),
+  rồi `git push` từ đó; hoặc nạp khóa vào một `ssh-agent` thường và trỏ `SSH_AUTH_SOCK` vào socket của nó.
+  Khóa `id_ed25519` **chưa** đăng ký với GitHub nên không thay thế được.
 
 ## Script tạo tài liệu nộp
 
