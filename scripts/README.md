@@ -35,6 +35,13 @@ Các script dưới đây **copy template của cô từ `TEMPLATES_DIR` sang `d
   ghi chú thuyết trình ~3 phút/slide
 - `install_template_fonts.py` — giải mã + cài font của template (chỉ cần chạy lại nếu đổi máy)
 
+## Script kiểm tra mô hình
+
+- `check_model.py` — nạp lại `outputs/models/sentiment_pipeline` bằng `PipelineModel.load`,
+  chạy `clean_text()` rồi dự đoán 5 câu thử tiếng Anh, in lớp + xác suất. Dùng để xác nhận
+  đường đi mà Task 8 (streaming) sẽ dùng:
+  `PYSPARK_DRIVER_PYTHON=$VENV_PY PYSPARK_PYTHON=$VENV_PY spark-submit --driver-memory 2g --master 'local[2]' scripts/check_model.py`
+
 ## Script vẽ biểu đồ
 
 - `make_pipeline_diagram.py` — vẽ sơ đồ kiến trúc pipeline (Task 5) →

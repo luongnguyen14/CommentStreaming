@@ -1,0 +1,49 @@
+26/10/15 00:11:14 WARN Utils: Your hostname, luongnguyen-VMware20-1 resolves to a loopback address: 127.0.1.1; using 172.16.99.138 instead (on interface ens160)
+26/10/15 00:11:14 WARN Utils: Set SPARK_LOCAL_IP if you need to bind to another address
+26/10/15 00:11:15 INFO SparkContext: Running Spark version 3.5.9
+26/10/15 00:11:15 INFO SparkContext: OS info Linux, 7.0.0-34-generic, aarch64
+26/10/15 00:11:15 INFO SparkContext: Java version 1.8.0_504
+26/10/15 00:11:15 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+26/10/15 00:11:15 INFO ResourceUtils: ==============================================================
+26/10/15 00:11:15 INFO ResourceUtils: No custom resources configured for spark.driver.
+26/10/15 00:11:15 INFO ResourceUtils: ==============================================================
+26/10/15 00:11:15 INFO SparkContext: Submitted application: capstone-check-model
+26/10/15 00:11:15 INFO ResourceProfile: Default ResourceProfile created, executor resources: Map(cores -> name: cores, amount: 1, script: , vendor: , memory -> name: memory, amount: 1024, script: , vendor: , offHeap -> name: offHeap, amount: 0, script: , vendor: ), task resources: Map(cpus -> name: cpus, amount: 1.0)
+26/10/15 00:11:15 INFO ResourceProfile: Limiting resource is cpu
+26/10/15 00:11:15 INFO ResourceProfileManager: Added ResourceProfile id: 0
+26/10/15 00:11:15 INFO SecurityManager: Changing view acls to: hadoop
+26/10/15 00:11:15 INFO SecurityManager: Changing modify acls to: hadoop
+26/10/15 00:11:15 INFO SecurityManager: Changing view acls groups to: 
+26/10/15 00:11:15 INFO SecurityManager: Changing modify acls groups to: 
+26/10/15 00:11:15 INFO SecurityManager: SecurityManager: authentication disabled; ui acls disabled; users with view permissions: hadoop; groups with view permissions: EMPTY; users with modify permissions: hadoop; groups with modify permissions: EMPTY
+26/10/15 00:11:15 INFO Utils: Successfully started service 'sparkDriver' on port 35727.
+26/10/15 00:11:15 INFO SparkEnv: Registering MapOutputTracker
+26/10/15 00:11:15 INFO SparkEnv: Registering BlockManagerMaster
+26/10/15 00:11:15 INFO BlockManagerMasterEndpoint: Using org.apache.spark.storage.DefaultTopologyMapper for getting topology information
+26/10/15 00:11:15 INFO BlockManagerMasterEndpoint: BlockManagerMasterEndpoint up
+26/10/15 00:11:15 INFO SparkEnv: Registering BlockManagerMasterHeartbeat
+26/10/15 00:11:15 INFO DiskBlockManager: Created local directory at /home/hadoop/spark-tmp/blockmgr-01c7b586-3c95-4bdd-a3cd-a22b1f36960e
+26/10/15 00:11:15 INFO MemoryStore: MemoryStore started with capacity 912.3 MiB
+26/10/15 00:11:15 INFO SparkEnv: Registering OutputCommitCoordinator
+26/10/15 00:11:16 INFO JettyUtils: Start Jetty 0.0.0.0:4040 for SparkUI
+26/10/15 00:11:16 INFO Utils: Successfully started service 'SparkUI' on port 4040.
+26/10/15 00:11:16 INFO Executor: Starting executor ID driver on host 172.16.99.138
+26/10/15 00:11:16 INFO Executor: OS info Linux, 7.0.0-34-generic, aarch64
+26/10/15 00:11:16 INFO Executor: Java version 1.8.0_504
+26/10/15 00:11:16 INFO Executor: Starting executor with user classpath (userClassPathFirst = false): ''
+26/10/15 00:11:16 INFO Executor: Created or updated repl class loader org.apache.spark.util.MutableURLClassLoader@319fb3e4 for default.
+26/10/15 00:11:16 INFO Utils: Successfully started service 'org.apache.spark.network.netty.NettyBlockTransferService' on port 40765.
+26/10/15 00:11:16 INFO NettyBlockTransferService: Server created on 172.16.99.138:40765
+26/10/15 00:11:16 INFO BlockManager: Using org.apache.spark.storage.RandomBlockReplicationPolicy for block replication policy
+26/10/15 00:11:16 INFO BlockManagerMaster: Registering BlockManager BlockManagerId(driver, 172.16.99.138, 40765, None)
+26/10/15 00:11:16 INFO BlockManagerMasterEndpoint: Registering block manager 172.16.99.138:40765 with 912.3 MiB RAM, BlockManagerId(driver, 172.16.99.138, 40765, None)
+26/10/15 00:11:16 INFO BlockManagerMaster: Registered BlockManager BlockManagerId(driver, 172.16.99.138, 40765, None)
+26/10/15 00:11:16 INFO BlockManager: Initialized BlockManager: BlockManagerId(driver, 172.16.99.138, 40765, None)
+26/10/15 00:11:16 INFO SingleEventLogFileWriter: Logging events to hdfs://localhost:9000/spark-logs/local-1791997876170.inprogress
+Mô hình: LogisticRegression | lưu lúc 2026-10-15T00:05:05 | Spark 3.5.9
+Nhãn: {0: 'negative', 1: 'neutral', 2: 'positive'} | macro-F1 test: 0.6233
+  [positive] negative=0.03, neutral=0.01, positive=0.96       | sạch: 'this movie was absolutely fantastic, i loved every minute of'
+  [negative] negative=0.96, neutral=0.03, positive=0.02       | sạch: 'boring, badly acted and way too long. i want my two hours ba'
+  [neutral ] negative=0.01, neutral=0.99, positive=0.00       | sạch: 'it was okay, nothing special. 6/10'
+  [neutral ] negative=0.08, neutral=0.80, positive=0.12       | sạch: 'not bad at all actually, quite enjoyable'
+  [positive] negative=0.07, neutral=0.07, positive=0.87       | sạch: 'i have never laughed more, 10/10 would watch again'

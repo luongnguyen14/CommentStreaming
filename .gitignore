@@ -17,6 +17,7 @@ logs/*
 !logs/task5_*.log
 !logs/task5_environment.txt
 !logs/task6_*.log
+!logs/task7_*.log
 
 # --- Môi trường / bí mật ---
 .venv/
@@ -37,3 +38,6 @@ templates/
 # --- Ghi chú ---
 # outputs/ ĐƯỢC commit: mọi con số trong báo cáo phải truy vết được về file thật.
 # Nhưng ảnh/CSV quá lớn thì cân nhắc Git LFS.
+
+# --- File checksum .crc của Hadoop (sinh tự động khi lưu model ra đĩa cục bộ) ---
+*.crc

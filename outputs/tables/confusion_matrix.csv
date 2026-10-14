@@ -1,0 +1,10 @@
+model,split,true_label,pred_label,count,row_share
+LogisticRegression,test,negative,negative,4626,0.6641780330222541
+LogisticRegression,test,negative,neutral,1625,0.23330940416367552
+LogisticRegression,test,negative,positive,714,0.10251256281407035
+LogisticRegression,test,neutral,negative,952,0.24708019724889696
+LogisticRegression,test,neutral,neutral,1934,0.5019465351674021
+LogisticRegression,test,neutral,positive,967,0.25097326758370103
+LogisticRegression,test,positive,negative,1218,0.07175680452456698
+LogisticRegression,test,positive,neutral,2812,0.16566513491221868
+LogisticRegression,test,positive,positive,12944,0.7625780605632143

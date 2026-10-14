@@ -3,8 +3,11 @@
 - `prepare.py` — nạp dữ liệu thô, chuyển sang JSONL (**tập con ~200 MB**), chuẩn hóa
   nhãn 3 lớp từ `rating`, làm sạch bằng hàm dùng chung, **loại trùng (kể cả gần trùng)**,
   rồi mới chia train/val/test; ghi parquet + nhãn test + các bảng thống kê (Task 6)
-- `train.py` — Spark ML Pipeline (RegexTokenizer -> StopWordsRemover -> n-gram ->
-  CountVectorizer -> IDF -> classifier) *(Task 7)*
+- `train.py` — Spark ML Pipeline (RegexTokenizer -> StopWordsRemover -> NGram ->
+  CountVectorizer -> IDF -> Normalizer -> bộ phân loại); huấn luyện 4 mô hình
+  (NaiveBayes, LogisticRegression, LinearSVC one-vs-rest, RandomForest) + baseline đa số,
+  chọn siêu tham số bằng `TrainValidationSplit` trong tập train, đánh giá trên
+  validation, **đánh giá cuối cùng một lần trên test**; xuất hình + bảng + metadata (Task 7)
 
 ⚠️ TF-IDF nằm **trong Pipeline** để chỉ fit trên tập train. Tập test **chỉ dùng một lần** ở cuối.
 ⚠️ Nhãn **không bao giờ** đi vào luồng Kafka — producer chỉ đọc `eval_labels.parquet` khi cần.
@@ -26,6 +29,48 @@ PYSPARK_DRIVER_PYTHON=$VENV_PY PYSPARK_PYTHON=$VENV_PY spark-submit \
 | `--sample N` | dùng ~N bản ghi (chạy thử); bỏ trống = dùng cả tập con trong `prepare.subsample_mod` |
 | `--method` | ghi đè `split.method` (`group_movie_balanced` hoặc `stratified`) |
 | `--config`, `--seed` | như tên gọi (mặc định `config.yaml`, seed 42) |
+
+## Cách chạy `train.py` (Task 7)
+
+```bash
+source scripts/env.sh
+# chạy thử — TỰ ĐỘNG bỏ qua tập test (--sample luôn kèm --no-test)
+PYSPARK_DRIVER_PYTHON=$VENV_PY PYSPARK_PYTHON=$VENV_PY spark-submit \
+    --driver-memory 2g --master 'local[2]' src/training/train.py --sample 20000
+# bản đầy đủ (~13 phút): chọn mô hình trên val, đánh giá test MỘT LẦN, lưu model
+PYSPARK_DRIVER_PYTHON=$VENV_PY PYSPARK_PYTHON=$VENV_PY spark-submit \
+    --driver-memory 2g --master 'local[2]' src/training/train.py
+# vẽ lại hình từ bảng đã lưu (không huấn luyện lại, không chạm test)
+$VENV_PY src/training/train.py --figures-only
+```
+
+| Tham số | Ý nghĩa |
+|---|---|
+| `--sample N` | chạy thử ~N dòng train (tất định theo `crc32`); **tự bật `--no-test`** |
+| `--models nb,lr,svc,rf` | chọn tập mô hình cần chạy |
+| `--no-test` | không đánh giá tập test (dùng khi thử nghiệm) |
+| `--figures-only` | chỉ vẽ lại hình từ `outputs/tables/*.csv` |
+| `--config`, `--seed` | như tên gọi |
+
+## Những điểm dễ sai khi huấn luyện (Task 7)
+
+1. **`array_position` trong PySpark chỉ nhận giá trị literal**, không nhận Column →
+   phải viết biểu thức bằng `F.expr("array_position(...)")` (dùng để lấy argmax của
+   `rawPrediction` cho LinearSVC).
+2. **`prediction` của `OneVsRest` với LinearSVC**: OneVsRest dùng ngưỡng 0.5 áp lên
+   điểm lề (margin) nên không đáng tin. Đã **đo thật**: trên 27.793 dòng val, cách của
+   Spark khớp `argmax(rawPrediction)` **100,00%** — nhưng code vẫn dùng argmax tường
+   minh để không phụ thuộc vào hành vi ngầm.
+3. **Bộ stopword tiếng Anh của Spark chứa `not`, `no`, `never`, `n't`** — bỏ hết là
+   mất tín hiệu phủ định; `training.keep_negations: true` giữ chúng lại.
+4. **Spark 3.5 không có evaluator macro-F1** cho Python → `TrainValidationSplit` chọn
+   theo weighted F1; **macro-F1 được tính riêng từ confusion matrix** và là chỉ số
+   dùng để so sánh mô hình trên tập validation.
+5. **`vector_to_array` + `element_at`** là cách lấy xác suất của lớp đúng (cột
+   `probability` là Vector, không phải mảng).
+6. **Chỉ số cao bất thường ⇒ dừng lại**: `training.leakage_threshold_macro_f1: 0.95`
+   — vượt ngưỡng thì script **không lưu mô hình**, ghi `outputs/tables/leakage_alert.txt`
+   và thoát mã 2.
 
 ## Những điểm dễ sai (đã gặp thật khi làm Task 6)
 

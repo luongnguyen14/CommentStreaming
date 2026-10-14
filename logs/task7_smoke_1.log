@@ -1,0 +1,67 @@
+26/10/14 23:48:44 WARN Utils: Your hostname, luongnguyen-VMware20-1 resolves to a loopback address: 127.0.1.1; using 172.16.99.138 instead (on interface ens160)
+26/10/14 23:48:44 WARN Utils: Set SPARK_LOCAL_IP if you need to bind to another address
+26/10/14 23:48:45 INFO SparkContext: Running Spark version 3.5.9
+26/10/14 23:48:45 INFO SparkContext: OS info Linux, 7.0.0-34-generic, aarch64
+26/10/14 23:48:45 INFO SparkContext: Java version 1.8.0_504
+26/10/14 23:48:45 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+26/10/14 23:48:45 INFO ResourceUtils: ==============================================================
+26/10/14 23:48:45 INFO ResourceUtils: No custom resources configured for spark.driver.
+26/10/14 23:48:45 INFO ResourceUtils: ==============================================================
+26/10/14 23:48:45 INFO SparkContext: Submitted application: capstone-task7-train
+26/10/14 23:48:46 INFO ResourceProfile: Default ResourceProfile created, executor resources: Map(cores -> name: cores, amount: 1, script: , vendor: , memory -> name: memory, amount: 1024, script: , vendor: , offHeap -> name: offHeap, amount: 0, script: , vendor: ), task resources: Map(cpus -> name: cpus, amount: 1.0)
+26/10/14 23:48:46 INFO ResourceProfile: Limiting resource is cpu
+26/10/14 23:48:46 INFO ResourceProfileManager: Added ResourceProfile id: 0
+26/10/14 23:48:46 INFO SecurityManager: Changing view acls to: hadoop
+26/10/14 23:48:46 INFO SecurityManager: Changing modify acls to: hadoop
+26/10/14 23:48:46 INFO SecurityManager: Changing view acls groups to: 
+26/10/14 23:48:46 INFO SecurityManager: Changing modify acls groups to: 
+26/10/14 23:48:46 INFO SecurityManager: SecurityManager: authentication disabled; ui acls disabled; users with view permissions: hadoop; groups with view permissions: EMPTY; users with modify permissions: hadoop; groups with modify permissions: EMPTY
+26/10/14 23:48:46 INFO Utils: Successfully started service 'sparkDriver' on port 36593.
+26/10/14 23:48:46 INFO SparkEnv: Registering MapOutputTracker
+26/10/14 23:48:46 INFO SparkEnv: Registering BlockManagerMaster
+26/10/14 23:48:46 INFO BlockManagerMasterEndpoint: Using org.apache.spark.storage.DefaultTopologyMapper for getting topology information
+26/10/14 23:48:46 INFO BlockManagerMasterEndpoint: BlockManagerMasterEndpoint up
+26/10/14 23:48:46 INFO SparkEnv: Registering BlockManagerMasterHeartbeat
+26/10/14 23:48:46 INFO DiskBlockManager: Created local directory at /home/hadoop/spark-tmp/blockmgr-b5334955-22c0-43d9-a5f7-ee29c922e376
+26/10/14 23:48:46 INFO MemoryStore: MemoryStore started with capacity 912.3 MiB
+26/10/14 23:48:46 INFO SparkEnv: Registering OutputCommitCoordinator
+26/10/14 23:48:46 INFO JettyUtils: Start Jetty 0.0.0.0:4040 for SparkUI
+26/10/14 23:48:46 INFO Utils: Successfully started service 'SparkUI' on port 4040.
+26/10/14 23:48:46 INFO Executor: Starting executor ID driver on host 172.16.99.138
+26/10/14 23:48:46 INFO Executor: OS info Linux, 7.0.0-34-generic, aarch64
+26/10/14 23:48:46 INFO Executor: Java version 1.8.0_504
+26/10/14 23:48:46 INFO Executor: Starting executor with user classpath (userClassPathFirst = false): ''
+26/10/14 23:48:46 INFO Executor: Created or updated repl class loader org.apache.spark.util.MutableURLClassLoader@319fb3e4 for default.
+26/10/14 23:48:46 INFO Utils: Successfully started service 'org.apache.spark.network.netty.NettyBlockTransferService' on port 33827.
+26/10/14 23:48:46 INFO NettyBlockTransferService: Server created on 172.16.99.138:33827
+26/10/14 23:48:46 INFO BlockManager: Using org.apache.spark.storage.RandomBlockReplicationPolicy for block replication policy
+26/10/14 23:48:46 INFO BlockManagerMaster: Registering BlockManager BlockManagerId(driver, 172.16.99.138, 33827, None)
+26/10/14 23:48:46 INFO BlockManagerMasterEndpoint: Registering block manager 172.16.99.138:33827 with 912.3 MiB RAM, BlockManagerId(driver, 172.16.99.138, 33827, None)
+26/10/14 23:48:46 INFO BlockManagerMaster: Registered BlockManager BlockManagerId(driver, 172.16.99.138, 33827, None)
+26/10/14 23:48:46 INFO BlockManager: Initialized BlockManager: BlockManagerId(driver, 172.16.99.138, 33827, None)
+26/10/14 23:48:47 INFO SingleEventLogFileWriter: Logging events to hdfs://localhost:9000/spark-logs/local-1791996526767.inprogress
+[23:48:47] Spark 3.5.9 | seed 42 | mô hình: nb,lr | CHẾ ĐỘ CHẠY THỬ
+[23:48:54] Dữ liệu: train 3,000 | val 2,000 | test (bỏ qua)
+[23:48:54] Trọng số lớp (tính trên tập train): lớp 0: 1.379 (n=725), lớp 1: 2.278 (n=439), lớp 2: 0.545 (n=1,836)
+[23:48:55] Kiểm tra rò rỉ (trùng văn bản sau chuẩn hóa): train↔val 0 | train↔test None | val↔test None
+[23:48:55] Stopword: 162 từ (giữ phủ định: True)
+[23:48:56] == MajorityBaseline: luôn đoán lớp positive ==
+[23:48:56]   Trên VALIDATION: acc 0.6305 | macro-F1 0.2578
+[23:48:56] == NaiveBayes: 2 tổ hợp siêu tham số ==
+[23:48:56]    - {'ngram': 1, 'smoothing': 1.0}
+[23:48:56]    - {'ngram': 2, 'smoothing': 1.0}
+[23:49:09]   TVS xong sau 12s | tốt nhất: n=1, smoothing=1 (weighted F1 nội bộ 0.6626)
+[23:49:09]   Trên VALIDATION: acc 0.6410 | macro-F1 0.5724 | weighted-F1 0.6716 | dự đoán 0.5s cho 2,000 dòng
+[23:49:09] == LogisticRegression: 4 tổ hợp siêu tham số ==
+[23:49:09]    - {'ngram': 1, 'reg_param': 0.01, 'max_iter': 20, 'elastic_net': 0.0}
+[23:49:09]    - {'ngram': 1, 'reg_param': 0.1, 'max_iter': 20, 'elastic_net': 0.0}
+[23:49:09]    - {'ngram': 2, 'reg_param': 0.01, 'max_iter': 20, 'elastic_net': 0.0}
+[23:49:09]    - {'ngram': 2, 'reg_param': 0.1, 'max_iter': 20, 'elastic_net': 0.0}
+[23:49:24]   TVS xong sau 15s | tốt nhất: elasticNetParam=0, maxIter=20, n=1, regParam=0.01 (weighted F1 nội bộ 0.6721)
+[23:49:25]   Trên VALIDATION: acc 0.6725 | macro-F1 0.5245 | weighted-F1 0.6566 | dự đoán 0.4s cho 2,000 dòng
+[23:49:25] Xếp hạng trên validation (macro-F1): NaiveBayes 0.5724 | LogisticRegression 0.5245 | MajorityBaseline 0.2578
+[23:49:25] Mô hình chọn: NaiveBayes (n=1, smoothing=1)
+Authorization required, but no authorization protocol specified
+
+[23:49:26] Bỏ qua lưu mô hình (--no-test = chế độ chạy thử)
+[23:49:26] HOÀN TẤT.

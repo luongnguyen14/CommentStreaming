@@ -1,0 +1,65 @@
+{
+  "model_name": "LogisticRegression",
+  "model_slug": "lr",
+  "saved_at": "2026-10-15T00:05:05",
+  "spark_version": "3.5.9",
+  "seed": 42,
+  "label_index": {
+    "negative": 0,
+    "neutral": 1,
+    "positive": 2
+  },
+  "label_source": "nhãn suy từ rating IMDb (1-4 negative / 5-6 neutral / 7-10 positive)",
+  "best_params": {
+    "n": 1.0,
+    "regParam": 0.1,
+    "maxIter": 20.0,
+    "elasticNetParam": 0.0
+  },
+  "vectorizer": {
+    "vocab_size": 20000,
+    "min_df": 3.0,
+    "ngram": 1,
+    "normalize_l2": true,
+    "stopwords": 162,
+    "keep_negations": true
+  },
+  "class_weights": "balanced",
+  "sizes": {
+    "train": 129701,
+    "val": 27793,
+    "test": 27792
+  },
+  "metrics": {
+    "val": {
+      "accuracy": 0.7062929514625985,
+      "macro_f1": 0.6290775045257361,
+      "weighted_f1": 0.7241285057252925,
+      "n": 27793
+    },
+    "test": {
+      "accuracy": 0.7017846862406448,
+      "macro_f1": 0.6233089334914862,
+      "weighted_f1": 0.721312928369018,
+      "n": 27792
+    }
+  },
+  "input_columns": [
+    "text"
+  ],
+  "text_column": "text",
+  "pipeline_stages": [
+    "RegexTokenizer",
+    "StopWordsRemover",
+    "NGram",
+    "CountVectorizerModel",
+    "IDFModel",
+    "Normalizer",
+    "LogisticRegressionModel"
+  ],
+  "notes": [
+    "Dự đoán trả về chỉ số lớp 0/1/2 — dịch sang tên lớp bằng label_index.",
+    "SVC không có cột probability; LR/NB/RF có.",
+    "Văn bản phải được làm sạch bằng src/common/text_cleaning.py trước khi đưa vào model."
+  ]
+}

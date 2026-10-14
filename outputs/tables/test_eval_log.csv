@@ -1,0 +1,2 @@
+timestamp,model,params,n_test,accuracy,macro_f1,weighted_f1,sample_mode,note
+2026-10-15T00:05:02,LogisticRegression,"elasticNetParam=0, maxIter=20, n=1, regParam=0.1",27792,0.7017846862406448,0.6233089334914862,0.721312928369018,False,đánh giá cuối cùng (Task 7)

@@ -27,6 +27,12 @@ labels:
     negative: [1, 2, 3, 4]
     neutral:  [5, 6]
     positive: [7, 8, 9, 10]
+  # Chỉ số lớp dùng trong Spark ML (bộ phân loại cần nhãn dạng số) và trong
+  # metadata của PipelineModel đã lưu — streaming đọc lại để dịch số -> tên lớp.
+  index:
+    negative: 0
+    neutral: 1
+    positive: 2
 
 # ---------------------------------------------------------------------------
 # Làm sạch văn bản (src/common/text_cleaning.py) — DÙNG CHUNG cho huấn luyện
@@ -86,6 +92,55 @@ prepare:
   subsample_mod: 5
   sample_rows_out: 1000       # số dòng mẫu ghi ra outputs/tables/clean_sample.csv
   emoji_top_n: 30             # số emoji phổ biến nhất ghi ra outputs/tables/emoji_frequency.csv
+
+# ---------------------------------------------------------------------------
+# Huấn luyện + đánh giá (Task 7) — src/training/train.py
+# ---------------------------------------------------------------------------
+training:
+  # Vector hóa NẰM TRONG Pipeline để TF-IDF chỉ học trên tập train (CLAUDE.md §6).
+  vectorizer:
+    vocab_size: 20000     # số từ/ngram giữ lại (chọn theo tần suất tài liệu)
+    min_df: 3             # bỏ từ/ngram xuất hiện ở dưới 3 tài liệu
+  normalize_l2: true      # chuẩn hóa L2 vector TF-IDF (giúp LR/SVC hội tụ nhanh)
+  # Bộ stopword tiếng Anh của Spark có sẵn "not/no/never/n't..." — với bài toán
+  # cảm xúc, bỏ chúng là mất tín hiệu ("not good" trái nghĩa "good"), nên giữ lại.
+  keep_negations: true
+  stopwords_extra: []     # thêm stopword ngoài danh sách mặc định (nếu cần)
+  class_weights: balanced # w_c = N / (k * n_c), tính TRÊN TẬP TRAIN
+  # Chọn siêu tham số: TrainValidationSplit bên TRONG tập train (không nhìn val/test)
+  tvs:
+    train_ratio: 0.8
+    metric: f1            # weighted F1 — Spark 3.5 không có evaluator macro-F1
+  # Lưới siêu tham số từng mô hình (tổ hợp = tích các danh sách con).
+  # Thử cả 1-gram và 1-2 gram qua tham số `ngram` (khớp task: "thử cả 1-gram và 1-2 gram").
+  grids:
+    nb:
+      ngram: [1, 2]
+      smoothing: [1.0]
+    lr:
+      ngram: [1, 2]
+      reg_param: [0.01, 0.1]
+      max_iter: [20]
+      elastic_net: [0.0]
+    svc:
+      ngram: [1]
+      reg_param: [0.01, 0.1]
+      max_iter: [20]
+    rf:
+      ngram: [1]
+      vocab_size: [5000]  # RF trên 20k đặc trưng thưa rất chậm, không đáng
+      num_trees: [30]
+      max_depth: [8, 12]
+  top_features_n: 20      # số từ có trọng số lớn nhất mỗi lớp ghi ra bảng/hình
+  error_n: 30             # số bình luận dự đoán sai lấy ra phân tích lỗi
+  model_out: outputs/models/sentiment_pipeline
+  leakage_threshold_macro_f1: 0.95   # vượt ngưỡng này -> dừng, nghi rò rỉ (task 7.6)
+  # Ngưỡng cho các quy tắc gán nhóm nguyên nhân trong error_analysis.csv
+  error_rules:
+    short_chars: 80
+    sarcasm_markers: ["yeah right", "oh sure", "just great", "how original", "sure thing", "go figure", "wow just wow"]
+    negation_markers: ["not", "n't", "no", "never", "nothing", "nobody", "without", "hardly", "barely"]
+    contrast_markers: ["but", "however", "although", "though", "yet", "unfortunately", "except"]
 
 kafka:
   bootstrap_servers: localhost:9092

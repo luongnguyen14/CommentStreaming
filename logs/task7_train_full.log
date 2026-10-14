@@ -1,0 +1,200 @@
+26/10/14 23:51:42 WARN Utils: Your hostname, luongnguyen-VMware20-1 resolves to a loopback address: 127.0.1.1; using 172.16.99.138 instead (on interface ens160)
+26/10/14 23:51:42 WARN Utils: Set SPARK_LOCAL_IP if you need to bind to another address
+26/10/14 23:51:43 INFO SparkContext: Running Spark version 3.5.9
+26/10/14 23:51:43 INFO SparkContext: OS info Linux, 7.0.0-34-generic, aarch64
+26/10/14 23:51:43 INFO SparkContext: Java version 1.8.0_504
+26/10/14 23:51:43 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+26/10/14 23:51:43 INFO ResourceUtils: ==============================================================
+26/10/14 23:51:43 INFO ResourceUtils: No custom resources configured for spark.driver.
+26/10/14 23:51:43 INFO ResourceUtils: ==============================================================
+26/10/14 23:51:43 INFO SparkContext: Submitted application: capstone-task7-train
+26/10/14 23:51:43 INFO ResourceProfile: Default ResourceProfile created, executor resources: Map(cores -> name: cores, amount: 1, script: , vendor: , memory -> name: memory, amount: 1024, script: , vendor: , offHeap -> name: offHeap, amount: 0, script: , vendor: ), task resources: Map(cpus -> name: cpus, amount: 1.0)
+26/10/14 23:51:43 INFO ResourceProfile: Limiting resource is cpu
+26/10/14 23:51:43 INFO ResourceProfileManager: Added ResourceProfile id: 0
+26/10/14 23:51:43 INFO SecurityManager: Changing view acls to: hadoop
+26/10/14 23:51:43 INFO SecurityManager: Changing modify acls to: hadoop
+26/10/14 23:51:43 INFO SecurityManager: Changing view acls groups to: 
+26/10/14 23:51:43 INFO SecurityManager: Changing modify acls groups to: 
+26/10/14 23:51:43 INFO SecurityManager: SecurityManager: authentication disabled; ui acls disabled; users with view permissions: hadoop; groups with view permissions: EMPTY; users with modify permissions: hadoop; groups with modify permissions: EMPTY
+26/10/14 23:51:44 INFO Utils: Successfully started service 'sparkDriver' on port 46771.
+26/10/14 23:51:44 INFO SparkEnv: Registering MapOutputTracker
+26/10/14 23:51:44 INFO SparkEnv: Registering BlockManagerMaster
+26/10/14 23:51:44 INFO BlockManagerMasterEndpoint: Using org.apache.spark.storage.DefaultTopologyMapper for getting topology information
+26/10/14 23:51:44 INFO BlockManagerMasterEndpoint: BlockManagerMasterEndpoint up
+26/10/14 23:51:44 INFO SparkEnv: Registering BlockManagerMasterHeartbeat
+26/10/14 23:51:44 INFO DiskBlockManager: Created local directory at /home/hadoop/spark-tmp/blockmgr-df14f461-a326-452b-b344-d93cf9ebf94b
+26/10/14 23:51:44 INFO MemoryStore: MemoryStore started with capacity 912.3 MiB
+26/10/14 23:51:44 INFO SparkEnv: Registering OutputCommitCoordinator
+26/10/14 23:51:44 INFO JettyUtils: Start Jetty 0.0.0.0:4040 for SparkUI
+26/10/14 23:51:44 INFO Utils: Successfully started service 'SparkUI' on port 4040.
+26/10/14 23:51:44 INFO Executor: Starting executor ID driver on host 172.16.99.138
+26/10/14 23:51:44 INFO Executor: OS info Linux, 7.0.0-34-generic, aarch64
+26/10/14 23:51:44 INFO Executor: Java version 1.8.0_504
+26/10/14 23:51:44 INFO Executor: Starting executor with user classpath (userClassPathFirst = false): ''
+26/10/14 23:51:44 INFO Executor: Created or updated repl class loader org.apache.spark.util.MutableURLClassLoader@5b79a1f for default.
+26/10/14 23:51:44 INFO Utils: Successfully started service 'org.apache.spark.network.netty.NettyBlockTransferService' on port 34409.
+26/10/14 23:51:44 INFO NettyBlockTransferService: Server created on 172.16.99.138:34409
+26/10/14 23:51:44 INFO BlockManager: Using org.apache.spark.storage.RandomBlockReplicationPolicy for block replication policy
+26/10/14 23:51:44 INFO BlockManagerMaster: Registering BlockManager BlockManagerId(driver, 172.16.99.138, 34409, None)
+26/10/14 23:51:44 INFO BlockManagerMasterEndpoint: Registering block manager 172.16.99.138:34409 with 912.3 MiB RAM, BlockManagerId(driver, 172.16.99.138, 34409, None)
+26/10/14 23:51:44 INFO BlockManagerMaster: Registered BlockManager BlockManagerId(driver, 172.16.99.138, 34409, None)
+26/10/14 23:51:44 INFO BlockManager: Initialized BlockManager: BlockManagerId(driver, 172.16.99.138, 34409, None)
+26/10/14 23:51:45 INFO SingleEventLogFileWriter: Logging events to hdfs://localhost:9000/spark-logs/local-1791996704662.inprogress
+[23:51:45] Spark 3.5.9 | seed 42 | mô hình: nb,lr,svc,rf
+[23:51:52] Dữ liệu: train 129,701 | val 27,793 | test 27,792
+[23:51:53] Trọng số lớp (tính trên tập train): lớp 0: 1.330 (n=32,504), lớp 1: 2.404 (n=17,983), lớp 2: 0.546 (n=79,214)
+[23:52:10] Kiểm tra rò rỉ (trùng văn bản sau chuẩn hóa): train↔val 0 | train↔test 0 | val↔test 0
+[23:52:10] Stopword: 162 từ (giữ phủ định: True)
+[23:52:11] == MajorityBaseline: luôn đoán lớp positive ==
+[23:52:11]   Trên VALIDATION: acc 0.6107 | macro-F1 0.2528
+[23:52:11] == NaiveBayes: 2 tổ hợp siêu tham số ==
+[23:52:11]    - {'ngram': 1, 'smoothing': 1.0}
+[23:52:11]    - {'ngram': 2, 'smoothing': 1.0}
+26/10/14 23:52:40 WARN DAGScheduler: Broadcasting large task binary with size 1091.9 KiB
+26/10/14 23:53:28 WARN DAGScheduler: Broadcasting large task binary with size 1178.5 KiB
+[23:54:00]   TVS xong sau 108s | tốt nhất: n=1, smoothing=1 (weighted F1 nội bộ 0.7206)
+26/10/14 23:54:00 WARN DAGScheduler: Broadcasting large task binary with size 1071.3 KiB
+[23:54:03]   Trên VALIDATION: acc 0.6743 | macro-F1 0.6192 | weighted-F1 0.7013 | dự đoán 3.0s cho 27,793 dòng
+[23:54:03] == LogisticRegression: 4 tổ hợp siêu tham số ==
+[23:54:03]    - {'ngram': 1, 'reg_param': 0.01, 'max_iter': 20, 'elastic_net': 0.0}
+[23:54:03]    - {'ngram': 1, 'reg_param': 0.1, 'max_iter': 20, 'elastic_net': 0.0}
+[23:54:03]    - {'ngram': 2, 'reg_param': 0.01, 'max_iter': 20, 'elastic_net': 0.0}
+[23:54:03]    - {'ngram': 2, 'reg_param': 0.1, 'max_iter': 20, 'elastic_net': 0.0}
+26/10/14 23:54:45 WARN DAGScheduler: Broadcasting large task binary with size 1096.5 KiB
+26/10/14 23:55:29 WARN DAGScheduler: Broadcasting large task binary with size 1096.5 KiB
+26/10/14 23:56:33 WARN DAGScheduler: Broadcasting large task binary with size 1183.1 KiB
+26/10/14 23:57:24 WARN DAGScheduler: Broadcasting large task binary with size 1183.1 KiB
+[23:58:09]   TVS xong sau 245s | tốt nhất: elasticNetParam=0, maxIter=20, n=1, regParam=0.1 (weighted F1 nội bộ 0.7370)
+26/10/14 23:58:09 WARN DAGScheduler: Broadcasting large task binary with size 1075.9 KiB
+[23:58:11]   Trên VALIDATION: acc 0.7063 | macro-F1 0.6291 | weighted-F1 0.7241 | dự đoán 2.6s cho 27,793 dòng
+[23:58:11] == LinearSVC(OvR): 2 tổ hợp siêu tham số ==
+[23:58:11]    - {'ngram': 1, 'reg_param': 0.01, 'max_iter': 20}
+[23:58:11]    - {'ngram': 1, 'reg_param': 0.1, 'max_iter': 20}
+26/10/14 23:58:48 WARN DAGScheduler: Broadcasting large task binary with size 1112.1 KiB
+26/10/14 23:59:25 WARN DAGScheduler: Broadcasting large task binary with size 1112.1 KiB
+[00:00:08]   TVS xong sau 116s | tốt nhất: maxIter=20, n=1, regParam=0.1 (weighted F1 nội bộ 0.7293)
+26/10/15 00:00:08 WARN DAGScheduler: Broadcasting large task binary with size 1109.5 KiB
+[00:00:13]   SVC: prediction của OneVsRest khớp argmax(rawPrediction) ở 100.00% dòng -> dùng argmax
+[00:00:13]   Trên VALIDATION: acc 0.7000 | macro-F1 0.6218 | weighted-F1 0.7172 | dự đoán 4.8s cho 27,793 dòng
+[00:00:13] == RandomForest: 2 tổ hợp siêu tham số ==
+[00:00:13]    - {'ngram': 1, 'vocab_size': 5000, 'num_trees': 30, 'max_depth': 8}
+[00:00:13]    - {'ngram': 1, 'vocab_size': 5000, 'num_trees': 30, 'max_depth': 12}
+26/10/15 00:00:44 WARN DAGScheduler: Broadcasting large task binary with size 1407.2 KiB
+26/10/15 00:00:49 WARN MemoryStore: Not enough space to cache rdd_1604_1 in memory! (computed 346.9 MiB so far)
+26/10/15 00:00:49 WARN MemoryStore: Not enough space to cache rdd_1604_0 in memory! (computed 346.9 MiB so far)
+26/10/15 00:00:49 WARN BlockManager: Persisting block rdd_1604_0 to disk instead.
+26/10/15 00:00:49 WARN BlockManager: Persisting block rdd_1604_1 to disk instead.
+26/10/15 00:01:02 WARN MemoryStore: Not enough space to cache rdd_1604_1 in memory! (computed 346.9 MiB so far)
+26/10/15 00:01:04 WARN MemoryStore: Not enough space to cache rdd_1604_0 in memory! (computed 781.6 MiB so far)
+26/10/15 00:01:09 WARN DAGScheduler: Broadcasting large task binary with size 1425.8 KiB
+26/10/15 00:01:11 WARN MemoryStore: Not enough space to cache rdd_1604_1 in memory! (computed 346.9 MiB so far)
+26/10/15 00:01:12 WARN MemoryStore: Not enough space to cache rdd_1604_0 in memory! (computed 781.6 MiB so far)
+26/10/15 00:01:13 WARN DAGScheduler: Broadcasting large task binary with size 1459.3 KiB
+26/10/15 00:01:14 WARN MemoryStore: Not enough space to cache rdd_1604_0 in memory! (computed 346.9 MiB so far)
+26/10/15 00:01:15 WARN MemoryStore: Not enough space to cache rdd_1604_1 in memory! (computed 520.7 MiB so far)
+26/10/15 00:01:16 WARN DAGScheduler: Broadcasting large task binary with size 1517.7 KiB
+26/10/15 00:01:17 WARN MemoryStore: Not enough space to cache rdd_1604_1 in memory! (computed 346.9 MiB so far)
+26/10/15 00:01:17 WARN MemoryStore: Not enough space to cache rdd_1604_0 in memory! (computed 520.7 MiB so far)
+26/10/15 00:01:18 WARN DAGScheduler: Broadcasting large task binary with size 1612.2 KiB
+26/10/15 00:01:19 WARN MemoryStore: Not enough space to cache rdd_1604_1 in memory! (computed 346.9 MiB so far)
+26/10/15 00:01:19 WARN MemoryStore: Not enough space to cache rdd_1604_0 in memory! (computed 520.7 MiB so far)
+26/10/15 00:01:21 WARN DAGScheduler: Broadcasting large task binary with size 1754.2 KiB
+26/10/15 00:01:22 WARN MemoryStore: Not enough space to cache rdd_1604_0 in memory! (computed 346.9 MiB so far)
+26/10/15 00:01:22 WARN MemoryStore: Not enough space to cache rdd_1604_1 in memory! (computed 520.7 MiB so far)
+26/10/15 00:01:24 WARN DAGScheduler: Broadcasting large task binary with size 1955.3 KiB
+26/10/15 00:01:25 WARN MemoryStore: Not enough space to cache rdd_1604_0 in memory! (computed 346.9 MiB so far)
+26/10/15 00:01:25 WARN MemoryStore: Not enough space to cache rdd_1604_1 in memory! (computed 520.7 MiB so far)
+26/10/15 00:01:27 WARN DAGScheduler: Broadcasting large task binary with size 2.2 MiB
+26/10/15 00:01:28 WARN MemoryStore: Not enough space to cache rdd_1604_0 in memory! (computed 346.9 MiB so far)
+26/10/15 00:01:29 WARN MemoryStore: Not enough space to cache rdd_1604_1 in memory! (computed 520.7 MiB so far)
+26/10/15 00:02:04 WARN DAGScheduler: Broadcasting large task binary with size 1407.2 KiB
+26/10/15 00:02:09 WARN MemoryStore: Not enough space to cache rdd_1706_1 in memory! (computed 346.9 MiB so far)
+26/10/15 00:02:09 WARN BlockManager: Persisting block rdd_1706_1 to disk instead.
+26/10/15 00:02:09 WARN MemoryStore: Not enough space to cache rdd_1706_0 in memory! (computed 346.9 MiB so far)
+26/10/15 00:02:09 WARN BlockManager: Persisting block rdd_1706_0 to disk instead.
+26/10/15 00:02:19 WARN MemoryStore: Not enough space to cache rdd_1706_1 in memory! (computed 520.7 MiB so far)
+26/10/15 00:02:19 WARN MemoryStore: Not enough space to cache rdd_1706_0 in memory! (computed 346.9 MiB so far)
+26/10/15 00:02:20 WARN DAGScheduler: Broadcasting large task binary with size 1425.8 KiB
+26/10/15 00:02:21 WARN MemoryStore: Not enough space to cache rdd_1706_1 in memory! (computed 346.9 MiB so far)
+26/10/15 00:02:22 WARN MemoryStore: Not enough space to cache rdd_1706_0 in memory! (computed 520.7 MiB so far)
+26/10/15 00:02:23 WARN DAGScheduler: Broadcasting large task binary with size 1459.3 KiB
+26/10/15 00:02:24 WARN MemoryStore: Not enough space to cache rdd_1706_0 in memory! (computed 346.9 MiB so far)
+26/10/15 00:02:24 WARN MemoryStore: Not enough space to cache rdd_1706_1 in memory! (computed 520.7 MiB so far)
+26/10/15 00:02:25 WARN DAGScheduler: Broadcasting large task binary with size 1517.7 KiB
+26/10/15 00:02:26 WARN MemoryStore: Not enough space to cache rdd_1706_1 in memory! (computed 346.9 MiB so far)
+26/10/15 00:02:26 WARN MemoryStore: Not enough space to cache rdd_1706_0 in memory! (computed 520.7 MiB so far)
+26/10/15 00:02:28 WARN DAGScheduler: Broadcasting large task binary with size 1612.2 KiB
+26/10/15 00:02:29 WARN MemoryStore: Not enough space to cache rdd_1706_0 in memory! (computed 346.9 MiB so far)
+26/10/15 00:02:29 WARN MemoryStore: Not enough space to cache rdd_1706_1 in memory! (computed 520.7 MiB so far)
+26/10/15 00:02:31 WARN DAGScheduler: Broadcasting large task binary with size 1754.2 KiB
+26/10/15 00:02:32 WARN MemoryStore: Not enough space to cache rdd_1706_0 in memory! (computed 346.9 MiB so far)
+26/10/15 00:02:32 WARN MemoryStore: Not enough space to cache rdd_1706_1 in memory! (computed 520.7 MiB so far)
+26/10/15 00:02:34 WARN DAGScheduler: Broadcasting large task binary with size 1955.3 KiB
+26/10/15 00:02:35 WARN MemoryStore: Not enough space to cache rdd_1706_1 in memory! (computed 346.9 MiB so far)
+26/10/15 00:02:36 WARN MemoryStore: Not enough space to cache rdd_1706_0 in memory! (computed 520.7 MiB so far)
+26/10/15 00:02:38 WARN DAGScheduler: Broadcasting large task binary with size 2.2 MiB
+26/10/15 00:02:39 WARN MemoryStore: Not enough space to cache rdd_1706_0 in memory! (computed 346.9 MiB so far)
+26/10/15 00:02:39 WARN MemoryStore: Not enough space to cache rdd_1706_1 in memory! (computed 520.7 MiB so far)
+26/10/15 00:02:42 WARN DAGScheduler: Broadcasting large task binary with size 2.5 MiB
+26/10/15 00:02:43 WARN MemoryStore: Not enough space to cache rdd_1706_0 in memory! (computed 346.9 MiB so far)
+26/10/15 00:02:43 WARN MemoryStore: Not enough space to cache rdd_1706_1 in memory! (computed 520.7 MiB so far)
+26/10/15 00:02:46 WARN DAGScheduler: Broadcasting large task binary with size 3.0 MiB
+26/10/15 00:02:47 WARN MemoryStore: Not enough space to cache rdd_1706_1 in memory! (computed 346.9 MiB so far)
+26/10/15 00:02:47 WARN MemoryStore: Not enough space to cache rdd_1706_0 in memory! (computed 520.7 MiB so far)
+26/10/15 00:02:52 WARN DAGScheduler: Broadcasting large task binary with size 3.5 MiB
+26/10/15 00:02:53 WARN MemoryStore: Not enough space to cache rdd_1706_0 in memory! (computed 346.9 MiB so far)
+26/10/15 00:02:54 WARN MemoryStore: Not enough space to cache rdd_1706_1 in memory! (computed 520.7 MiB so far)
+26/10/15 00:02:59 WARN DAGScheduler: Broadcasting large task binary with size 4.1 MiB
+26/10/15 00:02:59 WARN MemoryStore: Not enough space to cache rdd_1706_0 in memory! (computed 346.9 MiB so far)
+26/10/15 00:03:00 WARN MemoryStore: Not enough space to cache rdd_1706_1 in memory! (computed 520.7 MiB so far)
+26/10/15 00:03:05 WARN DAGScheduler: Broadcasting large task binary with size 1863.7 KiB
+26/10/15 00:03:45 WARN DAGScheduler: Broadcasting large task binary with size 1410.9 KiB
+26/10/15 00:03:50 WARN MemoryStore: Not enough space to cache rdd_1814_1 in memory! (computed 346.9 MiB so far)
+26/10/15 00:03:50 WARN BlockManager: Persisting block rdd_1814_1 to disk instead.
+26/10/15 00:03:50 WARN MemoryStore: Not enough space to cache rdd_1814_0 in memory! (computed 346.9 MiB so far)
+26/10/15 00:03:50 WARN BlockManager: Persisting block rdd_1814_0 to disk instead.
+26/10/15 00:04:02 WARN MemoryStore: Not enough space to cache rdd_1814_0 in memory! (computed 98.0 MiB so far)
+26/10/15 00:04:02 WARN MemoryStore: Not enough space to cache rdd_1814_1 in memory! (computed 781.6 MiB so far)
+26/10/15 00:04:04 WARN DAGScheduler: Broadcasting large task binary with size 1429.4 KiB
+26/10/15 00:04:05 WARN MemoryStore: Not enough space to cache rdd_1814_0 in memory! (computed 346.9 MiB so far)
+26/10/15 00:04:06 WARN MemoryStore: Not enough space to cache rdd_1814_1 in memory! (computed 520.7 MiB so far)
+26/10/15 00:04:07 WARN DAGScheduler: Broadcasting large task binary with size 1463.6 KiB
+26/10/15 00:04:09 WARN MemoryStore: Not enough space to cache rdd_1814_0 in memory! (computed 346.9 MiB so far)
+26/10/15 00:04:09 WARN MemoryStore: Not enough space to cache rdd_1814_1 in memory! (computed 520.7 MiB so far)
+26/10/15 00:04:11 WARN DAGScheduler: Broadcasting large task binary with size 1525.4 KiB
+26/10/15 00:04:12 WARN MemoryStore: Not enough space to cache rdd_1814_0 in memory! (computed 346.9 MiB so far)
+26/10/15 00:04:12 WARN MemoryStore: Not enough space to cache rdd_1814_1 in memory! (computed 520.7 MiB so far)
+26/10/15 00:04:14 WARN DAGScheduler: Broadcasting large task binary with size 1627.3 KiB
+26/10/15 00:04:15 WARN MemoryStore: Not enough space to cache rdd_1814_0 in memory! (computed 346.9 MiB so far)
+26/10/15 00:04:15 WARN MemoryStore: Not enough space to cache rdd_1814_1 in memory! (computed 520.7 MiB so far)
+26/10/15 00:04:17 WARN DAGScheduler: Broadcasting large task binary with size 1783.7 KiB
+26/10/15 00:04:18 WARN MemoryStore: Not enough space to cache rdd_1814_1 in memory! (computed 346.9 MiB so far)
+26/10/15 00:04:18 WARN MemoryStore: Not enough space to cache rdd_1814_0 in memory! (computed 520.7 MiB so far)
+26/10/15 00:04:21 WARN DAGScheduler: Broadcasting large task binary with size 2006.7 KiB
+26/10/15 00:04:22 WARN MemoryStore: Not enough space to cache rdd_1814_0 in memory! (computed 346.9 MiB so far)
+26/10/15 00:04:22 WARN MemoryStore: Not enough space to cache rdd_1814_1 in memory! (computed 520.7 MiB so far)
+26/10/15 00:04:25 WARN DAGScheduler: Broadcasting large task binary with size 2.3 MiB
+26/10/15 00:04:26 WARN MemoryStore: Not enough space to cache rdd_1814_0 in memory! (computed 346.9 MiB so far)
+26/10/15 00:04:27 WARN MemoryStore: Not enough space to cache rdd_1814_1 in memory! (computed 520.7 MiB so far)
+26/10/15 00:04:30 WARN DAGScheduler: Broadcasting large task binary with size 2.7 MiB
+26/10/15 00:04:31 WARN MemoryStore: Not enough space to cache rdd_1814_1 in memory! (computed 346.9 MiB so far)
+26/10/15 00:04:31 WARN MemoryStore: Not enough space to cache rdd_1814_0 in memory! (computed 520.7 MiB so far)
+26/10/15 00:04:36 WARN DAGScheduler: Broadcasting large task binary with size 3.1 MiB
+26/10/15 00:04:36 WARN MemoryStore: Not enough space to cache rdd_1814_0 in memory! (computed 346.9 MiB so far)
+26/10/15 00:04:37 WARN MemoryStore: Not enough space to cache rdd_1814_1 in memory! (computed 520.7 MiB so far)
+26/10/15 00:04:41 WARN DAGScheduler: Broadcasting large task binary with size 3.7 MiB
+26/10/15 00:04:42 WARN MemoryStore: Not enough space to cache rdd_1814_1 in memory! (computed 346.9 MiB so far)
+26/10/15 00:04:43 WARN MemoryStore: Not enough space to cache rdd_1814_0 in memory! (computed 520.7 MiB so far)
+26/10/15 00:04:48 WARN DAGScheduler: Broadcasting large task binary with size 4.4 MiB
+26/10/15 00:04:49 WARN MemoryStore: Not enough space to cache rdd_1814_1 in memory! (computed 346.9 MiB so far)
+26/10/15 00:04:49 WARN MemoryStore: Not enough space to cache rdd_1814_0 in memory! (computed 520.7 MiB so far)
+[00:04:56]   TVS xong sau 282s | tốt nhất: maxDepth=12, n=1, numTrees=30, vocabSize=5000 (weighted F1 nội bộ 0.6315)
+26/10/15 00:04:56 WARN DAGScheduler: Broadcasting large task binary with size 2030.2 KiB
+[00:04:59]   Trên VALIDATION: acc 0.5878 | macro-F1 0.5343 | weighted-F1 0.6131 | dự đoán 2.8s cho 27,793 dòng
+[00:04:59] Xếp hạng trên validation (macro-F1): LogisticRegression 0.6291 | LinearSVC(OvR) 0.6218 | NaiveBayes 0.6192 | RandomForest 0.5343 | MajorityBaseline 0.2528
+[00:04:59] Mô hình chọn: LogisticRegression (elasticNetParam=0, maxIter=20, n=1, regParam=0.1)
+26/10/15 00:04:59 WARN DAGScheduler: Broadcasting large task binary with size 1064.7 KiB
+[00:05:02] == TEST (dùng một lần): LogisticRegression | acc 0.7018 | macro-F1 0.6233 | weighted-F1 0.7213 | 2.8s cho 27,792 dòng ==
+[00:05:06] Đã lưu PipelineModel: /home/hadoop/capstone/outputs/models/sentiment_pipeline
+[00:05:06] Đã lưu metadata: /home/hadoop/capstone/outputs/models/sentiment_pipeline_metadata.json
+[00:05:07] HOÀN TẤT.
