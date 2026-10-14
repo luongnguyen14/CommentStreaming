@@ -24,3 +24,13 @@ CSV do code sinh ra. **Mọi con số trong báo cáo/slide phải lấy từ c�
 | `leak_check.json` | Số văn bản trùng nhau giữa các tập (kỳ vọng 0) |
 | `test_eval_log.csv` | **Nhật ký mọi lần chạm tập test** — quy tắc "test dùng một lần" (CLAUDE.md §6) |
 | `leakage_alert.txt` | Chỉ xuất hiện nếu macro-F1 vượt ngưỡng nghi rò rỉ (hiện **không có**) |
+
+## Task 8 (streaming)
+
+| File | Nội dung |
+|---|---|
+| `stream_batches.csv` | Mỗi micro-batch của mỗi query một dòng (do `StreamingQueryListener` ghi): số bản ghi vào, tốc độ, thời gian trigger, `num_rows_dropped_by_watermark`, số phần tử state — lọc theo cột `run_name` |
+| `stream_verification.csv` | Kết quả đối chiếu của `verify_stream.py`: `chấm điểm + DLQ = đã gửi`, đếm message Kafka theo chênh lệch offset, chỉ số trên luồng vs offline, độ trễ, watermark |
+| `stream_per_class_metrics.csv` | P/R/F1/support từng lớp, ba phạm vi: `stream`, `offline_same_ids`, `offline_full_test` |
+| `stream_sample_rows.csv` | 20 dòng mẫu (ẩn danh: không có văn bản gốc, chỉ `text_len`) |
+| `stream_dlq_rows.csv` | Từng bản ghi DLQ: `comment_id`, lý do, partition + offset Kafka để truy vết |

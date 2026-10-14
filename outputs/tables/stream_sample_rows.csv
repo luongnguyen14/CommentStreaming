@@ -1,0 +1,21 @@
+comment_id,true_label,pred_label,confidence,latency_ms,kafka_latency_ms,queue_latency_ms,text_len,event_time,stream_id,kafka_partition,kafka_offset
+rw5706237,neutral,positive,0.8009,2770,0,2770,186,2026-10-14 18:08:42.260000,Mrs. Serial Killer (2020),2,2732
+rw5707251,positive,positive,0.55,1960,0,1960,165,2026-10-14 18:08:43.070000,Mrs. Serial Killer (2020),0,2972
+rw5708154,negative,negative,0.6397,1545,0,1545,89,2026-10-14 18:08:43.485000,Mrs. Serial Killer (2020),0,3022
+rw5706660,positive,positive,0.9342,2693,0,2693,330,2026-10-14 18:08:42.337000,Mrs. Serial Killer (2020),1,2646
+rw5707295,positive,positive,0.9697,1950,0,1950,170,2026-10-14 18:08:43.080000,Mrs. Serial Killer (2020),1,2745
+rw5706323,negative,positive,0.6763,2753,1,2752,120,2026-10-14 18:08:42.277000,Mrs. Serial Killer (2020),0,2855
+rw5706990,positive,positive,0.9325,2023,0,2023,124,2026-10-14 18:08:43.007000,Mrs. Serial Killer (2020),0,2960
+rw5707581,positive,positive,0.9562,1915,0,1915,169,2026-10-14 18:08:43.115000,Mrs. Serial Killer (2020),0,2977
+rw5707182,positive,positive,0.5542,1983,0,1983,140,2026-10-14 18:08:43.047000,Mrs. Serial Killer (2020),1,2741
+rw5706015,positive,positive,0.7755,2805,0,2805,328,2026-10-14 18:08:42.225000,Mrs. Serial Killer (2020),1,2628
+rw5706897,positive,positive,0.5998,2045,0,2045,153,2026-10-14 18:08:42.985000,Mrs. Serial Killer (2020),0,2958
+rw5706313,positive,positive,0.8528,2755,0,2755,205,2026-10-14 18:08:42.275000,Mrs. Serial Killer (2020),1,2638
+rw5706174,positive,positive,0.9324,2788,0,2788,112,2026-10-14 18:08:42.242000,Mrs. Serial Killer (2020),0,2853
+rw5707922,negative,positive,0.8563,1558,0,1558,143,2026-10-14 18:08:43.472000,Mrs. Serial Killer (2020),1,2801
+rw5705702,negative,negative,0.7545,2825,0,2825,76,2026-10-14 18:08:42.205000,Mrs. Serial Killer (2020),1,2625
+rw5709251,positive,positive,0.9173,9203,0,9203,241,2026-10-14 18:08:45.610000,Mrs. Serial Killer (2020),2,2970
+rw2859522,positive,neutral,0.555,1775,0,1775,515,2026-10-14 18:08:43.255000,Olympus Has Fallen (2013),2,2854
+rw5707291,positive,positive,0.8861,1955,0,1955,147,2026-10-14 18:08:43.075000,Mrs. Serial Killer (2020),0,2974
+rw5706532,positive,positive,0.9494,2706,0,2706,207,2026-10-14 18:08:42.324000,Mrs. Serial Killer (2020),1,2644
+rw5708418,positive,positive,0.8081,1520,0,1520,2315,2026-10-14 18:08:43.510000,"Father Brown: The Tree of Truth (2017) Season 6, Episode 1",2,2894

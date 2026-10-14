@@ -1,0 +1,2 @@
+v1
+{"path":"file:///home/hadoop/capstone/outputs/stream/verify1/scored_detail/event_date=2026-10-14/event_hour=18/part-00000-1adfd9a8-a992-427e-bc35-347b69af1f53.c000.snappy.parquet","size":4478,"isDir":false,"modificationTime":1792001537177,"blockReplication":1,"blockSize":33554432,"action":"add"}

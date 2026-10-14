@@ -1,0 +1,28 @@
+Chuẩn bị gửi 11 ca lỗi x 1 lần vào topic `comments_raw` (localhost:9092)
+  bad-01: json_khong_hop_le: JSON hỏng hẳn  [9 B]
+  bad-02: json_khong_hop_le: JSON là mảng, không phải object  [9 B]
+  bad-03: json_khong_hop_le: JSON null  [4 B]
+  bad-04: thieu_truong:text  [117 B]
+  bad-05: thieu_truong:comment_id  [148 B]
+  bad-06: thieu_truong:event_ts  [132 B]
+  bad-07: event_ts_khong_doc_duoc  [164 B]
+  bad-08: van_ban_rong_sau_lam_sach  [134 B]
+  bad-09: van_ban_qua_ngan (dưới 20 ký tự)  [131 B]
+  bad-10: van_ban_qua_dai (trên 5000 ký tự)  [5179 B]
+  bad-11: HỢP LỆ nhưng lạc hậu 10 phút (quá hạn watermark) — dùng để thử watermark  [168 B]
+Sau đó: 12 heartbeat cách nhau 25s (~275s) để đẩy watermark tiến.
+Cuối cùng: 1 late-probe (hợp lệ, lạc hậu 10 phút) — phải bị watermark bỏ.
+  [01:08:51] hb-001 (event_ts=now)
+  [01:09:16] hb-002 (event_ts=now)
+  [01:09:41] hb-003 (event_ts=now)
+  [01:10:06] hb-004 (event_ts=now)
+  [01:10:31] hb-005 (event_ts=now)
+  [01:10:56] hb-006 (event_ts=now)
+  [01:11:21] hb-007 (event_ts=now)
+  [01:11:46] hb-008 (event_ts=now)
+  [01:12:11] hb-009 (event_ts=now)
+  [01:12:36] hb-010 (event_ts=now)
+  [01:13:01] hb-011 (event_ts=now)
+  [01:13:26] hb-012 (event_ts=now)
+  [01:13:26] probe-late (event_ts=now-600s)
+Đã gửi 24 message vào `comments_raw`: 14 HỢP LỆ (ca 11 + heartbeat + probe) + 10 vào DLQ.

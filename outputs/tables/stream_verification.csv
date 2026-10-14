@@ -1,0 +1,83 @@
+section,metric,value,note
+reconcile,producer_sent,1000,từ --sent-labels
+reconcile,extra_valid_sent,14,bad-11 + heartbeat + probe
+reconcile,bad_injected,10,
+reconcile,producer_records_into_dlq,0,bản ghi producer vướng luật làm sạch
+reconcile,sent_total,1024,
+reconcile,scored_detail_rows,1014,scored + dlq = đã gửi
+reconcile,expected_scored_rows,1014,scored + dlq = đã gửi
+reconcile,dlq_rows,10,
+reconcile,expected_dlq_rows,10,
+reconcile,equation,PASS,1014 + 10 = 1024
+dlq_cases,injected_checked,6,
+dlq_cases,injected_matched,6,
+dlq_cases,null_id_rows,4,kỳ vọng 4 = 3 JSON hỏng + 1 thiếu comment_id
+dlq_cases,bad-11_in_detail,True,"bản ghi hợp lệ, không vào DLQ"
+dlq_cases,bad-11_in_dlq,False,kỳ vọng False
+dlq_cases,probe-late_in_detail,True,"bản ghi hợp lệ, không vào DLQ"
+dlq_cases,probe-late_in_dlq,False,kỳ vọng False
+dlq_cases,heartbeat_scored,12,
+kafka,comments_scored_messages,1014,chênh lệch offset cuối so với mốc
+kafka,comments_dlq_messages,10,chênh lệch offset cuối so với mốc
+dlq,reason:json_khong_hop_le,3,
+dlq,reason:event_ts_khong_doc_duoc,1,
+dlq,reason:thieu_truong:comment_id,1,
+dlq,reason:van_ban_qua_dai_tren_5000_ky_tu,1,
+dlq,reason:thieu_truong:event_ts,1,
+dlq,reason:van_ban_rong_sau_lam_sach,1,
+dlq,reason:van_ban_qua_ngan_duoi_20_ky_tu,1,
+dlq,reason:thieu_truong:text,1,
+stream_metrics,n_eval,1000,số dòng ghép được nhãn thật
+stream_metrics,accuracy,0.703,
+stream_metrics,macro_f1,0.631088,
+stream_metrics,weighted_f1,0.72297,
+stream_metrics,negative_precision,0.706422,
+stream_metrics,negative_recall,0.669565,
+stream_metrics,negative_f1,0.6875,
+stream_metrics,negative_support,230,
+stream_metrics,neutral_precision,0.31405,
+stream_metrics,neutral_recall,0.535211,
+stream_metrics,neutral_f1,0.395833,
+stream_metrics,neutral_support,142,
+stream_metrics,positive_precision,0.875926,
+stream_metrics,positive_recall,0.753185,
+stream_metrics,positive_f1,0.809932,
+stream_metrics,positive_support,628,
+offline_full_test,accuracy,0.7017846862406448,outputs/tables/model_results.csv (Task 7)
+offline_full_test,macro_f1,0.6233089334914862,outputs/tables/model_results.csv (Task 7)
+offline_full_test,weighted_f1,0.721312928369018,outputs/tables/model_results.csv (Task 7)
+offline_full_test,n,27792,outputs/tables/model_results.csv (Task 7)
+offline_same_ids,n,1000,cùng comment_id với luồng
+equivalence,rows_compared,1000,
+equivalence,rows_agree,1000,
+equivalence,agreement_pct,100.0,
+offline_same_ids,accuracy,0.703,
+offline_same_ids,macro_f1,0.631088,
+offline_same_ids,weighted_f1,0.72297,
+delta_vs_offline_same_ids,macro_f1,0.0,luồng - offline(cùng id)
+delta_vs_offline_full_test,macro_f1,0.007779,luồng - offline(toàn bộ test)
+latency,lat_min,40,
+latency,lat_p50,2413,
+latency,lat_p95,9663,
+latency,lat_p99,27091,
+latency,lat_max,603608,
+latency,kl_p50,0,
+latency,kl_max,600206,
+latency,ql_min,40,
+latency,ql_p50,2355,
+latency,ql_p95,9136,
+latency,n_processing_ts,13,
+windows,window_1min_rows,710,
+windows,window_1min_comments,1007,2026-10-14 17:58:00 .. 2026-10-14 18:11:00 UTC
+windows,window_sliding_10s_rows,1466,
+windows,window_sliding_10s_comments,2015,2026-10-14 17:58:45 .. 2026-10-14 18:11:25 UTC
+watermark_late,bad-11_in_window_1min,True,bad-11 đến cùng batch đầu; probe-late đến sau khi watermark đã tiến 10 phút
+watermark_late,probe-late_in_window_1min,False,bad-11 đến cùng batch đầu; probe-late đến sau khi watermark đã tiến 10 phút
+watermark_late,heartbeat_sliding_min_start,2026-10-14 18:08:45,
+watermark,dropped_total,0,numRowsDroppedByWatermark
+watermark,dropped:detail,0,outputs/tables/stream_batches.csv
+watermark,dropped:dlq_kafka,0,outputs/tables/stream_batches.csv
+watermark,dropped:dlq_parquet,0,outputs/tables/stream_batches.csv
+watermark,dropped:kafka,0,outputs/tables/stream_batches.csv
+watermark,dropped:sliding,0,outputs/tables/stream_batches.csv
+watermark,dropped:window,0,outputs/tables/stream_batches.csv

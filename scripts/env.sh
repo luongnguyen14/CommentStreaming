@@ -11,6 +11,11 @@ export HADOOP_HOME=/usr/local/hadoop
 export HADOOP_CONF_DIR="$HADOOP_HOME/etc/hadoop"
 export SPARK_HOME=/home/hadoop/spark-3.5.9
 
+# Gói đọc/ghi Kafka cho Structured Streaming. PHẢI khớp phiên bản Spark và Scala
+# (Spark 3.5.9 dùng Scala 2.12) — đã kiểm chứng ở Task 5 và Task 8.
+# Gói nằm sẵn trong ~/.ivy2/jars nên chạy được cả khi không có mạng.
+export SPARK_KAFKA_PKG="org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.9"
+
 # Spark 3.5.9 không chạy được với Python 3.14 (cloudpickle 2.2.1 lỗi RecursionError
 # khi pickle). Máy có sẵn Python 3.11 — dùng cho cả driver lẫn executor của PySpark.
 export PYSPARK_PYTHON=/usr/bin/python3.11

@@ -1,0 +1,464 @@
+26/10/15 01:01:35 WARN Utils: Your hostname, luongnguyen-VMware20-1 resolves to a loopback address: 127.0.1.1; using 172.16.99.138 instead (on interface ens160)
+26/10/15 01:01:35 WARN Utils: Set SPARK_LOCAL_IP if you need to bind to another address
+:: loading settings :: url = jar:file:/home/hadoop/spark-3.5.9/jars/ivy-2.5.3.jar!/org/apache/ivy/core/settings/ivysettings.xml
+Ivy Default Cache set to: /home/hadoop/.ivy2/cache
+The jars for the packages stored in: /home/hadoop/.ivy2/jars
+org.apache.spark#spark-sql-kafka-0-10_2.12 added as a dependency
+:: resolving dependencies :: org.apache.spark#spark-submit-parent-b6918317-89ec-409f-a325-bf453c80e246;1.0
+	confs: [default]
+	found org.apache.spark#spark-sql-kafka-0-10_2.12;3.5.9 in central
+	found org.apache.spark#spark-token-provider-kafka-0-10_2.12;3.5.9 in central
+	found org.apache.kafka#kafka-clients;3.4.1 in central
+	found org.lz4#lz4-java;1.8.0 in central
+	found org.xerial.snappy#snappy-java;1.1.10.5 in central
+	found org.slf4j#slf4j-api;2.0.7 in central
+	found org.apache.hadoop#hadoop-client-runtime;3.3.4 in central
+	found org.apache.hadoop#hadoop-client-api;3.3.4 in central
+	found commons-logging#commons-logging;1.1.3 in central
+	found com.google.code.findbugs#jsr305;3.0.0 in central
+	found org.apache.commons#commons-pool2;2.11.1 in central
+:: resolution report :: resolve 498ms :: artifacts dl 6ms
+	:: modules in use:
+	com.google.code.findbugs#jsr305;3.0.0 from central in [default]
+	commons-logging#commons-logging;1.1.3 from central in [default]
+	org.apache.commons#commons-pool2;2.11.1 from central in [default]
+	org.apache.hadoop#hadoop-client-api;3.3.4 from central in [default]
+	org.apache.hadoop#hadoop-client-runtime;3.3.4 from central in [default]
+	org.apache.kafka#kafka-clients;3.4.1 from central in [default]
+	org.apache.spark#spark-sql-kafka-0-10_2.12;3.5.9 from central in [default]
+	org.apache.spark#spark-token-provider-kafka-0-10_2.12;3.5.9 from central in [default]
+	org.lz4#lz4-java;1.8.0 from central in [default]
+	org.slf4j#slf4j-api;2.0.7 from central in [default]
+	org.xerial.snappy#snappy-java;1.1.10.5 from central in [default]
+	---------------------------------------------------------------------
+	|                  |            modules            ||   artifacts   |
+	|       conf       | number| search|dwnlded|evicted|| number|dwnlded|
+	---------------------------------------------------------------------
+	|      default     |   11  |   0   |   0   |   0   ||   11  |   0   |
+	---------------------------------------------------------------------
+:: retrieving :: org.apache.spark#spark-submit-parent-b6918317-89ec-409f-a325-bf453c80e246
+	confs: [default]
+	0 artifacts copied, 11 already retrieved (0kB/11ms)
+26/10/15 01:01:36 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+26/10/15 01:01:37 INFO SparkContext: Running Spark version 3.5.9
+26/10/15 01:01:37 INFO SparkContext: OS info Linux, 7.0.0-34-generic, aarch64
+26/10/15 01:01:37 INFO SparkContext: Java version 1.8.0_504
+26/10/15 01:01:37 INFO ResourceUtils: ==============================================================
+26/10/15 01:01:37 INFO ResourceUtils: No custom resources configured for spark.driver.
+26/10/15 01:01:37 INFO ResourceUtils: ==============================================================
+26/10/15 01:01:37 INFO SparkContext: Submitted application: capstone-task8-stream-smoke1
+26/10/15 01:01:37 INFO ResourceProfile: Default ResourceProfile created, executor resources: Map(cores -> name: cores, amount: 1, script: , vendor: , memory -> name: memory, amount: 1024, script: , vendor: , offHeap -> name: offHeap, amount: 0, script: , vendor: ), task resources: Map(cpus -> name: cpus, amount: 1.0)
+26/10/15 01:01:37 INFO ResourceProfile: Limiting resource is cpu
+26/10/15 01:01:37 INFO ResourceProfileManager: Added ResourceProfile id: 0
+26/10/15 01:01:37 INFO SecurityManager: Changing view acls to: hadoop
+26/10/15 01:01:37 INFO SecurityManager: Changing modify acls to: hadoop
+26/10/15 01:01:37 INFO SecurityManager: Changing view acls groups to: 
+26/10/15 01:01:37 INFO SecurityManager: Changing modify acls groups to: 
+26/10/15 01:01:37 INFO SecurityManager: SecurityManager: authentication disabled; ui acls disabled; users with view permissions: hadoop; groups with view permissions: EMPTY; users with modify permissions: hadoop; groups with modify permissions: EMPTY
+26/10/15 01:01:37 INFO Utils: Successfully started service 'sparkDriver' on port 34933.
+26/10/15 01:01:38 INFO SparkEnv: Registering MapOutputTracker
+26/10/15 01:01:38 INFO SparkEnv: Registering BlockManagerMaster
+26/10/15 01:01:38 INFO BlockManagerMasterEndpoint: Using org.apache.spark.storage.DefaultTopologyMapper for getting topology information
+26/10/15 01:01:38 INFO BlockManagerMasterEndpoint: BlockManagerMasterEndpoint up
+26/10/15 01:01:38 INFO SparkEnv: Registering BlockManagerMasterHeartbeat
+26/10/15 01:01:38 INFO DiskBlockManager: Created local directory at /home/hadoop/spark-tmp/blockmgr-a4bc1b06-c20b-4b01-8a98-2732ab81e1ac
+26/10/15 01:01:38 INFO MemoryStore: MemoryStore started with capacity 912.3 MiB
+26/10/15 01:01:38 INFO SparkEnv: Registering OutputCommitCoordinator
+26/10/15 01:01:38 INFO JettyUtils: Start Jetty 0.0.0.0:4040 for SparkUI
+26/10/15 01:01:38 INFO Utils: Successfully started service 'SparkUI' on port 4040.
+26/10/15 01:01:38 INFO SparkContext: Added JAR file:///home/hadoop/.ivy2/jars/org.apache.spark_spark-sql-kafka-0-10_2.12-3.5.9.jar at spark://172.16.99.138:34933/jars/org.apache.spark_spark-sql-kafka-0-10_2.12-3.5.9.jar with timestamp 1792000897627
+26/10/15 01:01:38 INFO SparkContext: Added JAR file:///home/hadoop/.ivy2/jars/org.apache.spark_spark-token-provider-kafka-0-10_2.12-3.5.9.jar at spark://172.16.99.138:34933/jars/org.apache.spark_spark-token-provider-kafka-0-10_2.12-3.5.9.jar with timestamp 1792000897627
+26/10/15 01:01:38 INFO SparkContext: Added JAR file:///home/hadoop/.ivy2/jars/org.apache.kafka_kafka-clients-3.4.1.jar at spark://172.16.99.138:34933/jars/org.apache.kafka_kafka-clients-3.4.1.jar with timestamp 1792000897627
+26/10/15 01:01:38 INFO SparkContext: Added JAR file:///home/hadoop/.ivy2/jars/com.google.code.findbugs_jsr305-3.0.0.jar at spark://172.16.99.138:34933/jars/com.google.code.findbugs_jsr305-3.0.0.jar with timestamp 1792000897627
+26/10/15 01:01:38 INFO SparkContext: Added JAR file:///home/hadoop/.ivy2/jars/org.apache.commons_commons-pool2-2.11.1.jar at spark://172.16.99.138:34933/jars/org.apache.commons_commons-pool2-2.11.1.jar with timestamp 1792000897627
+26/10/15 01:01:38 INFO SparkContext: Added JAR file:///home/hadoop/.ivy2/jars/org.apache.hadoop_hadoop-client-runtime-3.3.4.jar at spark://172.16.99.138:34933/jars/org.apache.hadoop_hadoop-client-runtime-3.3.4.jar with timestamp 1792000897627
+26/10/15 01:01:38 INFO SparkContext: Added JAR file:///home/hadoop/.ivy2/jars/org.lz4_lz4-java-1.8.0.jar at spark://172.16.99.138:34933/jars/org.lz4_lz4-java-1.8.0.jar with timestamp 1792000897627
+26/10/15 01:01:38 INFO SparkContext: Added JAR file:///home/hadoop/.ivy2/jars/org.xerial.snappy_snappy-java-1.1.10.5.jar at spark://172.16.99.138:34933/jars/org.xerial.snappy_snappy-java-1.1.10.5.jar with timestamp 1792000897627
+26/10/15 01:01:38 INFO SparkContext: Added JAR file:///home/hadoop/.ivy2/jars/org.slf4j_slf4j-api-2.0.7.jar at spark://172.16.99.138:34933/jars/org.slf4j_slf4j-api-2.0.7.jar with timestamp 1792000897627
+26/10/15 01:01:38 INFO SparkContext: Added JAR file:///home/hadoop/.ivy2/jars/org.apache.hadoop_hadoop-client-api-3.3.4.jar at spark://172.16.99.138:34933/jars/org.apache.hadoop_hadoop-client-api-3.3.4.jar with timestamp 1792000897627
+26/10/15 01:01:38 INFO SparkContext: Added JAR file:///home/hadoop/.ivy2/jars/commons-logging_commons-logging-1.1.3.jar at spark://172.16.99.138:34933/jars/commons-logging_commons-logging-1.1.3.jar with timestamp 1792000897627
+26/10/15 01:01:38 INFO SparkContext: Added file file:///home/hadoop/.ivy2/jars/org.apache.spark_spark-sql-kafka-0-10_2.12-3.5.9.jar at file:///home/hadoop/.ivy2/jars/org.apache.spark_spark-sql-kafka-0-10_2.12-3.5.9.jar with timestamp 1792000897627
+26/10/15 01:01:38 INFO Utils: Copying /home/hadoop/.ivy2/jars/org.apache.spark_spark-sql-kafka-0-10_2.12-3.5.9.jar to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/org.apache.spark_spark-sql-kafka-0-10_2.12-3.5.9.jar
+26/10/15 01:01:38 INFO SparkContext: Added file file:///home/hadoop/.ivy2/jars/org.apache.spark_spark-token-provider-kafka-0-10_2.12-3.5.9.jar at file:///home/hadoop/.ivy2/jars/org.apache.spark_spark-token-provider-kafka-0-10_2.12-3.5.9.jar with timestamp 1792000897627
+26/10/15 01:01:38 INFO Utils: Copying /home/hadoop/.ivy2/jars/org.apache.spark_spark-token-provider-kafka-0-10_2.12-3.5.9.jar to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/org.apache.spark_spark-token-provider-kafka-0-10_2.12-3.5.9.jar
+26/10/15 01:01:38 INFO SparkContext: Added file file:///home/hadoop/.ivy2/jars/org.apache.kafka_kafka-clients-3.4.1.jar at file:///home/hadoop/.ivy2/jars/org.apache.kafka_kafka-clients-3.4.1.jar with timestamp 1792000897627
+26/10/15 01:01:38 INFO Utils: Copying /home/hadoop/.ivy2/jars/org.apache.kafka_kafka-clients-3.4.1.jar to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/org.apache.kafka_kafka-clients-3.4.1.jar
+26/10/15 01:01:38 INFO SparkContext: Added file file:///home/hadoop/.ivy2/jars/com.google.code.findbugs_jsr305-3.0.0.jar at file:///home/hadoop/.ivy2/jars/com.google.code.findbugs_jsr305-3.0.0.jar with timestamp 1792000897627
+26/10/15 01:01:38 INFO Utils: Copying /home/hadoop/.ivy2/jars/com.google.code.findbugs_jsr305-3.0.0.jar to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/com.google.code.findbugs_jsr305-3.0.0.jar
+26/10/15 01:01:38 INFO SparkContext: Added file file:///home/hadoop/.ivy2/jars/org.apache.commons_commons-pool2-2.11.1.jar at file:///home/hadoop/.ivy2/jars/org.apache.commons_commons-pool2-2.11.1.jar with timestamp 1792000897627
+26/10/15 01:01:38 INFO Utils: Copying /home/hadoop/.ivy2/jars/org.apache.commons_commons-pool2-2.11.1.jar to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/org.apache.commons_commons-pool2-2.11.1.jar
+26/10/15 01:01:38 INFO SparkContext: Added file file:///home/hadoop/.ivy2/jars/org.apache.hadoop_hadoop-client-runtime-3.3.4.jar at file:///home/hadoop/.ivy2/jars/org.apache.hadoop_hadoop-client-runtime-3.3.4.jar with timestamp 1792000897627
+26/10/15 01:01:38 INFO Utils: Copying /home/hadoop/.ivy2/jars/org.apache.hadoop_hadoop-client-runtime-3.3.4.jar to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/org.apache.hadoop_hadoop-client-runtime-3.3.4.jar
+26/10/15 01:01:38 INFO SparkContext: Added file file:///home/hadoop/.ivy2/jars/org.lz4_lz4-java-1.8.0.jar at file:///home/hadoop/.ivy2/jars/org.lz4_lz4-java-1.8.0.jar with timestamp 1792000897627
+26/10/15 01:01:38 INFO Utils: Copying /home/hadoop/.ivy2/jars/org.lz4_lz4-java-1.8.0.jar to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/org.lz4_lz4-java-1.8.0.jar
+26/10/15 01:01:38 INFO SparkContext: Added file file:///home/hadoop/.ivy2/jars/org.xerial.snappy_snappy-java-1.1.10.5.jar at file:///home/hadoop/.ivy2/jars/org.xerial.snappy_snappy-java-1.1.10.5.jar with timestamp 1792000897627
+26/10/15 01:01:38 INFO Utils: Copying /home/hadoop/.ivy2/jars/org.xerial.snappy_snappy-java-1.1.10.5.jar to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/org.xerial.snappy_snappy-java-1.1.10.5.jar
+26/10/15 01:01:38 INFO SparkContext: Added file file:///home/hadoop/.ivy2/jars/org.slf4j_slf4j-api-2.0.7.jar at file:///home/hadoop/.ivy2/jars/org.slf4j_slf4j-api-2.0.7.jar with timestamp 1792000897627
+26/10/15 01:01:38 INFO Utils: Copying /home/hadoop/.ivy2/jars/org.slf4j_slf4j-api-2.0.7.jar to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/org.slf4j_slf4j-api-2.0.7.jar
+26/10/15 01:01:38 INFO SparkContext: Added file file:///home/hadoop/.ivy2/jars/org.apache.hadoop_hadoop-client-api-3.3.4.jar at file:///home/hadoop/.ivy2/jars/org.apache.hadoop_hadoop-client-api-3.3.4.jar with timestamp 1792000897627
+26/10/15 01:01:38 INFO Utils: Copying /home/hadoop/.ivy2/jars/org.apache.hadoop_hadoop-client-api-3.3.4.jar to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/org.apache.hadoop_hadoop-client-api-3.3.4.jar
+26/10/15 01:01:38 INFO SparkContext: Added file file:///home/hadoop/.ivy2/jars/commons-logging_commons-logging-1.1.3.jar at file:///home/hadoop/.ivy2/jars/commons-logging_commons-logging-1.1.3.jar with timestamp 1792000897627
+26/10/15 01:01:38 INFO Utils: Copying /home/hadoop/.ivy2/jars/commons-logging_commons-logging-1.1.3.jar to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/commons-logging_commons-logging-1.1.3.jar
+26/10/15 01:01:38 INFO Executor: Starting executor ID driver on host 172.16.99.138
+26/10/15 01:01:38 INFO Executor: OS info Linux, 7.0.0-34-generic, aarch64
+26/10/15 01:01:38 INFO Executor: Java version 1.8.0_504
+26/10/15 01:01:38 INFO Executor: Starting executor with user classpath (userClassPathFirst = false): ''
+26/10/15 01:01:38 INFO Executor: Created or updated repl class loader org.apache.spark.util.MutableURLClassLoader@462c87e8 for default.
+26/10/15 01:01:38 INFO Executor: Fetching file:///home/hadoop/.ivy2/jars/org.apache.hadoop_hadoop-client-api-3.3.4.jar with timestamp 1792000897627
+26/10/15 01:01:38 INFO Utils: /home/hadoop/.ivy2/jars/org.apache.hadoop_hadoop-client-api-3.3.4.jar has been previously copied to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/org.apache.hadoop_hadoop-client-api-3.3.4.jar
+26/10/15 01:01:38 INFO Executor: Fetching file:///home/hadoop/.ivy2/jars/org.apache.commons_commons-pool2-2.11.1.jar with timestamp 1792000897627
+26/10/15 01:01:38 INFO Utils: /home/hadoop/.ivy2/jars/org.apache.commons_commons-pool2-2.11.1.jar has been previously copied to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/org.apache.commons_commons-pool2-2.11.1.jar
+26/10/15 01:01:38 INFO Executor: Fetching file:///home/hadoop/.ivy2/jars/org.lz4_lz4-java-1.8.0.jar with timestamp 1792000897627
+26/10/15 01:01:38 INFO Utils: /home/hadoop/.ivy2/jars/org.lz4_lz4-java-1.8.0.jar has been previously copied to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/org.lz4_lz4-java-1.8.0.jar
+26/10/15 01:01:38 INFO Executor: Fetching file:///home/hadoop/.ivy2/jars/org.apache.spark_spark-token-provider-kafka-0-10_2.12-3.5.9.jar with timestamp 1792000897627
+26/10/15 01:01:38 INFO Utils: /home/hadoop/.ivy2/jars/org.apache.spark_spark-token-provider-kafka-0-10_2.12-3.5.9.jar has been previously copied to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/org.apache.spark_spark-token-provider-kafka-0-10_2.12-3.5.9.jar
+26/10/15 01:01:38 INFO Executor: Fetching file:///home/hadoop/.ivy2/jars/org.slf4j_slf4j-api-2.0.7.jar with timestamp 1792000897627
+26/10/15 01:01:38 INFO Utils: /home/hadoop/.ivy2/jars/org.slf4j_slf4j-api-2.0.7.jar has been previously copied to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/org.slf4j_slf4j-api-2.0.7.jar
+26/10/15 01:01:38 INFO Executor: Fetching file:///home/hadoop/.ivy2/jars/org.apache.hadoop_hadoop-client-runtime-3.3.4.jar with timestamp 1792000897627
+26/10/15 01:01:38 INFO Utils: /home/hadoop/.ivy2/jars/org.apache.hadoop_hadoop-client-runtime-3.3.4.jar has been previously copied to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/org.apache.hadoop_hadoop-client-runtime-3.3.4.jar
+26/10/15 01:01:38 INFO Executor: Fetching file:///home/hadoop/.ivy2/jars/commons-logging_commons-logging-1.1.3.jar with timestamp 1792000897627
+26/10/15 01:01:38 INFO Utils: /home/hadoop/.ivy2/jars/commons-logging_commons-logging-1.1.3.jar has been previously copied to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/commons-logging_commons-logging-1.1.3.jar
+26/10/15 01:01:38 INFO Executor: Fetching file:///home/hadoop/.ivy2/jars/org.apache.spark_spark-sql-kafka-0-10_2.12-3.5.9.jar with timestamp 1792000897627
+26/10/15 01:01:38 INFO Utils: /home/hadoop/.ivy2/jars/org.apache.spark_spark-sql-kafka-0-10_2.12-3.5.9.jar has been previously copied to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/org.apache.spark_spark-sql-kafka-0-10_2.12-3.5.9.jar
+26/10/15 01:01:38 INFO Executor: Fetching file:///home/hadoop/.ivy2/jars/com.google.code.findbugs_jsr305-3.0.0.jar with timestamp 1792000897627
+26/10/15 01:01:38 INFO Utils: /home/hadoop/.ivy2/jars/com.google.code.findbugs_jsr305-3.0.0.jar has been previously copied to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/com.google.code.findbugs_jsr305-3.0.0.jar
+26/10/15 01:01:38 INFO Executor: Fetching file:///home/hadoop/.ivy2/jars/org.apache.kafka_kafka-clients-3.4.1.jar with timestamp 1792000897627
+26/10/15 01:01:38 INFO Utils: /home/hadoop/.ivy2/jars/org.apache.kafka_kafka-clients-3.4.1.jar has been previously copied to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/org.apache.kafka_kafka-clients-3.4.1.jar
+26/10/15 01:01:38 INFO Executor: Fetching file:///home/hadoop/.ivy2/jars/org.xerial.snappy_snappy-java-1.1.10.5.jar with timestamp 1792000897627
+26/10/15 01:01:38 INFO Utils: /home/hadoop/.ivy2/jars/org.xerial.snappy_snappy-java-1.1.10.5.jar has been previously copied to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/org.xerial.snappy_snappy-java-1.1.10.5.jar
+26/10/15 01:01:38 INFO Executor: Fetching spark://172.16.99.138:34933/jars/commons-logging_commons-logging-1.1.3.jar with timestamp 1792000897627
+26/10/15 01:01:38 INFO TransportClientFactory: Successfully created connection to /172.16.99.138:34933 after 64 ms (0 ms spent in bootstraps)
+26/10/15 01:01:38 INFO Utils: Fetching spark://172.16.99.138:34933/jars/commons-logging_commons-logging-1.1.3.jar to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/fetchFileTemp8761714646965478959.tmp
+26/10/15 01:01:38 INFO Utils: /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/fetchFileTemp8761714646965478959.tmp has been previously copied to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/commons-logging_commons-logging-1.1.3.jar
+26/10/15 01:01:38 INFO Executor: Adding file:/home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/commons-logging_commons-logging-1.1.3.jar to class loader default
+26/10/15 01:01:38 INFO Executor: Fetching spark://172.16.99.138:34933/jars/org.apache.kafka_kafka-clients-3.4.1.jar with timestamp 1792000897627
+26/10/15 01:01:38 INFO Utils: Fetching spark://172.16.99.138:34933/jars/org.apache.kafka_kafka-clients-3.4.1.jar to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/fetchFileTemp2739756205334276607.tmp
+26/10/15 01:01:38 INFO Utils: /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/fetchFileTemp2739756205334276607.tmp has been previously copied to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/org.apache.kafka_kafka-clients-3.4.1.jar
+26/10/15 01:01:38 INFO Executor: Adding file:/home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/org.apache.kafka_kafka-clients-3.4.1.jar to class loader default
+26/10/15 01:01:38 INFO Executor: Fetching spark://172.16.99.138:34933/jars/org.slf4j_slf4j-api-2.0.7.jar with timestamp 1792000897627
+26/10/15 01:01:38 INFO Utils: Fetching spark://172.16.99.138:34933/jars/org.slf4j_slf4j-api-2.0.7.jar to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/fetchFileTemp5504203625614885846.tmp
+26/10/15 01:01:38 INFO Utils: /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/fetchFileTemp5504203625614885846.tmp has been previously copied to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/org.slf4j_slf4j-api-2.0.7.jar
+26/10/15 01:01:38 INFO Executor: Adding file:/home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/org.slf4j_slf4j-api-2.0.7.jar to class loader default
+26/10/15 01:01:38 INFO Executor: Fetching spark://172.16.99.138:34933/jars/org.apache.spark_spark-sql-kafka-0-10_2.12-3.5.9.jar with timestamp 1792000897627
+26/10/15 01:01:39 INFO Utils: Fetching spark://172.16.99.138:34933/jars/org.apache.spark_spark-sql-kafka-0-10_2.12-3.5.9.jar to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/fetchFileTemp4553863712593120396.tmp
+26/10/15 01:01:39 INFO Utils: /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/fetchFileTemp4553863712593120396.tmp has been previously copied to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/org.apache.spark_spark-sql-kafka-0-10_2.12-3.5.9.jar
+26/10/15 01:01:39 INFO Executor: Adding file:/home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/org.apache.spark_spark-sql-kafka-0-10_2.12-3.5.9.jar to class loader default
+26/10/15 01:01:39 INFO Executor: Fetching spark://172.16.99.138:34933/jars/org.apache.commons_commons-pool2-2.11.1.jar with timestamp 1792000897627
+26/10/15 01:01:39 INFO Utils: Fetching spark://172.16.99.138:34933/jars/org.apache.commons_commons-pool2-2.11.1.jar to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/fetchFileTemp2309511432171151403.tmp
+26/10/15 01:01:39 INFO Utils: /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/fetchFileTemp2309511432171151403.tmp has been previously copied to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/org.apache.commons_commons-pool2-2.11.1.jar
+26/10/15 01:01:39 INFO Executor: Adding file:/home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/org.apache.commons_commons-pool2-2.11.1.jar to class loader default
+26/10/15 01:01:39 INFO Executor: Fetching spark://172.16.99.138:34933/jars/org.apache.hadoop_hadoop-client-api-3.3.4.jar with timestamp 1792000897627
+26/10/15 01:01:39 INFO Utils: Fetching spark://172.16.99.138:34933/jars/org.apache.hadoop_hadoop-client-api-3.3.4.jar to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/fetchFileTemp966302026117546973.tmp
+26/10/15 01:01:39 INFO Utils: /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/fetchFileTemp966302026117546973.tmp has been previously copied to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/org.apache.hadoop_hadoop-client-api-3.3.4.jar
+26/10/15 01:01:39 INFO Executor: Adding file:/home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/org.apache.hadoop_hadoop-client-api-3.3.4.jar to class loader default
+26/10/15 01:01:39 INFO Executor: Fetching spark://172.16.99.138:34933/jars/org.apache.hadoop_hadoop-client-runtime-3.3.4.jar with timestamp 1792000897627
+26/10/15 01:01:39 INFO Utils: Fetching spark://172.16.99.138:34933/jars/org.apache.hadoop_hadoop-client-runtime-3.3.4.jar to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/fetchFileTemp3884488831762128209.tmp
+26/10/15 01:01:39 INFO Utils: /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/fetchFileTemp3884488831762128209.tmp has been previously copied to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/org.apache.hadoop_hadoop-client-runtime-3.3.4.jar
+26/10/15 01:01:39 INFO Executor: Adding file:/home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/org.apache.hadoop_hadoop-client-runtime-3.3.4.jar to class loader default
+26/10/15 01:01:39 INFO Executor: Fetching spark://172.16.99.138:34933/jars/org.xerial.snappy_snappy-java-1.1.10.5.jar with timestamp 1792000897627
+26/10/15 01:01:39 INFO Utils: Fetching spark://172.16.99.138:34933/jars/org.xerial.snappy_snappy-java-1.1.10.5.jar to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/fetchFileTemp4997082609291426799.tmp
+26/10/15 01:01:39 INFO Utils: /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/fetchFileTemp4997082609291426799.tmp has been previously copied to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/org.xerial.snappy_snappy-java-1.1.10.5.jar
+26/10/15 01:01:39 INFO Executor: Adding file:/home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/org.xerial.snappy_snappy-java-1.1.10.5.jar to class loader default
+26/10/15 01:01:39 INFO Executor: Fetching spark://172.16.99.138:34933/jars/com.google.code.findbugs_jsr305-3.0.0.jar with timestamp 1792000897627
+26/10/15 01:01:39 INFO Utils: Fetching spark://172.16.99.138:34933/jars/com.google.code.findbugs_jsr305-3.0.0.jar to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/fetchFileTemp1249254792752501672.tmp
+26/10/15 01:01:39 INFO Utils: /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/fetchFileTemp1249254792752501672.tmp has been previously copied to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/com.google.code.findbugs_jsr305-3.0.0.jar
+26/10/15 01:01:39 INFO Executor: Adding file:/home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/com.google.code.findbugs_jsr305-3.0.0.jar to class loader default
+26/10/15 01:01:39 INFO Executor: Fetching spark://172.16.99.138:34933/jars/org.lz4_lz4-java-1.8.0.jar with timestamp 1792000897627
+26/10/15 01:01:39 INFO Utils: Fetching spark://172.16.99.138:34933/jars/org.lz4_lz4-java-1.8.0.jar to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/fetchFileTemp3534382496135810050.tmp
+26/10/15 01:01:39 INFO Utils: /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/fetchFileTemp3534382496135810050.tmp has been previously copied to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/org.lz4_lz4-java-1.8.0.jar
+26/10/15 01:01:39 INFO Executor: Adding file:/home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/org.lz4_lz4-java-1.8.0.jar to class loader default
+26/10/15 01:01:39 INFO Executor: Fetching spark://172.16.99.138:34933/jars/org.apache.spark_spark-token-provider-kafka-0-10_2.12-3.5.9.jar with timestamp 1792000897627
+26/10/15 01:01:39 INFO Utils: Fetching spark://172.16.99.138:34933/jars/org.apache.spark_spark-token-provider-kafka-0-10_2.12-3.5.9.jar to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/fetchFileTemp2054921976191740478.tmp
+26/10/15 01:01:39 INFO Utils: /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/fetchFileTemp2054921976191740478.tmp has been previously copied to /home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/org.apache.spark_spark-token-provider-kafka-0-10_2.12-3.5.9.jar
+26/10/15 01:01:39 INFO Executor: Adding file:/home/hadoop/spark-tmp/spark-94f9b393-f5b1-4f49-8d58-ff4a0080bc7c/userFiles-1f0ea47b-481b-428e-a0ab-41425ef89e7e/org.apache.spark_spark-token-provider-kafka-0-10_2.12-3.5.9.jar to class loader default
+26/10/15 01:01:39 INFO Utils: Successfully started service 'org.apache.spark.network.netty.NettyBlockTransferService' on port 38485.
+26/10/15 01:01:39 INFO NettyBlockTransferService: Server created on 172.16.99.138:38485
+26/10/15 01:01:39 INFO BlockManager: Using org.apache.spark.storage.RandomBlockReplicationPolicy for block replication policy
+26/10/15 01:01:39 INFO BlockManagerMaster: Registering BlockManager BlockManagerId(driver, 172.16.99.138, 38485, None)
+26/10/15 01:01:39 INFO BlockManagerMasterEndpoint: Registering block manager 172.16.99.138:38485 with 912.3 MiB RAM, BlockManagerId(driver, 172.16.99.138, 38485, None)
+26/10/15 01:01:39 INFO BlockManagerMaster: Registered BlockManager BlockManagerId(driver, 172.16.99.138, 38485, None)
+26/10/15 01:01:39 INFO BlockManager: Initialized BlockManager: BlockManagerId(driver, 172.16.99.138, 38485, None)
+26/10/15 01:01:39 INFO SingleEventLogFileWriter: Logging events to hdfs://localhost:9000/spark-logs/local-1792000898655.inprogress
+[18:01:48] Spark 3.5.9 | run `smoke1` | mô hình LogisticRegression (nạp 7.1s) | nhãn {0: 'negative', 1: 'neutral', 2: 'positive'}
+[18:01:48] nguồn: topic comments_raw @ localhost:9092 | startingOffsets=latest | maxOffsetsPerTrigger=5000 | trigger=10s | watermark=2 minutes
+[18:01:48] sink: /home/hadoop/capstone/outputs/stream/smoke1 | checkpoint: /home/hadoop/capstone/checkpoints/streaming/smoke1 | log batch: /home/hadoop/capstone/outputs/tables/stream_batches.csv
+26/10/15 01:01:50 WARN ResolveWriteToStream: spark.sql.adaptive.enabled is not supported in streaming DataFrames/Datasets and will be disabled.
+[18:01:50]   >> query bắt đầu: detail (id=28c8be08-6f13-4fa4-8274-babe244dd3c4)
+[18:01:50]   query `detail`      -> outputs/stream/smoke1/scored_detail (parquet, phân vùng event_date/event_hour, giữ văn bản: False)
+26/10/15 01:01:50 WARN AdminClientConfig: These configurations '[key.deserializer, value.deserializer, enable.auto.commit, max.poll.records, auto.offset.reset]' were supplied but are not used yet.
+26/10/15 01:01:52 WARN ResolveWriteToStream: spark.sql.adaptive.enabled is not supported in streaming DataFrames/Datasets and will be disabled.
+[18:01:52]   >> query bắt đầu: kafka (id=90e5d5e2-1a3a-4a8f-b9c1-80f5dc845635)
+[18:01:52]   query `kafka`       -> topic comments_scored (JSON, khóa = comment_id)
+26/10/15 01:01:52 WARN AdminClientConfig: These configurations '[key.deserializer, value.deserializer, enable.auto.commit, max.poll.records, auto.offset.reset]' were supplied but are not used yet.
+[18:01:55]   [kafka           ] batch   0:     0 bản ghi | trigger  2339 ms | bỏ do watermark 0 | state 0
+26/10/15 01:01:55 WARN ResolveWriteToStream: spark.sql.adaptive.enabled is not supported in streaming DataFrames/Datasets and will be disabled.
+[18:01:55]   >> query bắt đầu: window (id=8e403d23-ed4d-4b21-8ce6-88cab572d01a)
+[18:01:55]   query `window`      -> outputs/stream/smoke1/window_1min (cửa sổ 1 minute, watermark 2 minutes)
+26/10/15 01:01:55 WARN AdminClientConfig: These configurations '[key.deserializer, value.deserializer, enable.auto.commit, max.poll.records, auto.offset.reset]' were supplied but are not used yet.
+[18:01:55]   [detail          ] batch   0:     0 bản ghi | trigger  4269 ms | bỏ do watermark 0 | state 0
+26/10/15 01:01:57 WARN DAGScheduler: Broadcasting large task binary with size 1379.1 KiB
+26/10/15 01:01:57 WARN ResolveWriteToStream: spark.sql.adaptive.enabled is not supported in streaming DataFrames/Datasets and will be disabled.
+[18:01:57]   >> query bắt đầu: sliding (id=1a94e912-4d95-4812-b493-9c83ccf50c47)
+[18:01:57]   query `sliding`     -> outputs/stream/smoke1/window_sliding_10s (cửa sổ 10 seconds trượt 5 seconds, watermark 2 minutes)
+26/10/15 01:01:57 WARN AdminClientConfig: These configurations '[key.deserializer, value.deserializer, enable.auto.commit, max.poll.records, auto.offset.reset]' were supplied but are not used yet.
+26/10/15 01:01:58 WARN DAGScheduler: Broadcasting large task binary with size 1382.2 KiB
+[18:01:59]   [window          ] batch   0:     0 bản ghi | trigger  2984 ms | bỏ do watermark 0 | state 0
+26/10/15 01:01:59 WARN ResolveWriteToStream: spark.sql.adaptive.enabled is not supported in streaming DataFrames/Datasets and will be disabled.
+[18:01:59]   >> query bắt đầu: dlq_kafka (id=df50174f-1d39-4675-b602-a82d67252902)
+[18:01:59]   query `dlq_kafka`   -> topic comments_dlq (JSON kèm lý do)
+26/10/15 01:01:59 WARN AdminClientConfig: These configurations '[key.deserializer, value.deserializer, enable.auto.commit, max.poll.records, auto.offset.reset]' were supplied but are not used yet.
+[18:02:00]   [sliding         ] batch   0:     0 bản ghi | trigger  2157 ms | bỏ do watermark 0 | state 0
+[18:02:01]   [dlq_kafka       ] batch   0:     0 bản ghi | trigger   912 ms | bỏ do watermark 0 | state 0
+26/10/15 01:02:01 WARN ResolveWriteToStream: spark.sql.adaptive.enabled is not supported in streaming DataFrames/Datasets and will be disabled.
+[18:02:01]   >> query bắt đầu: dlq_parquet (id=ef431368-272b-4f1a-a096-1ddfa3df0d23)
+[18:02:01]   query `dlq_parquet` -> outputs/stream/smoke1/dlq
+[18:02:01] ĐÃ CHẠY 6 query. Sẵn sàng nhận dữ liệu (chờ micro-batch đầu tiên ...)
+26/10/15 01:02:01 WARN AdminClientConfig: These configurations '[key.deserializer, value.deserializer, enable.auto.commit, max.poll.records, auto.offset.reset]' were supplied but are not used yet.
+[18:02:01]   [dlq_parquet     ] batch   0:     0 bản ghi | trigger   380 ms | bỏ do watermark 0 | state 0
+[18:02:02] READY — đã sẵn sàng; có thể bắt đầu phát dữ liệu vào topic.
+26/10/15 01:02:11 WARN DAGScheduler: Broadcasting large task binary with size 1157.5 KiB
+26/10/15 01:02:11 WARN DAGScheduler: Broadcasting large task binary with size 1392.4 KiB
+26/10/15 01:02:11 WARN DAGScheduler: Broadcasting large task binary with size 1216.8 KiB
+26/10/15 01:02:12 WARN DAGScheduler: Broadcasting large task binary with size 1206.4 KiB
+[18:02:14]   [dlq_kafka       ] batch   1:    41 bản ghi | trigger  3801 ms | bỏ do watermark 0 | state 0
+[18:02:15]   [dlq_parquet     ] batch   1:    41 bản ghi | trigger  4787 ms | bỏ do watermark 0 | state 0
+[18:02:17]   [kafka           ] batch   1:    41 bản ghi | trigger  6613 ms | bỏ do watermark 0 | state 0
+[18:02:18]   [detail          ] batch   1:    41 bản ghi | trigger  7852 ms | bỏ do watermark 0 | state 0
+26/10/15 01:02:18 WARN DAGScheduler: Broadcasting large task binary with size 1383.4 KiB
+[18:02:19]   [sliding         ] batch   1:    41 bản ghi | trigger  9393 ms | bỏ do watermark 0 | state 60
+26/10/15 01:02:19 WARN DAGScheduler: Broadcasting large task binary with size 1380.3 KiB
+26/10/15 01:02:20 WARN ProcessingTimeExecutor: Current batch is falling behind. The trigger interval is 10000 milliseconds, but spent 10304 milliseconds
+[18:02:20]   [window          ] batch   1:    41 bản ghi | trigger 10302 ms | bỏ do watermark 0 | state 30
+[18:02:21]   [sliding         ] batch   2:     0 bản ghi | trigger   911 ms | bỏ do watermark 0 | state 58
+[18:02:21]   [window          ] batch   2:     0 bản ghi | trigger   789 ms | bỏ do watermark 0 | state 29
+[18:03:28] Nhận tín hiệu 15 — dừng an toàn ...
+[18:03:28]   đang dừng query `detail` (batch cuối: 2) ...
+[18:03:28]   đang dừng query `kafka` (batch cuối: 2) ...
+26/10/15 01:03:28 ERROR StreamingQueryListenerBus: Listener PythonStreamingQueryListenerWrapper threw an exception
+py4j.Py4JException: An exception was raised by the Python Proxy. Return Message: Traceback (most recent call last):
+  File "/home/hadoop/spark-3.5.9/python/lib/py4j-0.10.9.7-src.zip/py4j/clientserver.py", line 617, in _call_proxy
+    return_value = getattr(self.pool[obj_id], method)(*params)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hadoop/spark-3.5.9/python/lib/pyspark.zip/pyspark/sql/streaming/listener.py", line 159, in onQueryTerminated
+    self.pylistener.onQueryTerminated(QueryTerminatedEvent.fromJObject(jevent))
+  File "/home/hadoop/capstone/src/streaming/stream_job.py", line 362, in onQueryTerminated
+    log(f"  << query kết thúc: {event.name} (id={event.id})"
+                                ^^^^^^^^^^
+AttributeError: 'QueryTerminatedEvent' object has no attribute 'name'
+
+	at py4j.Protocol.getReturnValue(Protocol.java:476)
+	at py4j.reflection.PythonProxyHandler.invoke(PythonProxyHandler.java:108)
+	at com.sun.proxy.$Proxy36.onQueryTerminated(Unknown Source)
+	at org.apache.spark.sql.streaming.PythonStreamingQueryListenerWrapper.onQueryTerminated(StreamingQueryListener.scala:101)
+	at org.apache.spark.sql.execution.streaming.StreamingQueryListenerBus.doPostEvent(StreamingQueryListenerBus.scala:143)
+	at org.apache.spark.sql.execution.streaming.StreamingQueryListenerBus.doPostEvent(StreamingQueryListenerBus.scala:43)
+	at org.apache.spark.util.ListenerBus.postToAll(ListenerBus.scala:117)
+	at org.apache.spark.util.ListenerBus.postToAll$(ListenerBus.scala:101)
+	at org.apache.spark.sql.execution.streaming.StreamingQueryListenerBus.postToAll(StreamingQueryListenerBus.scala:88)
+	at org.apache.spark.sql.execution.streaming.StreamingQueryListenerBus.onOtherEvent(StreamingQueryListenerBus.scala:108)
+	at org.apache.spark.scheduler.SparkListenerBus.doPostEvent(SparkListenerBus.scala:100)
+	at org.apache.spark.scheduler.SparkListenerBus.doPostEvent$(SparkListenerBus.scala:28)
+	at org.apache.spark.scheduler.AsyncEventQueue.doPostEvent(AsyncEventQueue.scala:37)
+	at org.apache.spark.scheduler.AsyncEventQueue.doPostEvent(AsyncEventQueue.scala:37)
+	at org.apache.spark.util.ListenerBus.postToAll(ListenerBus.scala:117)
+	at org.apache.spark.util.ListenerBus.postToAll$(ListenerBus.scala:101)
+	at org.apache.spark.scheduler.AsyncEventQueue.super$postToAll(AsyncEventQueue.scala:105)
+	at org.apache.spark.scheduler.AsyncEventQueue.$anonfun$dispatch$1(AsyncEventQueue.scala:105)
+	at scala.runtime.java8.JFunction0$mcJ$sp.apply(JFunction0$mcJ$sp.java:23)
+	at scala.util.DynamicVariable.withValue(DynamicVariable.scala:62)
+	at org.apache.spark.scheduler.AsyncEventQueue.org$apache$spark$scheduler$AsyncEventQueue$$dispatch(AsyncEventQueue.scala:100)
+	at org.apache.spark.scheduler.AsyncEventQueue$$anon$2.$anonfun$run$1(AsyncEventQueue.scala:96)
+	at org.apache.spark.util.Utils$.tryOrStopSparkContext(Utils.scala:1356)
+	at org.apache.spark.scheduler.AsyncEventQueue$$anon$2.run(AsyncEventQueue.scala:96)
+26/10/15 01:03:28 ERROR StreamingQueryListenerBus: Listener PythonStreamingQueryListenerWrapper threw an exception
+py4j.Py4JException: An exception was raised by the Python Proxy. Return Message: Traceback (most recent call last):
+  File "/home/hadoop/spark-3.5.9/python/lib/py4j-0.10.9.7-src.zip/py4j/clientserver.py", line 617, in _call_proxy
+    return_value = getattr(self.pool[obj_id], method)(*params)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hadoop/spark-3.5.9/python/lib/pyspark.zip/pyspark/sql/streaming/listener.py", line 159, in onQueryTerminated
+    self.pylistener.onQueryTerminated(QueryTerminatedEvent.fromJObject(jevent))
+  File "/home/hadoop/capstone/src/streaming/stream_job.py", line 362, in onQueryTerminated
+    log(f"  << query kết thúc: {event.name} (id={event.id})"
+                                ^^^^^^^^^^
+AttributeError: 'QueryTerminatedEvent' object has no attribute 'name'
+
+	at py4j.Protocol.getReturnValue(Protocol.java:476)
+	at py4j.reflection.PythonProxyHandler.invoke(PythonProxyHandler.java:108)
+	at com.sun.proxy.$Proxy36.onQueryTerminated(Unknown Source)
+	at org.apache.spark.sql.streaming.PythonStreamingQueryListenerWrapper.onQueryTerminated(StreamingQueryListener.scala:101)
+	at org.apache.spark.sql.execution.streaming.StreamingQueryListenerBus.doPostEvent(StreamingQueryListenerBus.scala:143)
+	at org.apache.spark.sql.execution.streaming.StreamingQueryListenerBus.doPostEvent(StreamingQueryListenerBus.scala:43)
+	at org.apache.spark.util.ListenerBus.postToAll(ListenerBus.scala:117)
+	at org.apache.spark.util.ListenerBus.postToAll$(ListenerBus.scala:101)
+	at org.apache.spark.sql.execution.streaming.StreamingQueryListenerBus.postToAll(StreamingQueryListenerBus.scala:88)
+	at org.apache.spark.sql.execution.streaming.StreamingQueryListenerBus.onOtherEvent(StreamingQueryListenerBus.scala:108)
+	at org.apache.spark.scheduler.SparkListenerBus.doPostEvent(SparkListenerBus.scala:100)
+	at org.apache.spark.scheduler.SparkListenerBus.doPostEvent$(SparkListenerBus.scala:28)
+	at org.apache.spark.scheduler.AsyncEventQueue.doPostEvent(AsyncEventQueue.scala:37)
+	at org.apache.spark.scheduler.AsyncEventQueue.doPostEvent(AsyncEventQueue.scala:37)
+	at org.apache.spark.util.ListenerBus.postToAll(ListenerBus.scala:117)
+	at org.apache.spark.util.ListenerBus.postToAll$(ListenerBus.scala:101)
+	at org.apache.spark.scheduler.AsyncEventQueue.super$postToAll(AsyncEventQueue.scala:105)
+	at org.apache.spark.scheduler.AsyncEventQueue.$anonfun$dispatch$1(AsyncEventQueue.scala:105)
+	at scala.runtime.java8.JFunction0$mcJ$sp.apply(JFunction0$mcJ$sp.java:23)
+	at scala.util.DynamicVariable.withValue(DynamicVariable.scala:62)
+	at org.apache.spark.scheduler.AsyncEventQueue.org$apache$spark$scheduler$AsyncEventQueue$$dispatch(AsyncEventQueue.scala:100)
+	at org.apache.spark.scheduler.AsyncEventQueue$$anon$2.$anonfun$run$1(AsyncEventQueue.scala:96)
+	at org.apache.spark.util.Utils$.tryOrStopSparkContext(Utils.scala:1356)
+	at org.apache.spark.scheduler.AsyncEventQueue$$anon$2.run(AsyncEventQueue.scala:96)
+[18:03:28]   đang dừng query `window` (batch cuối: 3) ...
+26/10/15 01:03:28 ERROR StreamingQueryListenerBus: Listener PythonStreamingQueryListenerWrapper threw an exception
+py4j.Py4JException: An exception was raised by the Python Proxy. Return Message: Traceback (most recent call last):
+  File "/home/hadoop/spark-3.5.9/python/lib/py4j-0.10.9.7-src.zip/py4j/clientserver.py", line 617, in _call_proxy
+    return_value = getattr(self.pool[obj_id], method)(*params)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hadoop/spark-3.5.9/python/lib/pyspark.zip/pyspark/sql/streaming/listener.py", line 159, in onQueryTerminated
+    self.pylistener.onQueryTerminated(QueryTerminatedEvent.fromJObject(jevent))
+  File "/home/hadoop/capstone/src/streaming/stream_job.py", line 362, in onQueryTerminated
+    log(f"  << query kết thúc: {event.name} (id={event.id})"
+                                ^^^^^^^^^^
+AttributeError: 'QueryTerminatedEvent' object has no attribute 'name'
+
+	at py4j.Protocol.getReturnValue(Protocol.java:476)
+	at py4j.reflection.PythonProxyHandler.invoke(PythonProxyHandler.java:108)
+	at com.sun.proxy.$Proxy36.onQueryTerminated(Unknown Source)
+	at org.apache.spark.sql.streaming.PythonStreamingQueryListenerWrapper.onQueryTerminated(StreamingQueryListener.scala:101)
+	at org.apache.spark.sql.execution.streaming.StreamingQueryListenerBus.doPostEvent(StreamingQueryListenerBus.scala:143)
+	at org.apache.spark.sql.execution.streaming.StreamingQueryListenerBus.doPostEvent(StreamingQueryListenerBus.scala:43)
+	at org.apache.spark.util.ListenerBus.postToAll(ListenerBus.scala:117)
+	at org.apache.spark.util.ListenerBus.postToAll$(ListenerBus.scala:101)
+	at org.apache.spark.sql.execution.streaming.StreamingQueryListenerBus.postToAll(StreamingQueryListenerBus.scala:88)
+	at org.apache.spark.sql.execution.streaming.StreamingQueryListenerBus.onOtherEvent(StreamingQueryListenerBus.scala:108)
+	at org.apache.spark.scheduler.SparkListenerBus.doPostEvent(SparkListenerBus.scala:100)
+	at org.apache.spark.scheduler.SparkListenerBus.doPostEvent$(SparkListenerBus.scala:28)
+	at org.apache.spark.scheduler.AsyncEventQueue.doPostEvent(AsyncEventQueue.scala:37)
+	at org.apache.spark.scheduler.AsyncEventQueue.doPostEvent(AsyncEventQueue.scala:37)
+	at org.apache.spark.util.ListenerBus.postToAll(ListenerBus.scala:117)
+	at org.apache.spark.util.ListenerBus.postToAll$(ListenerBus.scala:101)
+	at org.apache.spark.scheduler.AsyncEventQueue.super$postToAll(AsyncEventQueue.scala:105)
+	at org.apache.spark.scheduler.AsyncEventQueue.$anonfun$dispatch$1(AsyncEventQueue.scala:105)
+	at scala.runtime.java8.JFunction0$mcJ$sp.apply(JFunction0$mcJ$sp.java:23)
+	at scala.util.DynamicVariable.withValue(DynamicVariable.scala:62)
+	at org.apache.spark.scheduler.AsyncEventQueue.org$apache$spark$scheduler$AsyncEventQueue$$dispatch(AsyncEventQueue.scala:100)
+	at org.apache.spark.scheduler.AsyncEventQueue$$anon$2.$anonfun$run$1(AsyncEventQueue.scala:96)
+	at org.apache.spark.util.Utils$.tryOrStopSparkContext(Utils.scala:1356)
+	at org.apache.spark.scheduler.AsyncEventQueue$$anon$2.run(AsyncEventQueue.scala:96)
+[18:03:28]   đang dừng query `sliding` (batch cuối: 3) ...
+26/10/15 01:03:28 ERROR StreamingQueryListenerBus: Listener PythonStreamingQueryListenerWrapper threw an exception
+py4j.Py4JException: An exception was raised by the Python Proxy. Return Message: Traceback (most recent call last):
+  File "/home/hadoop/spark-3.5.9/python/lib/py4j-0.10.9.7-src.zip/py4j/clientserver.py", line 617, in _call_proxy
+    return_value = getattr(self.pool[obj_id], method)(*params)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hadoop/spark-3.5.9/python/lib/pyspark.zip/pyspark/sql/streaming/listener.py", line 159, in onQueryTerminated
+    self.pylistener.onQueryTerminated(QueryTerminatedEvent.fromJObject(jevent))
+  File "/home/hadoop/capstone/src/streaming/stream_job.py", line 362, in onQueryTerminated
+    log(f"  << query kết thúc: {event.name} (id={event.id})"
+                                ^^^^^^^^^^
+AttributeError: 'QueryTerminatedEvent' object has no attribute 'name'
+
+	at py4j.Protocol.getReturnValue(Protocol.java:476)
+	at py4j.reflection.PythonProxyHandler.invoke(PythonProxyHandler.java:108)
+	at com.sun.proxy.$Proxy36.onQueryTerminated(Unknown Source)
+	at org.apache.spark.sql.streaming.PythonStreamingQueryListenerWrapper.onQueryTerminated(StreamingQueryListener.scala:101)
+	at org.apache.spark.sql.execution.streaming.StreamingQueryListenerBus.doPostEvent(StreamingQueryListenerBus.scala:143)
+	at org.apache.spark.sql.execution.streaming.StreamingQueryListenerBus.doPostEvent(StreamingQueryListenerBus.scala:43)
+	at org.apache.spark.util.ListenerBus.postToAll(ListenerBus.scala:117)
+	at org.apache.spark.util.ListenerBus.postToAll$(ListenerBus.scala:101)
+	at org.apache.spark.sql.execution.streaming.StreamingQueryListenerBus.postToAll(StreamingQueryListenerBus.scala:88)
+	at org.apache.spark.sql.execution.streaming.StreamingQueryListenerBus.onOtherEvent(StreamingQueryListenerBus.scala:108)
+	at org.apache.spark.scheduler.SparkListenerBus.doPostEvent(SparkListenerBus.scala:100)
+	at org.apache.spark.scheduler.SparkListenerBus.doPostEvent$(SparkListenerBus.scala:28)
+	at org.apache.spark.scheduler.AsyncEventQueue.doPostEvent(AsyncEventQueue.scala:37)
+	at org.apache.spark.scheduler.AsyncEventQueue.doPostEvent(AsyncEventQueue.scala:37)
+	at org.apache.spark.util.ListenerBus.postToAll(ListenerBus.scala:117)
+	at org.apache.spark.util.ListenerBus.postToAll$(ListenerBus.scala:101)
+	at org.apache.spark.scheduler.AsyncEventQueue.super$postToAll(AsyncEventQueue.scala:105)
+	at org.apache.spark.scheduler.AsyncEventQueue.$anonfun$dispatch$1(AsyncEventQueue.scala:105)
+	at scala.runtime.java8.JFunction0$mcJ$sp.apply(JFunction0$mcJ$sp.java:23)
+	at scala.util.DynamicVariable.withValue(DynamicVariable.scala:62)
+	at org.apache.spark.scheduler.AsyncEventQueue.org$apache$spark$scheduler$AsyncEventQueue$$dispatch(AsyncEventQueue.scala:100)
+	at org.apache.spark.scheduler.AsyncEventQueue$$anon$2.$anonfun$run$1(AsyncEventQueue.scala:96)
+	at org.apache.spark.util.Utils$.tryOrStopSparkContext(Utils.scala:1356)
+	at org.apache.spark.scheduler.AsyncEventQueue$$anon$2.run(AsyncEventQueue.scala:96)
+[18:03:28]   đang dừng query `dlq_kafka` (batch cuối: 2) ...
+26/10/15 01:03:28 ERROR StreamingQueryListenerBus: Listener PythonStreamingQueryListenerWrapper threw an exception
+py4j.Py4JException: An exception was raised by the Python Proxy. Return Message: Traceback (most recent call last):
+  File "/home/hadoop/spark-3.5.9/python/lib/py4j-0.10.9.7-src.zip/py4j/clientserver.py", line 617, in _call_proxy
+    return_value = getattr(self.pool[obj_id], method)(*params)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hadoop/spark-3.5.9/python/lib/pyspark.zip/pyspark/sql/streaming/listener.py", line 159, in onQueryTerminated
+    self.pylistener.onQueryTerminated(QueryTerminatedEvent.fromJObject(jevent))
+  File "/home/hadoop/capstone/src/streaming/stream_job.py", line 362, in onQueryTerminated
+    log(f"  << query kết thúc: {event.name} (id={event.id})"
+                                ^^^^^^^^^^
+AttributeError: 'QueryTerminatedEvent' object has no attribute 'name'
+
+	at py4j.Protocol.getReturnValue(Protocol.java:476)
+	at py4j.reflection.PythonProxyHandler.invoke(PythonProxyHandler.java:108)
+	at com.sun.proxy.$Proxy36.onQueryTerminated(Unknown Source)
+	at org.apache.spark.sql.streaming.PythonStreamingQueryListenerWrapper.onQueryTerminated(StreamingQueryListener.scala:101)
+	at org.apache.spark.sql.execution.streaming.StreamingQueryListenerBus.doPostEvent(StreamingQueryListenerBus.scala:143)
+	at org.apache.spark.sql.execution.streaming.StreamingQueryListenerBus.doPostEvent(StreamingQueryListenerBus.scala:43)
+	at org.apache.spark.util.ListenerBus.postToAll(ListenerBus.scala:117)
+	at org.apache.spark.util.ListenerBus.postToAll$(ListenerBus.scala:101)
+	at org.apache.spark.sql.execution.streaming.StreamingQueryListenerBus.postToAll(StreamingQueryListenerBus.scala:88)
+	at org.apache.spark.sql.execution.streaming.StreamingQueryListenerBus.onOtherEvent(StreamingQueryListenerBus.scala:108)
+	at org.apache.spark.scheduler.SparkListenerBus.doPostEvent(SparkListenerBus.scala:100)
+	at org.apache.spark.scheduler.SparkListenerBus.doPostEvent$(SparkListenerBus.scala:28)
+	at org.apache.spark.scheduler.AsyncEventQueue.doPostEvent(AsyncEventQueue.scala:37)
+	at org.apache.spark.scheduler.AsyncEventQueue.doPostEvent(AsyncEventQueue.scala:37)
+	at org.apache.spark.util.ListenerBus.postToAll(ListenerBus.scala:117)
+	at org.apache.spark.util.ListenerBus.postToAll$(ListenerBus.scala:101)
+	at org.apache.spark.scheduler.AsyncEventQueue.super$postToAll(AsyncEventQueue.scala:105)
+	at org.apache.spark.scheduler.AsyncEventQueue.$anonfun$dispatch$1(AsyncEventQueue.scala:105)
+	at scala.runtime.java8.JFunction0$mcJ$sp.apply(JFunction0$mcJ$sp.java:23)
+	at scala.util.DynamicVariable.withValue(DynamicVariable.scala:62)
+	at org.apache.spark.scheduler.AsyncEventQueue.org$apache$spark$scheduler$AsyncEventQueue$$dispatch(AsyncEventQueue.scala:100)
+	at org.apache.spark.scheduler.AsyncEventQueue$$anon$2.$anonfun$run$1(AsyncEventQueue.scala:96)
+	at org.apache.spark.util.Utils$.tryOrStopSparkContext(Utils.scala:1356)
+	at org.apache.spark.scheduler.AsyncEventQueue$$anon$2.run(AsyncEventQueue.scala:96)
+[18:03:28]   đang dừng query `dlq_parquet` (batch cuối: 2) ...
+[18:03:28]   query `detail` đã dừng sạch.
+[18:03:28]   query `kafka` đã dừng sạch.
+26/10/15 01:03:28 ERROR StreamingQueryListenerBus: Listener PythonStreamingQueryListenerWrapper threw an exception
+py4j.Py4JException: An exception was raised by the Python Proxy. Return Message: Traceback (most recent call last):
+  File "/home/hadoop/spark-3.5.9/python/lib/py4j-0.10.9.7-src.zip/py4j/clientserver.py", line 617, in _call_proxy
+    return_value = getattr(self.pool[obj_id], method)(*params)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hadoop/spark-3.5.9/python/lib/pyspark.zip/pyspark/sql/streaming/listener.py", line 159, in onQueryTerminated
+    self.pylistener.onQueryTerminated(QueryTerminatedEvent.fromJObject(jevent))
+  File "/home/hadoop/capstone/src/streaming/stream_job.py", line 362, in onQueryTerminated
+    log(f"  << query kết thúc: {event.name} (id={event.id})"
+                                ^^^^^^^^^^
+AttributeError: 'QueryTerminatedEvent' object has no attribute 'name'
+
+	at py4j.Protocol.getReturnValue(Protocol.java:476)
+	at py4j.reflection.PythonProxyHandler.invoke(PythonProxyHandler.java:108)
+	at com.sun.proxy.$Proxy36.onQueryTerminated(Unknown Source)
+	at org.apache.spark.sql.streaming.PythonStreamingQueryListenerWrapper.onQueryTerminated(StreamingQueryListener.scala:101)
+	at org.apache.spark.sql.execution.streaming.StreamingQueryListenerBus.doPostEvent(StreamingQueryListenerBus.scala:143)
+	at org.apache.spark.sql.execution.streaming.StreamingQueryListenerBus.doPostEvent(StreamingQueryListenerBus.scala:43)
+	at org.apache.spark.util.ListenerBus.postToAll(ListenerBus.scala:117)
+	at org.apache.spark.util.ListenerBus.postToAll$(ListenerBus.scala:101)
+	at org.apache.spark.sql.execution.streaming.StreamingQueryListenerBus.postToAll(StreamingQueryListenerBus.scala:88)
+	at org.apache.spark.sql.execution.streaming.StreamingQueryListenerBus.onOtherEvent(StreamingQueryListenerBus.scala:108)
+	at org.apache.spark.scheduler.SparkListenerBus.doPostEvent(SparkListenerBus.scala:100)
+	at org.apache.spark.scheduler.SparkListenerBus.doPostEvent$(SparkListenerBus.scala:28)
+	at org.apache.spark.scheduler.AsyncEventQueue.doPostEvent(AsyncEventQueue.scala:37)
+	at org.apache.spark.scheduler.AsyncEventQueue.doPostEvent(AsyncEventQueue.scala:37)
+	at org.apache.spark.util.ListenerBus.postToAll(ListenerBus.scala:117)
+	at org.apache.spark.util.ListenerBus.postToAll$(ListenerBus.scala:101)
+	at org.apache.spark.scheduler.AsyncEventQueue.super$postToAll(AsyncEventQueue.scala:105)
+	at org.apache.spark.scheduler.AsyncEventQueue.$anonfun$dispatch$1(AsyncEventQueue.scala:105)
+	at scala.runtime.java8.JFunction0$mcJ$sp.apply(JFunction0$mcJ$sp.java:23)
+	at scala.util.DynamicVariable.withValue(DynamicVariable.scala:62)
+	at org.apache.spark.scheduler.AsyncEventQueue.org$apache$spark$scheduler$AsyncEventQueue$$dispatch(AsyncEventQueue.scala:100)
+	at org.apache.spark.scheduler.AsyncEventQueue$$anon$2.$anonfun$run$1(AsyncEventQueue.scala:96)
+	at org.apache.spark.util.Utils$.tryOrStopSparkContext(Utils.scala:1356)
+	at org.apache.spark.scheduler.AsyncEventQueue$$anon$2.run(AsyncEventQueue.scala:96)
+[18:03:28]   query `window` đã dừng sạch.
+[18:03:28]   query `sliding` đã dừng sạch.
+[18:03:28]   query `dlq_kafka` đã dừng sạch.
+[18:03:28]   query `dlq_parquet` đã dừng sạch.
+[18:03:28] Tổng số bản ghi đã đọc qua các query: 246 | bỏ do watermark: 0
+[18:03:30] Đã dừng Spark. Kết quả nằm trong outputs/stream/smoke1

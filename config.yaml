@@ -151,6 +151,36 @@ kafka:
     acks: all
     linger_ms: 20             # gom lô nhỏ để tăng thông lượng (đo ở outputs/tables/ingestion_report.csv)
 
+# ---------------------------------------------------------------------------
+# Spark Structured Streaming (Task 8) — src/streaming/stream_job.py
+# ---------------------------------------------------------------------------
+streaming:
+  # Nguồn: topic kafka.topic_raw. startingOffsets nhận:
+  #   latest   — chỉ xử lý bản ghi đến SAU khi query khởi động (đúng cho demo trực tiếp)
+  #   earliest — phát lại toàn bộ topic từ đầu
+  #   chuỗi JSON {"comments_raw":{"0":7900,"1":7901,"2":7902}} — bắt đầu từ offset
+  #              chính xác (tái lập được; lấy bằng kafka-get-offsets.sh)
+  starting_offsets: latest
+  max_offsets_per_trigger: 5000   # trần số bản ghi mỗi micro-batch (chống dồn ứ)
+  trigger_seconds: 10             # chu kỳ micro-batch (processingTime trigger)
+  # Watermark = mốc muộn tối đa chấp nhận cho dữ liệu sự kiện. Chọn 2 phút vì
+  # replay.late_max_s = 30 s (độ trễ giả lập tối đa) → 2 phút là 4× biên an toàn;
+  # đồng thời chặn kích thước state của phép gộp cửa sổ. Hệ quả phải nói rõ:
+  # kết quả một cửa sổ chỉ được ghi ra sau khi cửa sổ ĐÓNG + watermark (với cửa sổ
+  # 1 phút ⇒ chậm nhất ~3 phút sau khi cửa sổ kết thúc).
+  watermark: "2 minutes"
+  window_duration: "1 minute"
+  sliding_window_duration: "10 seconds"
+  sliding_window_slide: "5 seconds"   # slide < duration ⇒ cửa sổ TRƯỢT thật sự
+  checkpoint_root: checkpoints/streaming
+  sink_root: outputs/stream
+  privacy:
+    keep_text: false      # false = KHÔNG giữ văn bản trong bảng chi tiết (mặc định)
+  dlq:
+    to_kafka: true        # bản ghi lỗi -> topic kafka.topic_dlq (kèm lý do)
+    to_parquet: true      # bản sao -> <sink>/dlq để đối chiếu số lượng
+  batch_log: outputs/tables/stream_batches.csv   # StreamingQueryListener ghi mỗi micro-batch
+
 replay:
   # Ánh xạ cột trong part-01.json -> trường của message JSON gửi Kafka.
   # Message chỉ gồm: comment_id, stream_id, user_hash, text, event_ts (KHÔNG có nhãn).

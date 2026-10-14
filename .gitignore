@@ -18,6 +18,7 @@ logs/*
 !logs/task5_environment.txt
 !logs/task6_*.log
 !logs/task7_*.log
+!logs/task8_*.log
 
 # --- Môi trường / bí mật ---
 .venv/

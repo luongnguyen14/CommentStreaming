@@ -1,0 +1,59 @@
+{
+  "run_name": "verify1",
+  "sink_dir": "outputs/stream/verify1",
+  "n_scored": 1014,
+  "n_dlq": 10,
+  "n_eval_joined": 1000,
+  "stream": {
+    "n": 1000,
+    "accuracy": 0.703,
+    "macro_f1": 0.6310882800608827,
+    "weighted_f1": 0.7229703196347032
+  },
+  "offline_same_ids": {
+    "n": 1000,
+    "accuracy": 0.703,
+    "macro_f1": 0.6310882800608827,
+    "weighted_f1": 0.7229703196347032
+  },
+  "agreement_pct": 100.0,
+  "per_class_stream": {
+    "negative": {
+      "precision": 0.706422,
+      "recall": 0.669565,
+      "f1": 0.6875,
+      "support": 230
+    },
+    "neutral": {
+      "precision": 0.31405,
+      "recall": 0.535211,
+      "f1": 0.395833,
+      "support": 142
+    },
+    "positive": {
+      "precision": 0.875926,
+      "recall": 0.753185,
+      "f1": 0.809932,
+      "support": 628
+    }
+  },
+  "latency": {
+    "lat_min": 40,
+    "lat_p50": 2413,
+    "lat_p95": 9663,
+    "lat_p99": 27091,
+    "lat_max": 603608,
+    "kl_p50": 0,
+    "kl_max": 600206,
+    "ql_min": 40,
+    "ql_p50": 2355,
+    "ql_p95": 9136,
+    "n_processing_ts": 13
+  },
+  "tables": [
+    "outputs/tables/stream_verification.csv",
+    "outputs/tables/stream_per_class_metrics.csv",
+    "outputs/tables/stream_sample_rows.csv",
+    "outputs/tables/stream_dlq_rows.csv"
+  ]
+}

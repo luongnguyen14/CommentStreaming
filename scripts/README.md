@@ -35,6 +35,33 @@ Các script dưới đây **copy template của cô từ `TEMPLATES_DIR` sang `d
   ghi chú thuyết trình ~3 phút/slide
 - `install_template_fonts.py` — giải mã + cài font của template (chỉ cần chạy lại nếu đổi máy)
 
+## Script streaming (Task 8)
+
+- `env.sh` (đã có ở trên) chứa `SPARK_KAFKA_PKG=org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.9`
+  — **phải khớp** phiên bản Spark/Scala; gói đã nằm trong `~/.ivy2/jars` nên chạy được khi không có mạng.
+- `run_stream.sh <tên-lần-chạy> [tham số của stream_job.py ...]` — kiểm tra trước khi chạy
+  (đã có job cùng tên? Kafka ở `localhost:9092`? HDFS sống?), chạy `spark-submit` ở nền và
+  **chờ tới khi job in `READY`** mới trả về (để bên phát dữ liệu không gửi sớm hơn mốc offset).
+  Log `logs/task8_stream_<tên>.log`, PID `logs/task8_stream_<tên>.pid`.
+- `stop_stream.sh <tên-lần-chạy>` — dừng **êm**: SIGTERM cho tiến trình Python của driver
+  (con của JVM `spark-submit`) → handler gọi `query.stop()` cho từng query. Không dùng `kill -9`.
+- `send_bad_events.py` — gửi 10 ca lỗi đã biết (`bad-01`…`bad-10`) để kiểm chứng nhánh DLQ,
+  thêm `--heartbeat N --heartbeat-interval S` (bản ghi hợp lệ đẩy watermark tiến) và
+  `--late-probe` (bản ghi hợp lệ lạc hậu 10 phút, phải bị watermark bỏ). `--dry-run` để xem trước.
+
+Quy trình kiểm chứng đầy đủ (đã chạy thật, số liệu ở `outputs/streaming_summary.md`):
+
+```bash
+$VENV_PY src/streaming/verify_stream.py --record-baseline --run-name verify1   # ghi mốc offset
+bash scripts/run_stream.sh verify1 --sink-dir outputs/stream/verify1 \
+     --checkpoint-root checkpoints/streaming/verify1 --trigger-seconds 5
+$VENV_PY src/producer/replay_producer.py --only-test --max 1000 --rate 50 \
+     --labels-out outputs/stream/verify1/sent_labels.parquet
+$VENV_PY scripts/send_bad_events.py --heartbeat 12 --heartbeat-interval 25 --late-probe
+bash scripts/stop_stream.sh verify1
+# rồi chạy verify_stream.py (không có --record-baseline) để đối chiếu + tính macro-F1
+```
+
 ## Script kiểm tra mô hình
 
 - `check_model.py` — nạp lại `outputs/models/sentiment_pipeline` bằng `PipelineModel.load`,

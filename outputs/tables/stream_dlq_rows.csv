@@ -1,0 +1,11 @@
+comment_id,reason,kafka_partition,kafka_offset,event_ts
+(khong-co-id),json_khong_hop_le,0,3103,
+bad-04,thieu_truong:text,0,3104,2026-10-14T18:08:51.205Z
+(khong-co-id),json_khong_hop_le,1,2893,
+bad-06,thieu_truong:event_ts,1,2894,
+bad-07,event_ts_khong_doc_duoc,1,2895,2026-13-45T99:99:99Z
+bad-08,van_ban_rong_sau_lam_sach,1,2896,2026-10-14T18:08:51.205Z
+bad-09,van_ban_qua_ngan_duoi_20_ky_tu,1,2897,2026-10-14T18:08:51.205Z
+(khong-co-id),json_khong_hop_le,2,2986,
+(khong-co-id),thieu_truong:comment_id,2,2987,2026-10-14T18:08:51.205Z
+bad-10,van_ban_qua_dai_tren_5000_ky_tu,2,2988,2026-10-14T18:08:51.205Z
