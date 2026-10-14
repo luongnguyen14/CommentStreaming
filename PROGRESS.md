@@ -26,5 +26,6 @@ Ngày Day N tính từ Day 1 = 15/09/2026.
 | 2 | **Đo RAM khi chạy đồng thời Kafka + Spark** | Task 4, 5 | Máy 7 GB RAM. Đo 14/10 khi chỉ có HDFS: còn khả dụng 1,9 GB; cần đo lại khi Kafka + Spark cùng chạy để chốt cấu hình `local[N]`. |
 | 3 | **Xác minh vài `review_id` với trang Kaggle** | Trước Final Report | Xem `data/raw/SOURCE.md` (mục "Việc còn lại"). |
 | 4 | **Nhóm rà lại WBS** (phân công, trạng thái) trước khi nộp | Task 3 | Bản trong `deliverables/WBS.xlsx`. |
+| 5 | **Chốt cấu hình Kafka ở Task 4** | Task 4 | Kafka 2.8.1 cài ở `/home/hadoop/kafka` (thư mục `kafka_2.12-2.8.1` chỉ còn `logs`, không dùng); `log.dirs=/tmp/kafka-logs` — cân nhắc đổi sang đường dẫn ổn định để không mất log khi reboot. |
 
 ✔️ **Đã gỡ chặn:** (1) LibreOffice đã cài (02/10/2026). (2) **Nguồn dữ liệu đã truy vết** — dùng IMDb Review Dataset (CC0), loại CSV không rõ nguồn (14/10/2026). (3) **Day 1 đã chốt** = 15/09/2026 (14/10/2026). (4) **pandas + streamlit đã cài** (14/10/2026). (5) **Cách chạy Spark đã chốt**: `spark-submit` 3.5.9 + Python 3.11 qua `scripts/env.sh`; bản `pyspark` pip 4.2.0 không dùng được (cần Java 17, máy chỉ có Java 8/11). (6) **HDFS + Spark đã chạy thông** — smoke test 14/10/2026, event log ghi lên `hdfs://localhost:9000/spark-logs`.
