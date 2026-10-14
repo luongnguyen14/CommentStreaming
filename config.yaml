@@ -1,0 +1,44 @@
+# config.yaml — Tham số dùng chung của dự án (CLAUDE.md §3: không hard-code trong script)
+#
+# Quy ước: mọi script đọc file này. Muối băm và khóa API KHÔNG để ở đây —
+# đọc từ biến môi trường (xem scripts/env.sh và README của từng thư mục).
+
+seed: 42                      # mọi bước có yếu tố ngẫu nhiên (CLAUDE.md §3)
+
+paths:
+  raw_comments: data/raw/part-01.json          # IMDb Review Dataset - ebD (CC0, xem data/raw/SOURCE.md)
+  eval_labels: data/processed/eval_labels.parquet
+  outputs_tables: outputs/tables
+  outputs_figures: outputs/figures
+  logs: logs
+
+kafka:
+  bootstrap_servers: localhost:9092
+  topic_raw: comments_raw
+  topic_scored: comments_scored
+  topic_dlq: comments_dlq
+  producer:
+    acks: all
+    linger_ms: 20             # gom lô nhỏ để tăng thông lượng (đo ở outputs/tables/ingestion_report.csv)
+
+replay:
+  # Ánh xạ cột trong part-01.json -> trường của message JSON gửi Kafka.
+  # Message chỉ gồm: comment_id, stream_id, user_hash, text, event_ts (KHÔNG có nhãn).
+  id_field: review_id         # -> comment_id
+  stream_field: movie         # -> stream_id (dùng tên phim làm "phòng live" thay thế)
+  user_field: reviewer        # -> user_hash (băm có muối, KHÔNG gửi bản gốc)
+  text_field: review_detail   # -> text
+
+  rate: 50                    # bình luận/giây (0 = không giới hạn tốc độ)
+  burst_prob: 0.02            # xác suất bắt đầu một đợt bùng nổ
+  burst_factor: 8             # trong đợt bùng nổ, tốc độ tăng gấp bấy nhiêu lần
+  burst_len_s: 2.0            # độ dài mỗi đợt bùng nổ (giây)
+  late_ratio: 0.05            # tỷ lệ bản ghi có event_ts bị đẩy trễ (thử watermark)
+  late_max_s: 30              # mức trễ tối đa của bản ghi đến muộn (giây)
+
+  # Ánh xạ nhãn — TẠM THỜI, sẽ chốt chính thức ở Task 6 (docs/data_dictionary.md).
+  # Nhãn KHÔNG bao giờ đi vào message Kafka; chỉ ghi ra data/processed/eval_labels.parquet.
+  label_map:
+    negative: [1, 2, 3, 4]
+    neutral:  [5, 6]
+    positive: [7, 8, 9, 10]

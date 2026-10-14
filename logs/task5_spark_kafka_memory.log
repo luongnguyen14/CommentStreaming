@@ -1,0 +1,25 @@
+== 14/10/2026 — Đo RAM khi Kafka broker + Spark chạy đồng thời ==
+Lệnh: spark-submit (local[2]) đọc topic comments_raw, lấy mẫu `free -m` mỗi 5 giây.
+Kafka broker KRaft (heap 512 MB) chạy nền; HDFS cũng đang chạy.
+
+t+5s : đã dùng=5066MB còn trống=303MB khả dụng=2142MB
+t+10s: đã dùng=5243MB còn trống=126MB khả dụng=1966MB
+t+15s: đã dùng=5308MB còn trống=136MB khả dụng=1901MB
+t+20s: đã dùng=4449MB còn trống=1028MB khả dụng=2759MB   <- Spark driver đã thoát
+t+25s: đã dùng=4449MB còn trống=1028MB khả dụng=2759MB
+t+30s: đã dùng=4449MB còn trống=1028MB khả dụng=2759MB
+
+Kết quả job: KAFKA_ROWS: 7000 (đọc đủ), không lỗi.
+
+Kết luận (làm cơ sở chốt cấu hình Task 8):
+- Kafka (512 MB heap) + Spark local[2] chạy ĐỒNG THỜI được trên máy 7 GB.
+- Mức khả dụng thấp nhất đo được: ~1,9 GB (có dùng swap: 1,2 GiB).
+- Vì vậy job streaming nên giữ driver ~1g, local[2], và đặt heap Kafka 512 MB như hiện tại.
+
+== 14/10/2026 — Kiểm tra gói Spark–Kafka ==
+spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.9:
+SPARK_VERSION: 3.5.9
+SCALA_VERSION: 2.12.18
+KAFKA_COLUMNS: ['key', 'offset', 'partition', 'timestamp', 'timestampType', 'topic', 'value']
+KAFKA_ROWS: 7000
+KAFKA_SAMPLE_KEY: rw5704483

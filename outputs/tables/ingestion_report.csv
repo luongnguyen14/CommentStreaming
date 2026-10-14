@@ -1,0 +1,6 @@
+timestamp_utc,topic,rate_target,burst_prob,late_ratio,sent,delivered,errors,seconds,msgs_per_sec,bytes,note
+2026-10-14T14:47:09.128Z,comments_raw,100.0,0.0,0.05,1000,1000,0,10.00,100.0,737507,sample=0 max=1000 loop=False seed=42
+2026-10-14T14:47:11.973Z,comments_raw,500.0,0.0,0.05,1000,1000,0,2.00,499.0,737507,sample=0 max=1000 loop=False seed=42
+2026-10-14T14:47:13.181Z,comments_raw,2000.0,0.0,0.05,1000,1000,0,0.51,1973.7,737507,sample=0 max=1000 loop=False seed=42
+2026-10-14T14:47:14.501Z,comments_raw,0.0,0.0,0.05,2000,2000,0,0.55,3614.6,1560279,sample=0 max=2000 loop=False seed=42
+2026-10-14T14:47:17.003Z,comments_raw,100.0,0.02,0.05,1000,1000,0,1.79,559.5,737507,sample=0 max=1000 loop=False seed=42

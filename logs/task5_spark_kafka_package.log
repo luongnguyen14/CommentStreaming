@@ -1,0 +1,5 @@
+SPARK_VERSION: 3.5.9
+SCALA_VERSION: 2.12.18
+KAFKA_COLUMNS: ['key', 'offset', 'partition', 'timestamp', 'timestampType', 'topic', 'value']
+KAFKA_ROWS: 7000
+KAFKA_SAMPLE_KEY: rw5704483

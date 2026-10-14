@@ -1,0 +1,13 @@
+
+Topic 'comments_raw': đọc 1000 message trong 0.14s (7056.3 msg/s) | 720.2 KiB
+  theo partition: {0: 362, 1: 317, 2: 321}
+  message lỗi: 0
+
+Mẫu (2):
+  comment_id=rw5704483 stream_id=The Valhalla Murders (2019– ) user_hash=2fc4691eaef797da event_ts=2026-10-14T14:46:37.663Z
+    text: "I know Iceland is a small country and police do things a bit different..."
+  comment_id=rw5704487 stream_id=The Droving (2020) user_hash=d81057482b17989a event_ts=2026-10-14T14:46:49.539Z
+    text: "Here's the truth. There's not much to this movie at all. I was sucked ..."
+
+KIỂM CHỨNG: mong đợi 1000 message, đọc được 1000 -> ĐẠT
+  event_ts của message cuối: 2026-10-14T14:46:49.619Z

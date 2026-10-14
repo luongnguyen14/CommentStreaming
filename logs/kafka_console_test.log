@@ -1,0 +1,8 @@
+== 2026-10-14T21:42:45+07:00 — console producer/consumer test ==
+-- da gui 3 message; doc lai:
+The consumer rebalance protocol (KIP-848) is production-ready! Set group.protocol=consumer to try it out. See https://kafka.apache.org/documentation/#consumer_rebalance_protocol
+{"comment_id":"c-001","text":"kiem tra console producer"}
+{"comment_id":"c-002","text":"test 2"}
+{"comment_id":"c-003","text":"test 3"}
+Processed a total of 3 messages
+-- exit code consumer: 0

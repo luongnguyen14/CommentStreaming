@@ -8,8 +8,14 @@ data/processed/*
 
 # --- Trạng thái chạy ---
 checkpoints/
-logs/
+logs/*
 *.log
+# Bằng chứng kiểm chứng của Task 5 — CỐ Ý commit để người chấm đối chiếu được
+# (phải đặt SAU các dòng loại trừ ở trên, git lấy dòng khớp cuối cùng)
+!logs/README.md
+!logs/kafka_console_test.log
+!logs/task5_*.log
+!logs/task5_environment.txt
 
 # --- Môi trường / bí mật ---
 .venv/

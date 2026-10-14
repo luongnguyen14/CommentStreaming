@@ -1,0 +1,38 @@
+== java -version (hệ thống, dùng cho Spark/Hadoop)
+openjdk version "1.8.0_504"
+OpenJDK Runtime Environment (build 1.8.0_504-8u504-ga-1ubuntu1~26.04.3-b01)
+OpenJDK 64-Bit Server VM (build 25.504-b01, mixed mode)
+
+== java -version (JDK 17 dành riêng cho Kafka)
+openjdk version "17.0.20.1" 2026-08-18
+OpenJDK Runtime Environment Temurin-17.0.20.1+1 (build 17.0.20.1+1)
+OpenJDK 64-Bit Server VM Temurin-17.0.20.1+1 (build 17.0.20.1+1, mixed mode, sharing)
+
+== python
+Python 3.11.15
+Python 3.11.15
+
+== RAM
+               total        used        free      shared  buff/cache   available
+Mem:           7.0Gi       4.6Gi       282Mi       381Mi       2.8Gi       2.5Gi
+Swap:          3.0Gi       1.2Gi       1.8Gi
+
+== ổ đĩa
+/dev/nvme0n1p2  262G   37G  214G  15% /
+tmpfs           3.6G  297M  3.3G   9% /tmp
+/dev/nvme0n1p2  262G   37G  214G  15% /
+
+== CPU
+4
+
+== pyspark + scala
+pyspark 3.5.9
+scala-library-2.12.18.jar
+spark-core_2.12-3.5.9.jar
+
+== Kafka
+/home/hadoop/kafka
+/home/hadoop/kafka-2.8.1-old
+kafka-server-4.3.1.jar
+kafka-server-common-4.3.1.jar
+kafka_2.13-4.3.1.jar

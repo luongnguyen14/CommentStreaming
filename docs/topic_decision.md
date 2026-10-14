@@ -7,6 +7,14 @@
 **Nhóm:** Nhóm 6 — Nhóm trưởng: Vàng A Ký — Thành viên: Nguyễn Đình Bằng; Vàng Thị Dẳm; Dương Thị Hạnh; Ngô Lương Nguyên
 **Task:** 1 (Day 1–2) · **Ngày soạn:** 02/10/2026 · **Trạng thái:** ⏳ *chờ nhóm chốt và hỏi cô*
 
+> 🔄 **CẬP NHẬT 14/10/2026 (Task 2b) — mục "Dữ liệu huấn luyện" ở §0 đã thay đổi:**
+> bộ `YoutubeCommentsDataSet.csv` (18.408 dòng) **không dùng nữa** (không truy vết được nguồn gốc).
+> Dữ liệu huấn luyện chính thức nay là **IMDb Review Dataset - ebD (giấy phép CC0, 1.010.296 review)**,
+> tải sẵn ở `data/raw/part-01.json` — xem `data/raw/SOURCE.md` và mục Task 2b trong `PROGRESS.md`.
+> Các đoạn bên dưới nhắc tới bộ CSV cũ là **ghi chép lịch sử tại thời điểm Task 1**, giữ nguyên để
+> đối chiếu; riêng số liệu dữ liệu thì lấy theo SOURCE.md.
+> Kết luận về nguồn luồng (**replay qua Kafka, không thu livestream thật**) vẫn giữ nguyên.
+
 ---
 
 ## 0. Tóm tắt quyết định

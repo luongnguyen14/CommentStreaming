@@ -35,6 +35,13 @@ Các script dưới đây **copy template của cô từ `TEMPLATES_DIR` sang `d
   ghi chú thuyết trình ~3 phút/slide
 - `install_template_fonts.py` — giải mã + cài font của template (chỉ cần chạy lại nếu đổi máy)
 
+## Script vẽ biểu đồ
+
+- `make_pipeline_diagram.py` — vẽ sơ đồ kiến trúc pipeline (Task 5) →
+  `outputs/figures/00_pipeline_architecture.png` (200 dpi, chữ tiếng Anh, dùng chung
+  bảng màu ở `src/common/plotting.py`). Số liệu in trên hình lấy từ
+  `outputs/tables/ingestion_report.csv` và `logs/task5_1000msg_*.log`.
+
 Sau khi chạy, **luôn kiểm tra bố cục** theo quy ước CLAUDE.md §11: chuyển PDF bằng
 `soffice --headless --convert-to pdf` rồi soát trang trắng và render ảnh.
 

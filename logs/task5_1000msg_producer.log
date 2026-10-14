@@ -1,0 +1,8 @@
+Nguồn: part-01.json | topic: comments_raw | rate=0.0 | max=1000 | loop=False | late_ratio=0.05
+  ... 500 message (3694 msg/s đặt lịch, 0 đã xác nhận)
+  ... 1000 message (5518 msg/s đặt lịch, 275 đã xác nhận)
+Đang chờ Kafka xác nhận hết message còn lại ...
+
+Kết quả: đặt lịch 1000 message | Kafka xác nhận 1000 | lỗi 0 | bỏ qua (thiếu trường) 0
+Thời gian 0.31s -> 3228.0 msg/s | 720.2 KiB | 756 B/label
+Nhãn: 1072 dòng -> data/processed/eval_labels.parquet (chỉ comment_id + label + rating — không có thông tin cá nhân)
