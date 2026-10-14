@@ -125,8 +125,9 @@ ABSTRACT = (
     "Results are aggregated per one-minute window and an alert is raised when the "
     "negative ratio crosses a configurable threshold. Because labelled live chat is "
     "not publicly available and platform terms restrict retaining user comments, the "
-    "model is trained on a public labelled comment dataset and the live stream is "
-    "reproduced by replaying that data through Kafka."
+    "model is trained on a public, CC0-licensed IMDb review dataset, with the three "
+    "sentiment classes derived from user ratings, and the live stream is reproduced "
+    "by replaying that data through Kafka."
 )
 
 METHOD = (
@@ -142,15 +143,16 @@ METHOD = (
 )
 
 DATA = (
-    "The model is trained on a public labelled dataset of online comments with three "
-    "sentiment classes; the exact source and licence are recorded before any reported "
-    "result uses it. Live chat comments are not publicly available with sentiment "
-    "labels, and platform terms restrict retaining user comments, so the live stream "
-    "is simulated: the labelled dataset is replayed through Kafka at a configurable "
-    "rate, with random bursts and a small share of deliberately late records to "
-    "exercise watermarking and the dead-letter queue. Labels never enter the stream; "
-    "they are stored separately and joined back by comment ID only for evaluation. "
-    "User identifiers are replaced with salted hashes and no personal data is retained."
+    "The model is trained on a public IMDb review dataset under CC0 (about 1.0 million "
+    "reviews; source and licence in data/raw/SOURCE.md). It carries no sentiment "
+    "labels: the three classes are derived from the 1-10 user ratings by a documented "
+    "mapping, reported as rating-derived labels. Live chat is not available with "
+    "sentiment labels and platform terms restrict retaining it, so the stream is "
+    "simulated: the dataset is replayed through Kafka at a configurable rate, with "
+    "bursts and deliberately late records to exercise watermarking and the dead-letter "
+    "queue. Labels never enter the stream; they are stored separately and joined back "
+    "by comment ID for evaluation. User identifiers are replaced with salted hashes "
+    "and no personal data is retained."
 )
 
 EXPECTED_OUTCOME = (
