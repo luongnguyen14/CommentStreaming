@@ -9,7 +9,8 @@ Các bước (đúng theo yêu cầu Task 6):
  2. Làm sạch văn bản bằng hàm dùng chung `src/common/text_cleaning.py`.
  3. Ánh xạ `rating` -> 3 lớp theo `labels.mapping` trong config.yaml.
  4. Loại bản ghi rỗng / quá ngắn / quá dài (ngưỡng trong config.yaml).
- 5. Loại trùng CHÍNH XÁC và GẦN TRÙNG (trùng bộ từ sau chuẩn hóa).
+ 5. Loại bản ghi trùng MÃ (`review_id` lặp trong nguồn), trùng CHÍNH XÁC và
+    GẦN TRÙNG (trùng bộ từ sau chuẩn hóa).
  6. Chia train/val/test 70/15/15 SAU khi loại trùng — mặc định theo NHÓM PHIM
     (một phim không nằm ở hai tập) và cân bằng nhãn bằng tham lam, seed 42.
  7. Ghi parquet + nhãn tập test cho producer + các bảng thống kê.
@@ -334,9 +335,13 @@ def main() -> int:
         log(f"CẢNH BÁO: JSONL có {n_manifest:,} dòng nhưng Spark đọc được {n_loaded:,} "
             f"(chênh {n_loaded - n_manifest:+,}) — kiểm tra file lạ trong {jsonl_dir.name}/")
     if args.sample:
-        frac = min(1.0, args.sample * 2.5 / max(n_loaded, 1))
-        raw = raw.sample(fraction=frac, seed=seed).limit(args.sample)
-        log(f"CHẠY THỬ: lấy mẫu ~{args.sample:,} bản ghi trong {n_loaded:,} (fraction={frac:.4f})")
+        # Lấy mẫu TẤT ĐỊNH: N dòng có crc32(review_id) nhỏ nhất — đúng N dòng,
+        # trải đều toàn file, chạy lại ra đúng tập cũ. KHÔNG dùng sample().limit():
+        # cách đó chỉ giữ N dòng đầu của kết quả nên mẫu dồn về đầu file — đo được
+        # tỷ lệ trùng trong mẫu 20k chỉ 0,07% so với 1,9% ở bản đầy đủ (không đại diện).
+        raw = raw.orderBy(F.crc32(F.col("review_id"))).limit(args.sample)
+        log(f"CHẠY THỬ: lấy {args.sample:,} bản ghi có crc32(review_id) nhỏ nhất "
+            f"(tất định, trải đều trong {n_loaded:,} bản ghi)")
     else:
         log(f"Nạp {n_loaded:,} bản ghi từ {jsonl_dir.name}")
 
@@ -375,13 +380,27 @@ def main() -> int:
     valid = df.filter(keep).persist()
     n_valid = valid.count()
 
+    # ---- loại bản ghi trùng MÃ (nguồn có review_id xuất hiện nhiều lần) ----
+    # Đo trên nguồn: 3.100/201.074 dòng (1,5%) trùng id, gần như toàn bộ là bản
+    # sao y hệt (cùng văn bản). Giữ bản có văn bản DÀI NHẤT (nhiều thông tin hơn),
+    # hòa thì lấy ngày cũ hơn — cách chọn tất định. Phải làm bước này để
+    # `comment_id` là khóa duy nhất: job streaming và bảng nhãn đánh giá đều nối
+    # theo khóa này, id trùng sẽ làm phép nối nhập nhằng.
+    w_id = Window.partitionBy("comment_id").orderBy(F.length("text").desc(), F.asc("review_date"))
+    idn = valid.withColumn("rn", F.row_number().over(w_id))
+    n_id_dup = idn.filter(F.col("rn") > 1).count()
+    uniq = idn.filter(F.col("rn") == 1).drop("rn").persist()
+    n_after_id = uniq.count()
+    valid.unpersist()
+    log(f"Trùng mã (comment_id): bỏ {n_id_dup:,} -> còn {n_after_id:,}")
+
     # ---- loại trùng chính xác (cùng văn bản đã làm sạch) ----
     w_exact = Window.partitionBy("key_exact").orderBy("comment_id")
-    ex = valid.withColumn("key_exact", F.md5("text")).withColumn("rn", F.row_number().over(w_exact))
+    ex = uniq.withColumn("key_exact", F.md5("text")).withColumn("rn", F.row_number().over(w_exact))
     n_exact_dup = ex.filter(F.col("rn") > 1).count()
     ex1 = ex.filter(F.col("rn") == 1).drop("rn", "key_exact").persist()
     n_after_exact = ex1.count()
-    valid.unpersist()
+    uniq.unpersist()
     log(f"Trùng chính xác: bỏ {n_exact_dup:,} -> còn {n_after_exact:,}")
 
     # ---- loại gần trùng (trùng bộ từ sau chuẩn hóa) ----
@@ -456,11 +475,13 @@ def main() -> int:
          "note": f"n_chars < {cl['min_chars']}"},
         {"step": "05_qua_dai", "rows_in": None, "rows_removed": counts["too_long"], "rows_out": None,
          "note": f"n_chars > {cl['max_chars']}"},
-        {"step": "06_trung_chinh_xac", "rows_in": n_valid, "rows_removed": n_exact_dup,
+        {"step": "06_trung_ma", "rows_in": n_valid, "rows_removed": n_id_dup,
+         "rows_out": n_after_id, "note": "nguồn có review_id lặp; giữ bản văn bản dài nhất"},
+        {"step": "07_trung_chinh_xac", "rows_in": n_after_id, "rows_removed": n_exact_dup,
          "rows_out": n_after_exact, "note": "trùng khít văn bản đã làm sạch"},
-        {"step": "07_trung_gan", "rows_in": n_after_exact, "rows_removed": n_near_dup,
+        {"step": "08_trung_gan", "rows_in": n_after_exact, "rows_removed": n_near_dup,
          "rows_out": n_final, "note": "trùng bộ từ sau chuẩn hóa (khác thứ tự/dấu câu)"},
-        {"step": "08_con_lai", "rows_in": n_final, "rows_removed": 0, "rows_out": n_final,
+        {"step": "09_con_lai", "rows_in": n_final, "rows_removed": 0, "rows_out": n_final,
          "note": "dữ liệu sạch dùng để chia tập"},
     ]
     # 04/05 có rows_in/rows_out suy ra từ bước 03
@@ -474,12 +495,20 @@ def main() -> int:
 
     # ---- mẫu 1000 dòng (kèm văn bản gốc để đối chiếu bằng mắt) ----
     n_out = cfg["prepare"]["sample_rows_out"]
-    frac = min(1.0, n_out * 2.5 / max(n_final, 1))
+    # Mẫu cũng lấy TẤT ĐỊNH: n_out dòng có crc32(comment_id) nhỏ nhất — đúng
+    # n_out dòng (cách lọc theo tỷ lệ bị hụt: 1.000 phần ra 919 dòng, 10.000 phần
+    # ra 992 dòng, vì cỡ nhóm ứng viên dao động quanh giá trị mong đợi).
     sample = (split_df.select("comment_id", "stream_id", "user_hash", "label", "rating",
                               "text", "review_date", "split")
-                      .sample(fraction=frac, seed=seed).limit(n_out).toPandas())
-    orig = (raw.select(F.col("review_id").alias("comment_id"), F.col("review_detail").alias("text_raw"))
-               .where(F.col("comment_id").isin(list(sample["comment_id"]))).toPandas())
+                      .orderBy(F.crc32(F.col("comment_id")))
+                      .limit(n_out).toPandas())
+    # Phía nguồn vẫn còn review_id lặp -> phải lọc trùng ở đây, nếu không phép
+    # nối sẽ nhân dòng (đã từng ra 1.015 dòng thay vì 1.000).
+    orig = (raw.select(F.col("review_id").alias("comment_id"),
+                       F.col("review_detail").alias("text_raw"))
+               .where(F.col("comment_id").isin(list(sample["comment_id"])))
+               .dropDuplicates(["comment_id"])
+               .toPandas())
     sample = sample.merge(orig, on="comment_id", how="left")
     sample.to_csv(tables / "clean_sample.csv", index=False,
                   columns=["comment_id", "stream_id", "user_hash", "label", "rating", "split",

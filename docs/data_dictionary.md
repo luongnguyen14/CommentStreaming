@@ -17,7 +17,7 @@ tử là một review:
 
 | Cột | Kiểu | Ý nghĩa | Ghi chú |
 |---|---|---|---|
-| `review_id` | string | Mã review | **Duy nhất**; dùng làm `comment_id` |
+| `review_id` | string | Mã review | ⚠️ **KHÔNG duy nhất trong nguồn**: đo trên cả file có 994.692 id khác nhau / 1.010.293 dòng ⇒ **15.601 dòng (1,54%) lặp id** (gần như toàn bộ là bản sao y hệt). `prepare.py` loại trùng theo `comment_id` trước khi chia tập |
 | `reviewer` | string | Mã/tên người viết | **Không đưa vào dữ liệu huấn luyện**; chỉ dùng để băm → `user_hash` |
 | `movie` | string | Tên phim | Dùng làm `stream_id` (nhóm "phòng" thay cho livestream) |
 | `rating` | **string** (1–10) | Điểm số | ~5–8% bản ghi **thiếu** → những dòng này không có nhãn |
@@ -180,7 +180,7 @@ trường bắt buộc lẫn trường bị cấm và trả mã lỗi nếu phá
 
 | File | Cột | Nội dung |
 |---|---|---|
-| `cleaning_log.csv` | `step`, `rows_in`, `rows_removed`, `rows_out`, `note` | Số dòng bị loại ở **từng bước**: nạp → thiếu văn bản → thiếu nhãn → quá ngắn → quá dài → trùng chính xác → trùng gần → còn lại |
+| `cleaning_log.csv` | `step`, `rows_in`, `rows_removed`, `rows_out`, `note` | Số dòng bị loại ở **từng bước**: nạp → thiếu văn bản → thiếu nhãn → quá ngắn → quá dài → **trùng mã** → trùng chính xác → trùng gần → còn lại |
 | `class_distribution.csv` | `split`, `label`, `count`, `share_in_split` | Phân bố lớp ở từng tập + dòng `ALL` (toàn bộ). `share_in_split` = tỷ lệ trong chính tập đó |
 | `emoji_frequency.csv` | `emoji`, `count` | Top `prepare.emoji_top_n` emoji phổ biến nhất trên văn bản **đã làm sạch** |
 | `clean_sample.csv` | `comment_id`, `stream_id`, `user_hash`, `label`, `rating`, `split`, `review_date`, `text`, `text_raw` | `prepare.sample_rows_out` dòng để **đối chiếu bằng mắt**: `text_raw` (gốc) cạnh `text` (đã sạch) |
@@ -193,9 +193,11 @@ trường bắt buộc lẫn trường bị cấm và trả mã lỗi nếu phá
 
 Thứ tự bắt buộc (CLAUDE.md §6): **làm sạch → loại trùng → mới chia tập**.
 
-1. **Loại trùng trước khi chia** — cả trùng khít và gần trùng (`dedup_key`: chữ thường,
-   bỏ dấu câu, gộp khoảng trắng, **sắp xếp từ** rồi băm). Hai câu cùng bộ từ chỉ khác thứ
-   tự/dấu câu ra cùng khoá → bị coi là gần trùng. Nếu để lẫn, bản copy ở tập train sẽ
+1. **Loại trùng trước khi chia**, theo ba mức: (a) **trùng mã** — nguồn có `review_id` lặp
+   (1,54% số dòng), giữ bản văn bản dài nhất, nhờ đó `comment_id` là khoá duy nhất nối
+   được với luồng Kafka và bảng nhãn; (b) **trùng khít** văn bản đã làm sạch; (c) **gần
+   trùng** (`dedup_key`: chữ thường, bỏ dấu câu, gộp khoảng trắng, **sắp xếp từ** rồi băm —
+   hai câu cùng bộ từ khác thứ tự/dấu câu ra cùng khoá). Nếu để lẫn, bản copy ở tập train
    xuất hiện y hệt ở tập test → điểm cao giả tạo.
 2. **Chia theo nhóm phim** (`split.method: group_movie_balanced`): một phim **không bao
    giờ** nằm ở hai tập, vì review cùng một phim chia sẻ bối cảnh rất mạnh. Chương trình

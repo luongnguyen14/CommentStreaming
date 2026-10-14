@@ -18,6 +18,7 @@
 | Kích thước | `1.095.550.407` byte (≈ 1,1 GB) |
 | Số bản ghi | **1.010.293** review — đo lại 14/10/2026 (Task 6): `grep -o '"review_id"' \| wc -l` = 1.010.293, khớp đúng số dòng JSONL sinh ra từ file; md5 không đổi. Con số 1.010.296 ghi trước đó **sai 3 bản ghi** |
 | Các trường | `review_id`, `reviewer`, `movie`, `rating`, `review_summary`, `review_date`, `spoiler_tag`, `review_detail`, `helpful` (9 trường) |
+| ⚠️ `review_id` **KHÔNG duy nhất** | Đo 14/10/2026 trên cả file: **994.692 id khác nhau** ⇒ **15.601 dòng (1,54%) lặp id**, gần như toàn bộ là bản sao y hệt (cùng phim, cùng người, cùng văn bản). `prepare.py` **loại trùng theo `comment_id`** trước khi chia tập — nếu không, phép nối nhãn đánh giá theo `comment_id` sẽ nhập nhằng |
 | Phân bố `rating` (1–10) | 958.776 bản ghi có rating. Đo 14/10/2026: 1★ 111.357 · 2★ 42.242 · 3★ 43.669 · 4★ 44.636 · 5★ 58.654 · 6★ 74.483 · 7★ 99.790 · 8★ 121.886 · 9★ 112.082 · 10★ 249.977 |
 | Checksum | `md5 = e723d956b3b4a0dcd3e8d54ec1e9d4ca` (bản trong `data/raw/`, khớp bản gốc `/home/hadoop/part-01.json`) |
 | Checksum zip gốc | `md5 = bba9d5187587cd46ec65176390c639bb` (`/home/hadoop/part-01.json.zip`) |

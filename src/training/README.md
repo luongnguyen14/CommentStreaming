@@ -29,12 +29,18 @@ PYSPARK_DRIVER_PYTHON=$VENV_PY PYSPARK_PYTHON=$VENV_PY spark-submit \
 
 ## Những điểm dễ sai (đã gặp thật khi làm Task 6)
 
-1. **HDFS là filesystem mặc định** của Spark ở máy này → mọi đường dẫn cục bộ phải ghi
+1. **`review_id` KHÔNG duy nhất trong nguồn**: đo trên file gốc — 1.010.293 bản ghi nhưng
+   chỉ **994.692 id khác nhau**, tức **15.601 dòng (1,54%) lặp id**, gần như toàn bộ là bản
+   sao y hệt. `prepare.py` phải loại trùng theo `comment_id` (giữ bản văn bản dài nhất) —
+   vì job streaming và bảng nhãn đánh giá đều nối theo khóa này, id trùng làm phép nối
+   nhập nhằng.
+2. **HDFS là filesystem mặc định** của Spark ở máy này → mọi đường dẫn cục bộ phải ghi
    `file://`, nếu không Spark đi tìm trên HDFS và báo `PATH_NOT_FOUND`.
-2. **`_manifest.json` phải bắt đầu bằng `_`** — file không có tiền tố đó nằm trong thư mục
+3. **`_manifest.json` phải bắt đầu bằng `_`** — file không có tiền tố đó nằm trong thư mục
    JSONL sẽ bị `spark.read.json(dir)` đọc thành một bản ghi rỗng (từng làm Spark đếm thừa 1 dòng).
-3. **Chia tập: thiếu hụt phải lấy `argmax`** (chọn tập đang thiếu nhiều nhất), không phải
+4. **Chia tập: thiếu hụt phải lấy `argmax`** (chọn tập đang thiếu nhiều nhất), không phải
    `argmin` khoảng cách tới mục tiêu — bản đầu dồn hết dữ liệu vào val/test, train = 0 dòng.
-4. **Tham lam chỉ cân theo số lượng**, không sửa được lệch tỷ lệ lớp → thêm bước hoán đổi
+5. **Tham lam chỉ cân theo số lượng**, không sửa được lệch tỷ lệ lớp → thêm bước hoán đổi
    cục bộ (`n_swap_try` lần, tất định): lệch giảm từ 1,64% xuống 0,01% trên bản mẫu.
-5. `/tmp` là tmpfs ~3,6 GB → `scripts/env.sh` đã trỏ `SPARK_LOCAL_DIRS` sang ổ đĩa thật.
+6. **`--sample` phải lấy mẫu tất định theo `crc32`**, không dùng `sample().limit()` (mẫu dồn về đầu file).
+7. `/tmp` là tmpfs ~3,6 GB → `scripts/env.sh` đã trỏ `SPARK_LOCAL_DIRS` sang ổ đĩa thật.

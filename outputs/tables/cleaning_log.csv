@@ -4,6 +4,7 @@ step,rows_in,rows_removed,rows_out,note
 03_thieu_nhan,201074,10394,190680,"rating thiếu hoặc ngoài ánh xạ {'negative': [1, 2, 3, 4], 'neutral': [5, 6], 'positive': [7, 8, 9, 10]}"
 04_qua_ngan,190680,10,190670,n_chars < 20
 05_qua_dai,190670,1686,188984,n_chars > 5000
-06_trung_chinh_xac,188984,3634,185350,trùng khít văn bản đã làm sạch
-07_trung_gan,185350,63,185287,trùng bộ từ sau chuẩn hóa (khác thứ tự/dấu câu)
-08_con_lai,185287,0,185287,dữ liệu sạch dùng để chia tập
+06_trung_ma,188984,2999,185985,nguồn có review_id lặp; giữ bản văn bản dài nhất
+07_trung_chinh_xac,185985,636,185349,trùng khít văn bản đã làm sạch
+08_trung_gan,185349,63,185286,trùng bộ từ sau chuẩn hóa (khác thứ tự/dấu câu)
+09_con_lai,185286,0,185286,dữ liệu sạch dùng để chia tập

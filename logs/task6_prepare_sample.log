@@ -1,21 +1,22 @@
-[22:37:33] JSONL đã có sẵn: 201,074 bản ghi -> /home/hadoop/capstone/data/processed/imdb_jsonl
-[22:37:42] CHẠY THỬ: lấy mẫu ~40,000 bản ghi trong 201,074 (fraction=0.4973)
-[22:38:08] Tổng 40,000 | rỗng 0 | thiếu nhãn 2,333 | quá ngắn 1 | quá dài 392
-[22:39:34] Trùng chính xác: bỏ 60 -> còn 37,214
-[22:39:46] Gần trùng: bỏ 6 -> còn 37,208
-[22:39:46] Chia tập theo phương thức: group_movie_balanced
-[22:39:57] Chia theo nhóm phim: 18,390 phim, 32 lần thử, lệch 1.64% so với mục tiêu (tính trong 12s)
-[22:40:01]   hoán đổi cục bộ: nhận 207/200,000 lần -> lệch 0.01%
-[22:40:01]   train:    26,045 dòng (100.0% mục tiêu) (neg=6,237 neu=3,718 pos=16,090)
-[22:40:01]   val  :     5,582 dòng (100.0% mục tiêu) (neg=1,337 neu=797 pos=3,448)
-[22:40:01]   test :     5,581 dòng (100.0% mục tiêu) (neg=1,336 neu=797 pos=3,448)
-[22:40:12] Kiểm tra rò rỉ: phim nằm ở >1 tập: 0 | người dùng ở >1 tập: 2,057
-[22:40:14] Đã ghi train: data/processed/train.parquet
-[22:40:15] Đã ghi val: data/processed/val.parquet
-[22:40:16] Đã ghi test: data/processed/test.parquet
-[22:40:18] Đã ghi nhãn test: data/processed/eval_labels.parquet
-[22:40:18] Đã ghi bảng phân bố lớp: 12 dòng
-[22:40:18] Đã ghi nhật ký làm sạch: outputs/tables/cleaning_log.csv
-[22:40:23] Đã ghi mẫu: 1000 dòng -> outputs/tables/clean_sample.csv
-[22:40:25] Đã ghi tần suất emoji: top 30 -> outputs/tables/emoji_frequency.csv
-[22:40:25] HOÀN TẤT sau 172s
+[23:16:34] JSONL đã có sẵn: 201,074 bản ghi -> /home/hadoop/capstone/data/processed/imdb_jsonl
+[23:16:41] CHẠY THỬ: lấy 20,000 bản ghi có crc32(review_id) nhỏ nhất (tất định, trải đều trong 201,074 bản ghi)
+[23:16:52] Tổng 20,000 | rỗng 0 | thiếu nhãn 1,061 | quá ngắn 1 | quá dài 162
+[23:17:28] Trùng mã (comment_id): bỏ 329 -> còn 18,447
+[23:17:29] Trùng chính xác: bỏ 9 -> còn 18,438
+[23:17:33] Gần trùng: bỏ 1 -> còn 18,437
+[23:17:33] Chia tập theo phương thức: group_movie_balanced
+[23:17:37] Chia theo nhóm phim: 10,667 phim, 32 lần thử, lệch 1.43% so với mục tiêu (tính trong 4s)
+[23:17:40]   hoán đổi cục bộ: nhận 107/200,000 lần -> lệch 0.01%
+[23:17:40]   train:    12,906 dòng (100.0% mục tiêu) (neg=3,157 neu=1,778 pos=7,971)
+[23:17:40]   val  :     2,766 dòng (100.0% mục tiêu) (neg=677 neu=381 pos=1,708)
+[23:17:40]   test :     2,765 dòng (100.0% mục tiêu) (neg=676 neu=381 pos=1,708)
+[23:17:45] Kiểm tra rò rỉ: phim nằm ở >1 tập: 0 | người dùng ở >1 tập: 829
+[23:17:47] Đã ghi train: data/processed/train.parquet
+[23:17:48] Đã ghi val: data/processed/val.parquet
+[23:17:49] Đã ghi test: data/processed/test.parquet
+[23:17:50] Đã ghi nhãn test: data/processed/eval_labels.parquet
+[23:17:51] Đã ghi bảng phân bố lớp: 12 dòng
+[23:17:51] Đã ghi nhật ký làm sạch: outputs/tables/cleaning_log.csv
+[23:17:55] Đã ghi mẫu: 1000 dòng -> outputs/tables/clean_sample.csv
+[23:17:56] Đã ghi tần suất emoji: top 30 -> outputs/tables/emoji_frequency.csv
+[23:17:56] HOÀN TẤT sau 82s
