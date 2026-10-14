@@ -1,0 +1,13 @@
+split,label,count,share_in_split
+train,negative,32504,0.2506
+train,neutral,17983,0.1386
+train,positive,79214,0.6107
+val,negative,6965,0.2506
+val,neutral,3854,0.1387
+val,positive,16975,0.6107
+test,negative,6965,0.2506
+test,neutral,3853,0.1386
+test,positive,16974,0.6108
+ALL,negative,46434,0.2506
+ALL,neutral,25690,0.1386
+ALL,positive,113163,0.6107

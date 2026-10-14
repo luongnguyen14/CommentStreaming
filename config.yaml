@@ -7,10 +7,85 @@ seed: 42                      # mọi bước có yếu tố ngẫu nhiên (CLAU
 
 paths:
   raw_comments: data/raw/part-01.json          # IMDb Review Dataset - ebD (CC0, xem data/raw/SOURCE.md)
+  raw_jsonl: data/processed/imdb_jsonl         # bản newline-delimited JSON để Spark đọc song song
+  train: data/processed/train.parquet
+  val: data/processed/val.parquet
+  test: data/processed/test.parquet
   eval_labels: data/processed/eval_labels.parquet
   outputs_tables: outputs/tables
   outputs_figures: outputs/figures
   logs: logs
+
+# ---------------------------------------------------------------------------
+# Nhãn — CHỐT CHÍNH THỨC ở Task 6 (docs/data_dictionary.md §3).
+# Dùng chung cho cả prepare (huấn luyện) lẫn producer (nhãn đánh giá).
+# Đây là ÁNH XẠ THIẾT KẾ: bộ dữ liệu gốc không có nhãn cảm xúc, chỉ có điểm
+# rating 1–10; nhóm quy ước 1–4 = negative, 5–6 = neutral, 7–10 = positive.
+# ---------------------------------------------------------------------------
+labels:
+  mapping:
+    negative: [1, 2, 3, 4]
+    neutral:  [5, 6]
+    positive: [7, 8, 9, 10]
+
+# ---------------------------------------------------------------------------
+# Làm sạch văn bản (src/common/text_cleaning.py) — DÙNG CHUNG cho huấn luyện
+# và streaming, nên mọi thay đổi ở đây ảnh hưởng cả hai phía (CLAUDE.md §4).
+# ---------------------------------------------------------------------------
+cleaning:
+  min_chars: 20               # ngắn hơn -> loại
+  max_chars: 5000             # dài hơn -> loại (p90 của dữ liệu ~2.400 ký tự)
+  # Từ điển viết tắt / teencode (tiếng Anh — dữ liệu IMDb).
+  # Thêm được thoải mái; khóa phải viết thường, được thay theo ranh giới từ.
+  abbreviations:
+    u: you
+    ur: your
+    urs: yours
+    r: are
+    pls: please
+    plz: please
+    thx: thanks
+    tnx: thanks
+    ty: thanks
+    btw: by the way
+    imo: in my opinion
+    tbh: to be honest
+    idk: i do not know
+    wanna: want to
+    gonna: going to
+    gotta: got to
+    cuz: because
+    coz: because
+    bc: because
+    lmk: let me know
+    rn: right now
+    smh: shaking my head
+
+# ---------------------------------------------------------------------------
+# Loại trùng + chia tập (Task 6)
+# ---------------------------------------------------------------------------
+dedup:
+  near_dup: true              # loại cả gần trùng (trùng tập từ sau chuẩn hóa)
+
+split:
+  # group_movie_balanced: chia theo NHÓM PHIM (một phim không nằm ở 2 tập)
+  # và cân bằng nhãn bằng thuật toán tham lam, seed 42.
+  # stratified: chia ngẫu nhiên phân tầng theo nhãn (không nhóm theo phim).
+  method: group_movie_balanced
+  ratios:
+    train: 0.70
+    val: 0.15
+    test: 0.15
+
+prepare:
+  truncate_raw_detail: 20000  # cắt bớt review_detail khi chuyển JSONL (tiết kiệm đĩa)
+  # Chỉ dùng một tập con của nguồn cho vừa máy ảo (~200 MB thay vì 1,1 GB):
+  # giữ bản ghi có crc32(review_id) % subsample_mod == 0. Cách này TẤT ĐỊNH
+  # (chạy lại ra đúng tập con cũ), trải đều theo review_id nên không lệch theo
+  # thứ tự phim trong file. mod = 5 -> ~20% -> ~202.000 dòng ~ 200 MB (đo thật).
+  subsample_mod: 5
+  sample_rows_out: 1000       # số dòng mẫu ghi ra outputs/tables/clean_sample.csv
+  emoji_top_n: 30             # số emoji phổ biến nhất ghi ra outputs/tables/emoji_frequency.csv
 
 kafka:
   bootstrap_servers: localhost:9092
@@ -27,7 +102,7 @@ replay:
   id_field: review_id         # -> comment_id
   stream_field: movie         # -> stream_id (dùng tên phim làm "phòng live" thay thế)
   user_field: reviewer        # -> user_hash (băm có muối, KHÔNG gửi bản gốc)
-  text_field: review_detail   # -> text
+  text_field: review_detail   # -> text (khớp cột `text` của tập huấn luyện)
 
   rate: 50                    # bình luận/giây (0 = không giới hạn tốc độ)
   burst_prob: 0.02            # xác suất bắt đầu một đợt bùng nổ
@@ -35,10 +110,3 @@ replay:
   burst_len_s: 2.0            # độ dài mỗi đợt bùng nổ (giây)
   late_ratio: 0.05            # tỷ lệ bản ghi có event_ts bị đẩy trễ (thử watermark)
   late_max_s: 30              # mức trễ tối đa của bản ghi đến muộn (giây)
-
-  # Ánh xạ nhãn — TẠM THỜI, sẽ chốt chính thức ở Task 6 (docs/data_dictionary.md).
-  # Nhãn KHÔNG bao giờ đi vào message Kafka; chỉ ghi ra data/processed/eval_labels.parquet.
-  label_map:
-    negative: [1, 2, 3, 4]
-    neutral:  [5, 6]
-    positive: [7, 8, 9, 10]

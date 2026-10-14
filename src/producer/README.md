@@ -33,6 +33,9 @@ $VENV_PY src/producer/replay_producer.py --help
 # Chạy thử nhỏ trước (quy ước CLAUDE.md §3)
 $VENV_PY src/producer/replay_producer.py --sample 200 --rate 20
 
+# Phát ĐÚNG tập test (nhãn đã có sẵn trong data/processed/eval_labels.parquet)
+$VENV_PY src/producer/replay_producer.py --only-test --sample 500 --rate 50
+
 # Gửi 1000 message nhanh nhất có thể
 $VENV_PY src/producer/replay_producer.py --max 1000 --rate 0
 
@@ -46,13 +49,16 @@ $VENV_PY src/producer/replay_producer.py --max 2000 --rate 100 \
 
 | Tham số | Ý nghĩa |
 |---|---|
+| `--source {jsonl,raw}` | `jsonl` (mặc định): bản đã xử lý ~190 MB ở `data/processed/imdb_jsonl`; `raw`: file gốc 1,1 GB |
 | `--rate R` | bình luận/giây (`0` = không giới hạn); mặc định lấy từ `config.yaml` |
 | `--max N` | gửi tối đa N message rồi dừng |
 | `--sample N` | lấy mẫu ngẫu nhiên N bản ghi trong file (seed 42) |
+| `--only-test` | chỉ phát `comment_id` thuộc tập test (đọc `paths.eval_labels`) — nhãn đã có ở đó nên không cần ghi lại |
 | `--loop` | gửi lặp lại khi hết dữ liệu |
 | `--burst P` | xác suất bắt đầu đợt bùng nổ (tốc độ ×8 trong 2 s, theo config) |
 | `--late-ratio P` | tỷ lệ bản ghi có `event_ts` bị đẩy trễ 5–30 s (để thử watermark) |
-| `--topic/--config/--labels-out/--report/--seed/--log-every` | như tên gọi |
+| `--labels-out F` | ghi nhãn của đợt phát ra file parquet **mới**; bỏ trống = **không ghi** (mặc định — tránh ghi đè `eval_labels.parquet` do `prepare.py` tạo) |
+| `--topic/--config/--report/--seed/--log-every` | như tên gọi |
 
 ## test_consumer.py
 

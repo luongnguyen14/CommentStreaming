@@ -16,6 +16,7 @@ logs/*
 !logs/kafka_console_test.log
 !logs/task5_*.log
 !logs/task5_environment.txt
+!logs/task6_*.log
 
 # --- Môi trường / bí mật ---
 .venv/

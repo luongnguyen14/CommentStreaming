@@ -10,10 +10,17 @@ Message gửi lên topic `comments_raw` (JSON, UTF-8):
     - user_hash = băm SHA-256 có muối của mã người dùng; muối đọc từ biến môi
       trường COMMENT_HASH_SALT (không hard-code — CLAUDE.md §7)
 
-Nhãn đánh giá lưu riêng ở data/processed/eval_labels.parquet theo comment_id
-(nhãn suy từ cột `rating`; ánh xạ chính thức chốt ở Task 6).
+Nhãn đánh giá lưu RIÊNG ở data/processed/eval_labels.parquet theo comment_id
+(nhãn suy từ cột `rating`; ánh xạ chính thức ở config.yaml mục `labels.mapping`).
+File đó do src/training/prepare.py tạo cho tập test — producer chỉ ĐỌC, không ghi
+đè (muốn ghi nhãn của đợt phát thì truyền --labels-out <file mới>).
+
+Nguồn phát mặc định là bản JSONL đã xử lý (~200 MB) ở data/processed/imdb_jsonl;
+`--source raw` để đọc thẳng file gốc 1,1 GB (chậm hơn).
 
 Ví dụ:
+    # phát đúng tập test (nhãn đã có sẵn trong eval_labels.parquet)
+    .venv/bin/python src/producer/replay_producer.py --only-test --sample 500 --rate 50
     .venv/bin/python src/producer/replay_producer.py --sample 200 --rate 20
     .venv/bin/python src/producer/replay_producer.py --max 1000 --rate 0        # nhanh nhất có thể
     .venv/bin/python src/producer/replay_producer.py --sample 500 --loop --rate 50 --burst 0.05
@@ -57,17 +64,28 @@ def iso_utc(ts: float) -> str:
 
 
 def build_label_map(cfg: dict) -> dict[str, str]:
-    """{rating(str): nhãn} từ config.yaml (ánh xạ tạm thời, chốt ở Task 6)."""
+    """{rating(str): nhãn} từ config.yaml — mục `labels.mapping` (ánh xạ chính
+    thức chốt ở Task 6, dùng chung với src/training/prepare.py)."""
     return {str(r): label
-            for label, ratings in cfg["replay"]["label_map"].items()
+            for label, ratings in cfg["labels"]["mapping"].items()
             for r in ratings}
 
 
-def reservoir_sample(path: Path, n: int, seed: int) -> list[dict]:
+def iter_jsonl(path: Path):
+    """Đọc file JSONL (mỗi dòng một object) — dùng cho bản đã xử lý ở
+    data/processed/imdb_jsonl (tập con ~200 MB thay vì file gốc 1,1 GB)."""
+    with open(path, encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                yield json.loads(line)
+
+
+def reservoir_sample(path: Path, n: int, seed: int, reader=iter_json_array) -> list[dict]:
     """Mẫu ngẫu nhiên đều trên toàn file (reservoir sampling, không nạp cả file)."""
     rng = random.Random(seed)
     sample: list[dict] = []
-    for i, rec in enumerate(iter_json_array(path)):
+    for i, rec in enumerate(reader(path)):
         if i < n:
             sample.append(rec)
         elif rng.randint(0, i) < n:
@@ -93,7 +111,8 @@ def record_to_message(rec: dict, cfg: dict, salt: bytes, label_map: dict):
     return msg, label_map.get(rating), rating
 
 
-def replay(args, cfg: dict, producer, salt: bytes, label_map: dict, raw_path: Path):
+def replay(args, cfg: dict, producer, salt: bytes, label_map: dict, raw_path: Path,
+           only_ids: set[str] | None = None):
     """Vòng lặp gửi: điều tiết tốc độ, bùng nổ, bản ghi đến muộn, đếm đã xác nhận."""
     r = cfg["replay"]
     rate = args.rate if args.rate is not None else r["rate"]
@@ -118,13 +137,14 @@ def replay(args, cfg: dict, producer, salt: bytes, label_map: dict, raw_path: Pa
 
     def source():
         """Iterator bản ghi cho một vòng (sample là list, ngược lại đọc file theo dòng)."""
-        return iter(args._sample) if args._sample else iter_json_array(raw_path)
+        return iter(args._sample) if args._sample else iter(args._reader(args._source_path))
 
     step = (1.0 / rate) if rate and rate > 0 else 0.0     # 0 = gửi nhanh nhất có thể
     labels: dict[str, dict] = {}
     sent = 0
     bytes_sent = 0
     skipped = 0
+    filtered = 0
     t_start = None
     next_due = None
     burst_until = 0.0
@@ -137,6 +157,9 @@ def replay(args, cfg: dict, producer, salt: bytes, label_map: dict, raw_path: Pa
             msg, label, rating = record_to_message(rec, cfg, salt, label_map)
             if msg is None:
                 skipped += 1
+                continue
+            if only_ids is not None and msg["comment_id"] not in only_ids:
+                filtered += 1          # --only-test: ngoài tập test thì không phát
                 continue
             produced_any = True
 
@@ -186,7 +209,8 @@ def replay(args, cfg: dict, producer, salt: bytes, label_map: dict, raw_path: Pa
     print("Đang chờ Kafka xác nhận hết message còn lại ...", flush=True)
     producer.flush(timeout=120)
     elapsed = (time.time() - t_start) if t_start else 0.0
-    return sent, stats["delivered"], stats["failed"], labels, skipped, elapsed, bytes_sent
+    return (sent, stats["delivered"], stats["failed"], labels, skipped, filtered,
+            elapsed, bytes_sent)
 
 
 def write_labels(labels: dict[str, dict], labels_out: Path) -> int:
@@ -227,6 +251,9 @@ def append_report(rep_path: Path, args, cfg, sent, delivered, failed, elapsed, b
 def main() -> int:
     ap = argparse.ArgumentParser(description="Replay dữ liệu IMDb qua Kafka (mô phỏng livestream)")
     ap.add_argument("--config", default=str(PROJECT_ROOT / "config.yaml"))
+    ap.add_argument("--source", choices=["jsonl", "raw"], default="jsonl",
+                    help="jsonl (mặc định): bản đã xử lý ~200 MB ở paths.raw_jsonl; "
+                         "raw: file gốc paths.raw_comments (1,1 GB)")
     ap.add_argument("--topic", default=None, help="mặc định: kafka.topic_raw trong config")
     ap.add_argument("--rate", type=float, default=None, help="bình luận/giây (0 = không giới hạn)")
     ap.add_argument("--max", type=int, default=0, help="số message tối đa (0 = không giới hạn)")
@@ -237,8 +264,13 @@ def main() -> int:
                     help="xác suất bắt đầu đợt bùng nổ mỗi bước gửi (mặc định theo config)")
     ap.add_argument("--late-ratio", type=float, default=None,
                     help="tỷ lệ bản ghi có event_ts bị đẩy trễ (mặc định theo config)")
+    ap.add_argument("--only-test", action="store_true",
+                    help="chỉ phát các comment_id thuộc tập test (đọc paths.eval_labels) — "
+                         "nhãn đã có sẵn ở đó nên KHÔNG cần --labels-out")
     ap.add_argument("--labels-out", default=None,
-                    help="file parquet nhãn đánh giá (mặc định: paths.eval_labels)")
+                    help="file parquet để ghi nhãn đánh giá; BỎ TRỐNG thì không ghi "
+                         "(mặc định không ghi: data/processed/eval_labels.parquet do "
+                         "src/training/prepare.py tạo, chỉ chứa tập test — tránh ghi đè)")
     ap.add_argument("--report", default=None, help="ghi 1 dòng thống kê thông lượng vào CSV (append)")
     ap.add_argument("--seed", type=int, default=None)
     ap.add_argument("--log-every", type=int, default=500)
@@ -248,9 +280,22 @@ def main() -> int:
     args.seed = args.seed if args.seed is not None else cfg["seed"]
     args.topic = args.topic or cfg["kafka"]["topic_raw"]
     raw_path = PROJECT_ROOT / cfg["paths"]["raw_comments"]
-    labels_out = Path(args.labels_out or cfg["paths"]["eval_labels"])
-    if not labels_out.is_absolute():
-        labels_out = PROJECT_ROOT / labels_out
+    eval_labels_path = PROJECT_ROOT / cfg["paths"]["eval_labels"]
+    labels_out = None
+    if args.labels_out:
+        labels_out = Path(args.labels_out)
+        if not labels_out.is_absolute():
+            labels_out = PROJECT_ROOT / labels_out
+
+    only_ids = None
+    if args.only_test:
+        import pandas as pd
+        if not eval_labels_path.exists():
+            print(f"LỖI: --only-test cần {eval_labels_path.relative_to(PROJECT_ROOT)} "
+                  f"(chạy src/training/prepare.py trước)", file=sys.stderr)
+            return 2
+        only_ids = set(pd.read_parquet(eval_labels_path, columns=["comment_id"])["comment_id"])
+        print(f"--only-test: chỉ phát {len(only_ids):,} comment_id của tập test")
 
     try:
         salt = get_salt()
@@ -261,13 +306,27 @@ def main() -> int:
         print(f"LỖI: không thấy dữ liệu nguồn {raw_path}", file=sys.stderr)
         return 2
 
+    # Nguồn phát: mặc định bản JSONL đã xử lý (~200 MB, tập con của nguồn) cho
+    # nhanh; --source raw để đọc thẳng file gốc 1,1 GB nếu cần.
+    if args.source == "jsonl":
+        src_path = PROJECT_ROOT / cfg["paths"]["raw_jsonl"] / "part-000.jsonl"
+        if not src_path.exists():
+            print(f"LỖI: chưa có {src_path.relative_to(PROJECT_ROOT)} — chạy "
+                  f"src/training/prepare.py trước, hoặc dùng --source raw", file=sys.stderr)
+            return 2
+        args._reader = iter_jsonl
+    else:
+        src_path = raw_path
+        args._reader = iter_json_array
+    args._source_path = src_path
+
     args._sample = None
     if args.sample:
         t0 = time.time()
-        args._sample = reservoir_sample(raw_path, args.sample, args.seed)
+        args._sample = reservoir_sample(src_path, args.sample, args.seed, args._reader)
         print(f"Đã lấy mẫu {len(args._sample)} bản ghi trong {time.time() - t0:.1f}s (seed={args.seed})")
 
-    print(f"Nguồn: {raw_path.name} | topic: {args.topic} | "
+    print(f"Nguồn: {src_path.name} ({args.source}) | topic: {args.topic} | "
           f"rate={args.rate if args.rate is not None else cfg['replay']['rate']} | "
           f"max={args.max or '∞'} | loop={args.loop} | late_ratio="
           f"{args.late_ratio if args.late_ratio is not None else cfg['replay']['late_ratio']}",
@@ -282,21 +341,23 @@ def main() -> int:
     signal.signal(signal.SIGINT, _on_sigint)
 
     try:
-        sent, delivered, failed, labels, skipped, elapsed, bytes_sent = replay(
-            args, cfg, producer, salt, build_label_map(cfg), raw_path)
+        sent, delivered, failed, labels, skipped, filtered, elapsed, bytes_sent = replay(
+            args, cfg, producer, salt, build_label_map(cfg), raw_path, only_ids)
     finally:
         producer.close(timeout=10)
 
     print(f"\nKết quả: đặt lịch {sent} message | Kafka xác nhận {delivered} | lỗi {failed} | "
-          f"bỏ qua (thiếu trường) {skipped}")
+          f"bỏ qua (thiếu trường) {skipped} | ngoài tập test {filtered:,}")
     print(f"Thời gian {elapsed:.2f}s -> {delivered / elapsed:.1f} msg/s | "
           f"{bytes_sent / 1024:.1f} KiB | {bytes_sent / max(len(labels), 1):.0f} B/label" if labels
           else f"Thời gian {elapsed:.2f}s -> {delivered / elapsed:.1f} msg/s | {bytes_sent / 1024:.1f} KiB")
 
-    if labels:
+    if labels and labels_out is not None:
         total = write_labels(labels, labels_out)
         print(f"Nhãn: {total} dòng -> {labels_out.relative_to(PROJECT_ROOT)} "
               f"(chỉ comment_id + label + rating — không có thông tin cá nhân)")
+    elif labels:
+        print(f"Nhãn: {len(labels)} comment_id đã phát (không ghi file — dùng --labels-out nếu muốn)")
 
     if args.report:
         rep = Path(args.report)

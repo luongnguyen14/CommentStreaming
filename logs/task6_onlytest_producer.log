@@ -1,0 +1,4 @@
+
+Kết quả: đặt lịch 300 message | Kafka xác nhận 300 | lỗi 0 | bỏ qua (thiếu trường) 0 | ngoài tập test 1,785
+Thời gian 0.23s -> 1304.3 msg/s | 289.6 KiB | 988 B/label
+Nhãn: 300 comment_id đã phát (không ghi file — dùng --labels-out nếu muốn)

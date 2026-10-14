@@ -1,0 +1,9 @@
+step,rows_in,rows_removed,rows_out,note
+01_nap_raw,201074,0,201074,nạp từ JSONL (ảnh hưởng của --sample)
+02_thieu_van_ban,201074,0,201074,text rỗng sau khi làm sạch
+03_thieu_nhan,201074,10394,190680,"rating thiếu hoặc ngoài ánh xạ {'negative': [1, 2, 3, 4], 'neutral': [5, 6], 'positive': [7, 8, 9, 10]}"
+04_qua_ngan,190680,10,190670,n_chars < 20
+05_qua_dai,190670,1686,188984,n_chars > 5000
+06_trung_chinh_xac,188984,3634,185350,trùng khít văn bản đã làm sạch
+07_trung_gan,185350,63,185287,trùng bộ từ sau chuẩn hóa (khác thứ tự/dấu câu)
+08_con_lai,185287,0,185287,dữ liệu sạch dùng để chia tập

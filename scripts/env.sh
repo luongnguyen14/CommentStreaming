@@ -16,6 +16,12 @@ export SPARK_HOME=/home/hadoop/spark-3.5.9
 export PYSPARK_PYTHON=/usr/bin/python3.11
 export PYSPARK_DRIVER_PYTHON=/usr/bin/python3.11
 
+# Thư mục tạm của Spark (shuffle/spill) — mặc định là /tmp, nhưng /tmp ở máy này
+# là tmpfs chỉ ~3,6 GB, dễ đầy khi xử lý file 1,1 GB. Trỏ sang ổ đĩa thật.
+mkdir -p /home/hadoop/spark-tmp 2>/dev/null || true
+export SPARK_LOCAL_DIRS=/home/hadoop/spark-tmp
+export TMPDIR=/home/hadoop/spark-tmp
+
 # ---------------------------------------------------------------------------
 # Bí mật cục bộ (muối băm COMMENT_HASH_SALT ...). File KHÔNG nằm trong repo
 # (quyền 600). Tạo một lần bằng:

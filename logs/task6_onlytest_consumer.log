@@ -1,0 +1,11 @@
+
+Topic 'comments_raw': đọc 300 message trong 6.60s (45.5 msg/s) | 289.6 KiB
+  theo partition: {0: 107, 1: 98, 2: 95}
+  message lỗi: 0
+
+Mẫu (1):
+  comment_id=rw5704528 stream_id=Red Joan (2018) user_hash=f60af2bde7d00db1 event_ts=2026-10-14T15:49:47.063Z
+    text: "Jennie Rooney's novel RED JOAN, based on the true story of British phy..."
+
+KIỂM CHỨNG: mong đợi 300 message, đọc được 300 -> ĐẠT
+  event_ts của message cuối: 2026-10-14T15:49:47.277Z

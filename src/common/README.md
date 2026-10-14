@@ -5,7 +5,12 @@
   (`iter_json_array` — dùng cho `data/raw/part-01.json` 1,1 GB).
 - `plotting.py` — bảng màu + thiết lập chung cho mọi biểu đồ (PNG 200 dpi,
   chữ tiếng Anh, cùng bộ màu 3 lớp cảm xúc ở mọi hình — CLAUDE.md §8).
-- `text_cleaning.py` — chuẩn hóa văn bản bằng **hàm Spark SQL** (không dùng Python UDF khi tránh được) *(Task 6/7)*
+- `text_cleaning.py` — làm sạch văn bản bằng **hàm Spark SQL** (Task 6): chữ thường,
+  URL → `<url>`, @mention → `<user>`, viết tắt/teencode theo từ điển trong
+  `config.yaml`, rút gọn ký tự lặp ("haaaay" → "haay"), tách emoji thành token riêng
+  (đếm được tần suất), gộp khoảng trắng; kèm `dedup_key` (khoá chống trùng) và
+  `emoji_frequency`. Hàm **idempotent** (làm sạch hai lần vẫn ra cùng kết quả).
+  Không dùng Python UDF; test ở `tests/test_text_cleaning.py`.
 
 ⚠️ **`text_cleaning.py` là nguồn duy nhất** cho logic làm sạch văn bản.
 Cả huấn luyện (`src/training`) và streaming (`src/streaming`) **phải import từ đây**
