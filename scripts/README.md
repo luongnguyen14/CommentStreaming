@@ -25,7 +25,21 @@ Các script dưới đây **copy template của cô từ `TEMPLATES_DIR` sang `d
 
 - `fill_action_plan.py` — điền Action Plan (Task 2)
 - `fill_wbs.py` — điền WBS 20 ngày: ngày D1–D20, phân công, Gantt (Task 3)
+- `fill_proposal_slides.py` — dựng slide đề xuất 5 trang từ Slide Template (Task 4);
+  giữ nguyên master/layout/màu/font, vẽ sơ đồ kiến trúc bằng shape của PowerPoint,
+  ghi chú thuyết trình ~3 phút/slide
 - `install_template_fonts.py` — giải mã + cài font của template (chỉ cần chạy lại nếu đổi máy)
 
 Sau khi chạy, **luôn kiểm tra bố cục** theo quy ước CLAUDE.md §11: chuyển PDF bằng
 `soffice --headless --convert-to pdf` rồi soát trang trắng và render ảnh.
+
+**Lỗi đã biết của template PPTX khi render bằng LibreOffice** (gặp ở Task 4):
+
+1. Đặt `shape.height` cho placeholder **kế thừa vị trí từ layout** làm python-pptx ghi ra
+   `<a:ext cx="0">` → chữ biến mất. Phải "materialize" `left/top/width` từ layout trước
+   (xem `materialize_geometry` trong `fill_proposal_slides.py`).
+2. Font thương hiệu (Samsung Sharp Sans) bị LibreOffice thay thế glyph sai ở ngữ cảnh
+   *chữ thường + dấu cách + chữ số*: `Team 6` → `Tea 6` + ô vuông ☒, và lỗi này vào cả PDF.
+   Cách chữa: tách cụm chữ số thành run riêng (`set_para_text_safe_digits`).
+3. Xoá slide chỉ xoá quan hệ, part vẫn nằm trong gói → `add_slide` có thể ghi đè part đang
+   dùng (2 slide trùng nội dung). Phải nhân bản slide trước, xoá sau.
