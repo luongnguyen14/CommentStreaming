@@ -38,7 +38,16 @@
 **Lưu ý vận hành:**
 
 - HDFS **không tự chạy lại sau khi khởi động máy**: chạy `/usr/local/hadoop/sbin/start-dfs.sh` trước khi dùng Spark.
-  Spark ghi event log lên `hdfs://localhost:9000/spark-logs`; HDFS tắt thì Spark báo lỗi kết nối `localhost:9000`.
+  Spark ghi event log lên `hdfs://localhost:9000/spark-logs`; HDFS tắt thì Spark báo lỗi kết nối `localhost:9000`
+  (đã gặp thật 15/10/2026 sau khi VM reboot).
+- **`run_stream.sh` tự xử lý hai ca HDFS, không cần làm gì thêm** (sửa 15/10/2026):
+  - **HDFS tắt** → chạy job với `--conf spark.eventLog.enabled=false` **cho riêng lần đó** (không sửa
+    `spark-defaults.conf` vì file đó dùng chung). Job **vẫn chạy bình thường**: sink và checkpoint đều
+    nằm trên **ổ đĩa cục bộ** (`config.yaml`: `sink_root`, `checkpoint_root`) — HDFS **chỉ** dùng cho
+    event log. Đổi lại, Spark History Server (cổng 18080) **không có** lần chạy đó.
+  - **HDFS vừa `start-dfs.sh` còn ở safe mode** → `hdfs dfs -ls` **vẫn chạy được** (chỉ đọc) nhưng tạo
+    `/spark-logs` sẽ ném `SafeModeException`, nên script **chờ tối đa 90 s** cho safe mode tắt
+    (`hdfs dfsadmin -safemode get`), rồi chạy với event log bật bình thường.
 - `start-dfs.sh` cần ssh không mật khẩu tới localhost. Khóa `~/.ssh/id_rsa` có passphrase nên không dùng được ở chế độ
   tự động — đã tạo thêm khóa `~/.ssh/id_ed25519` (không passphrase, 14/10/2026) và thêm vào `~/.ssh/authorized_keys`.
 - **Push GitHub** (`git@github.com:luongnguyen14/CommentStreaming`) cần khóa `~/.ssh/id_rsa` — khóa này có passphrase,
@@ -64,8 +73,9 @@ Các script dưới đây **copy template của cô từ `TEMPLATES_DIR` sang `d
 - `env.sh` (đã có ở trên) chứa `SPARK_KAFKA_PKG=org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.9`
   — **phải khớp** phiên bản Spark/Scala; gói đã nằm trong `~/.ivy2/jars` nên chạy được khi không có mạng.
 - `run_stream.sh <tên-lần-chạy> [tham số của stream_job.py ...]` — kiểm tra trước khi chạy
-  (đã có job cùng tên? Kafka ở `localhost:9092`? HDFS sống?), chạy `spark-submit` ở nền và
-  **chờ tới khi job in `READY`** mới trả về (để bên phát dữ liệu không gửi sớm hơn mốc offset).
+  (đã có job cùng tên? Kafka ở `localhost:9092`? HDFS sống? còn safe mode?), chạy `spark-submit`
+  ở nền và **chờ tới khi job in `READY`** mới trả về (để bên phát dữ liệu không gửi sớm hơn mốc
+  offset). HDFS tắt **không** làm job dừng — xem mục "Lưu ý vận hành" ở trên.
   Log `logs/task8_stream_<tên>.log`, PID `logs/task8_stream_<tên>.pid`.
 - `stop_stream.sh <tên-lần-chạy>` — dừng **êm**: SIGTERM cho tiến trình Python của driver
   (con của JVM `spark-submit`) → handler gọi `query.stop()` cho từng query. Không dùng `kill -9`.

@@ -30,9 +30,40 @@ if ! (exec 3<>/dev/tcp/localhost/9092) 2>/dev/null; then
   echo "LỖI: không kết nối được Kafka ở localhost:9092 — chạy bash kafka/start_kafka.sh" >&2
   exit 1
 fi
+# HDFS chỉ dùng cho event log của Spark — sink và checkpoint đều nằm trên ổ đĩa cục bộ
+# (config.yaml: `sink_root`, `checkpoint_root`). Nên HDFS tắt KHÔNG phải lý do để job
+# không chạy: thay vì để SparkContext chết vì ConnectException tới localhost:9000 (đã
+# gặp thật 15/10/2026, sau khi VM reboot), tắt event log cho riêng lần chạy này bằng
+# --conf. Không sửa spark-defaults.conf vì file đó dùng chung cho mọi job Spark.
+SPARK_CONF=()
+hdfs_safemode_off() {
+  # `hdfs dfs -ls` vẫn chạy được trong safe mode (chỉ đọc), nên phải hỏi riêng.
+  # SLF4J cảnh báo nhiều binding in ra stderr -> lọc bằng 2>/dev/null.
+  hdfs dfsadmin -safemode get 2>/dev/null | grep -q "Safe mode is OFF"
+}
 if ! hdfs dfs -ls / >/dev/null 2>&1; then
-  echo "CẢNH BÁO: HDFS không phản hồi — Spark ghi event log lên hdfs://localhost:9000/spark-logs"
-  echo "          sẽ lỗi. Chạy: /usr/local/hadoop/sbin/start-dfs.sh" >&2
+  echo "CẢNH BÁO: HDFS không phản hồi — chạy lần này với spark.eventLog.enabled=false" >&2
+  echo "          (Spark History Server sẽ KHÔNG có lần chạy này; sink/checkpoint" >&2
+  echo "          vẫn ghi bình thường vì nằm trên ổ đĩa cục bộ)." >&2
+  echo "          Muốn có event log: /usr/local/hadoop/sbin/start-dfs.sh" >&2
+  SPARK_CONF+=(--conf spark.eventLog.enabled=false)
+elif ! hdfs_safemode_off; then
+  # NameNode vừa khởi động còn ở safe mode vài giây; lúc đó tạo /spark-logs bị
+  # SafeModeException (đã gặp thật 15/10/2026: start-dfs.sh rồi chạy job ngay).
+  echo -n "HDFS đang ở safe mode — chờ tối đa 90 s "
+  safe=0
+  for _ in $(seq 1 90); do
+    if hdfs_safemode_off; then safe=1; break; fi
+    sleep 1; echo -n "."
+  done
+  echo
+  if [ "$safe" -eq 1 ]; then
+    echo "  HDFS đã ra khỏi safe mode — event log bật bình thường."
+  else
+    echo "CẢNH BÁO: HDFS vẫn ở safe mode sau 90 s — chạy lần này với" >&2
+    echo "          spark.eventLog.enabled=false (thử: hdfs dfsadmin -safemode leave)." >&2
+    SPARK_CONF+=(--conf spark.eventLog.enabled=false)
+  fi
 fi
 
 echo "Khởi chạy job streaming: run='${RUN}' | log=${LOG#$PROJECT_ROOT/}"
@@ -43,6 +74,7 @@ export PYSPARK_DRIVER_PYTHON="$VENV_PY" PYSPARK_PYTHON="$VENV_PY"
 nohup "$SPARK_HOME/bin/spark-submit" \
   --master 'local[2]' --driver-memory 2g \
   --packages "$SPARK_KAFKA_PKG" \
+  "${SPARK_CONF[@]}" \
   "$PROJECT_ROOT/src/streaming/stream_job.py" --run-name "$RUN" "$@" \
   >>"$LOG" 2>&1 &
 PID=$!
