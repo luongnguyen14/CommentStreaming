@@ -195,3 +195,33 @@ replay:
   burst_len_s: 2.0            # độ dài mỗi đợt bùng nổ (giây)
   late_ratio: 0.05            # tỷ lệ bản ghi có event_ts bị đẩy trễ (thử watermark)
   late_max_s: 30              # mức trễ tối đa của bản ghi đến muộn (giây)
+
+# ---------------------------------------------------------------------------
+# EDA — truy vấn, insight, trực quan hóa (Task 9) — src/eda/queries.py + plots.py
+# ---------------------------------------------------------------------------
+eda:
+  # Lần chạy streaming lấy dữ liệu phân tích. Đổi tên này là đổi cả hình 10–13
+  # và bảng eda_* tương ứng (mọi script đều đọc từ đây, không hard-code).
+  streaming_run: verify1
+  top_words_n: 20             # số từ đặc trưng nhất mỗi lớp (hình 08)
+  top_words_min_count: 20     # bỏ từ xuất hiện < mức này TRONG LỚP (chống từ hiếm)
+  log_odds_prior: 1000        # alpha_0 của log-odds có prior Dirichlet (Monroe 2008)
+  emoji_per_class_n: 12       # số emoji nhiều nhất mỗi lớp (hình 09)
+  length_bin_width: 25        # bề rộng mỗi khoảng độ dài, đơn vị token (hình 07)
+  length_bin_max: 400         # gộp mọi bình luận dài hơn vào khoảng cuối
+  latency_bins_per_decade: 5  # số khoảng trong mỗi bậc 10× của độ trễ (hình 13)
+  # stream_id do scripts/send_bad_events.py tạo ra khi kiểm chứng (KHÔNG phải
+  # dữ liệu replay thật). Dùng để ĐÁNH DẤU trong hình, không để lọc bỏ.
+  synthetic_stream_ids: ["heartbeat", "stream-test"]
+  alert:
+    # Ngưỡng cảnh báo tỷ lệ tiêu cực. Căn cứ: tỷ lệ lớp negative đo trên tập
+    # test = 0,2506 (outputs/tables/class_distribution.csv) + biên 5 điểm phần
+    # trăm. Cửa sổ có ít hơn `min_comments` bình luận KHÔNG được cảnh báo, vì
+    # 1 bình luận tiêu cực cũng cho tỷ lệ 100% (đã thấy thật ở Task 8).
+    negative_share_threshold: 0.30
+    min_comments: 5
+    basis: "ty le negative tren tap test 0.2506 + bien 5 diem phan tram"
+  burst:
+    # Bùng nổ = giây có số bình luận > mean + sigma * std của chính lần chạy.
+    # Kèm đường tham chiếu "trần lý thuyết" = replay.rate * replay.burst_factor.
+    sigma: 2.0

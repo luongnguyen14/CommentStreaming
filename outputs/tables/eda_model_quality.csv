@@ -1,0 +1,10 @@
+true_label,pred_label,count,row_share,model
+negative,negative,4626,0.6642,LogisticRegression
+negative,neutral,1625,0.2333,LogisticRegression
+negative,positive,714,0.1025,LogisticRegression
+neutral,negative,952,0.2471,LogisticRegression
+neutral,neutral,1934,0.5019,LogisticRegression
+neutral,positive,967,0.251,LogisticRegression
+positive,negative,1218,0.0718,LogisticRegression
+positive,neutral,2812,0.1657,LogisticRegression
+positive,positive,12944,0.7626,LogisticRegression

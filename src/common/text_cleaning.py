@@ -46,12 +46,20 @@ HTML_TAG_RE = r"</?(?!url>|user>)[a-zA-Z][^>]{0,200}>"
 HTML_ENTITY_RE = r"&(?:amp|lt|gt|quot|apos|nbsp|hellip|mdash|ndash|#\d{1,5}|#x[0-9a-fA-F]{1,5});"
 REPEAT_RE = r"(.)\1{2,}"                       # 3 ký tự giống nhau trở lên
 INVISIBLE_RE = "[\\x{200B}\\x{200C}\\x{FEFF}\\x{00AD}]"   # zero-width, soft hyphen
-# Emoji: ký hiệu (Symbol-other) + các dải emoji chính + variation selector/ZWJ.
+# Các dải emoji TƯỜNG MINH (mặt cười, cờ, ký hiệu, ngôi sao...). Tách riêng
+# khỏi EMOJI_CLASS vì cần dùng khi lọc CHẶT: lớp \p{So} ở dưới bao gồm cả ký tự
+# typography không phải emoji — "°" (U+00B0, 59 lần trong top-30 emoji toàn bộ
+# dữ liệu), "©" (U+00A9), "™" (U+2122). Thống kê emoji cho báo cáo phải dùng
+# dải tường minh này, nếu không bảng "emoji" sẽ lẫn ký tự vô nghĩa.
+EMOJI_SYMBOL_RANGES = ("\\x{1F000}-\\x{1FAFF}\\x{1F1E6}-\\x{1F1FF}"
+                       "\\x{2600}-\\x{27BF}\\x{2B00}-\\x{2BFF}")
+
+# Lớp dùng để TÁCH emoji thành token khi làm sạch: rộng hơn (thêm \p{So}) và
+# thêm các ký tự NỐI (variation selector, ZWJ, keycap) để không cắt vụn emoji.
 # KHÔNG lấy lớp \p{Sk} (modifier symbol): nó gồm cả dấu mũ/trăng treo như "¨"
 # (U+00A8) — đo trên dữ liệu thật thấy "¨" đứng đầu bảng tần suất với 394 lần,
 # rõ ràng là rác mã hóa chứ không phải emoji, nên loại khỏi lớp này.
-EMOJI_CLASS = ("[\\p{So}\\x{1F000}-\\x{1FAFF}\\x{1F1E6}-\\x{1F1FF}"
-               "\\x{FE0F}\\x{200D}\\x{20E3}\\x{2600}-\\x{27BF}\\x{2B00}-\\x{2BFF}]")
+EMOJI_CLASS = "[\\p{So}" + EMOJI_SYMBOL_RANGES + "\\x{FE0F}\\x{200D}\\x{20E3}]"
 
 _PUNCT_MAP = {"’": "'", "‘": "'", "ʼ": "'", "´": "'",
               "“": '"', "”": '"', "„": '"',

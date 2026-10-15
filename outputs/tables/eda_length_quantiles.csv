@@ -1,0 +1,4 @@
+label,n_comments,mean_tokens,p25_tokens,p50_tokens,p75_tokens,p95_tokens,max_tokens,mean_chars,p50_chars
+negative,32504,118.2,31,73,153,380,940,660.2,406
+neutral,17983,174.4,63,131,229,501,931,984.3,735
+positive,79214,132.5,32,83,172,443,937,748.0,459

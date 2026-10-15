@@ -1,0 +1,3 @@
+label,n_comments,min_ms,p50_ms,p90_ms,p95_ms,p99_ms,max_ms,mean_ms,kafka_p50_ms,kafka_p95_ms,queue_p50_ms,queue_p95_ms,queue_min_ms
+all,1014,40,2413,9113,9663,27091,603608,4795.4,0,1,2355,9136,40
+injected_late,2,603575,603575,603608,603608,603608,603608,603591.5,600000,600206,3402,3575,3402

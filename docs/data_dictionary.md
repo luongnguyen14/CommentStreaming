@@ -1,7 +1,7 @@
 # Từ điển dữ liệu — Capstone SIC Big Data (Nhóm 6)
 
 > Tài liệu này mô tả **mọi cột** xuất hiện trong dự án: dữ liệu gốc, dữ liệu đã
-> xử lý, nhãn đánh giá và các bảng thống kê. Cập nhật lần cuối: **14/10/2026** (Task 6).
+> xử lý, nhãn đánh giá và các bảng thống kê. Cập nhật lần cuối: **15/10/2026** (Task 9).
 >
 > ⚠️ Nhắc lại nguyên tắc trung thực (CLAUDE.md §9): mọi con số trong báo cáo phải
 > lấy từ file thật trong `outputs/`. Tài liệu này ghi **nguồn của từng con số**,
@@ -146,6 +146,14 @@ Ghi chú kỹ thuật:
   tiêu là giữ tín hiệu cảm xúc, không phải hiển thị.
 - Lớp emoji **không** gồm `\p{Sk}` (modifier symbol): đo trên dữ liệu thật thấy ký tự
   `¨` (U+00A8) đứng đầu bảng "emoji" với 394 lần — đó là rác mã hoá, nên đã loại.
+- **Hai mức lọc emoji, đừng lẫn (bổ sung ở Task 9).** Hằng số `EMOJI_CLASS` (dùng ở bước 8
+  để **tách token**) có chứa `\p{So}` — lớp này bao gồm cả **ký tự typography không phải
+  emoji**: đo trên train thấy `°` (U+00B0) xuất hiện 59 lần và lọt vào top-30 "emoji".
+  Vì vậy khi **thống kê** emoji (Hình 09, `eda_emoji_by_class.csv`) phải lọc thêm dải
+  tường minh `EMOJI_SYMBOL_RANGES` trong cùng file. Hệ quả: số emoji ở bảng Task 9
+  (`eda_emoji_by_class.csv`) **nhỏ hơn hoặc bằng** `emoji_frequency.csv` của Task 6
+  (bảng đó chỉ dùng điều kiện thứ nhất). Đây là **lỗi đã sửa**, không phải hai định nghĩa
+  song song có chủ ý — khi báo cáo chỉ dùng số của Task 9.
 - **Ghi chú về tiếng Việt:** bộ dữ liệu hiện tại là **tiếng Anh**, nên **không** cần
   `underthesea`/`pyvi`. Nếu sau này chuyển sang dữ liệu tiếng Việt thì **bắt buộc** thêm
   bước tách từ tiếng Việt; cách làm là `pandas_udf` (Arrow theo lô) vì Spark SQL không có
@@ -186,6 +194,44 @@ trường bắt buộc lẫn trường bị cấm và trả mã lỗi nếu phá
 | `clean_sample.csv` | `comment_id`, `stream_id`, `user_hash`, `label`, `rating`, `split`, `review_date`, `text`, `text_raw` | `prepare.sample_rows_out` dòng để **đối chiếu bằng mắt**: `text_raw` (gốc) cạnh `text` (đã sạch) |
 | `ingestion_report.csv` | `timestamp_utc`, `topic`, `rate_target`, `burst_prob`, `late_ratio`, `sent`, `delivered`, `errors`, `seconds`, `msgs_per_sec`, `bytes`, `note` | Thông lượng producer (Task 5), ghi thêm một dòng mỗi lần chạy |
 | `split_leak_check.csv` (nếu có) | — | Kết quả đo rò rỉ giữa các tập |
+
+### Task 9 (EDA) — `outputs/tables/eda_*.csv`
+
+Do `src/eda/queries.py` (Spark SQL) ghi ra; **bảng số liệu nền của từng hình**.
+SQL nguyên văn ở `src/eda/sql/q00_…q12_*.sql`; sửa hình không phải chạy lại Spark
+(`src/eda/plots.py` chỉ đọc lại các CSV này). Ghi chú chung:
+
+- Phần lớn bảng «tĩnh» (tính từ parquet train/val/test) có cột `split`; ngoại lệ:
+  `eda_length_quantiles.csv`, `eda_length_histogram.csv` và `eda_top_words_by_class.csv`
+  **chỉ tính trên train** nên không có cột này — hình vẽ cũng dùng train.
+- Các bảng «luồng» đọc từ `outputs/stream/<run>/` của **Task 8** — lần chạy
+  `verify1`, **1.014 bình luận** (1.000 phát lại + 14 bản ghi kiểm chứng nhịp tim).
+  ⚠️ REPLAY, không phải livestream thật. Bản ghi kiểm chứng sinh ra các cửa sổ
+  1 bình luận — tỷ lệ ở đó **không có ý nghĩa thống kê**.
+
+| File | Cột chính | Nội dung |
+|---|---|---|
+| `eda_overview.csv` | `n_train`, `n_val`, `n_test`, `n_streams_train`, `n_stream_comments`, `n_streams_streaming`, `stream_first/last_event_utc`, `n_windows_1min_rows`, `n_comments_in_windows`, `n_synthetic_comments`, `n_replay_comments` | Số kiểm tra quy mô (không vẽ hình) |
+| `eda_class_distribution.csv` | `split`, `label`, `n_comments`, `share_in_split` | Phân bố lớp ở cả ba tập (Hình 06) |
+| `eda_length_quantiles.csv` | `label`, `n_comments`, `mean_tokens`, `p25_tokens`, `p50_tokens`, `p75_tokens`, `p95_tokens`, `max_tokens`, `mean_chars`, `p50_chars` | Phân vị độ dài theo **token** (và ký tự) mỗi lớp (Hình 07) |
+| `eda_length_histogram.csv` | `label`, `bin_lower_tokens`, `n_comments`, `share_in_class` | Histogram độ dài, bin rộng `eda.length_bin_width` (Hình 07). ⚠️ Bảng **không** có cột `split` — chỉ tính trên train |
+| `eda_top_words_by_class.csv` | `label`, `rk`, `word`, `n_in_class`, `log_odds`, `z_score` | 20 từ đặc trưng nhất mỗi lớp, xếp theo log-odds có prior (Hình 08). `z_score` = điểm chuẩn hoá dùng để xếp hạng |
+| `eda_emoji_by_class.csv` | `label`, `rk_in_class`, `rk_global`, `emoji`, `n_emoji`, `n_emoji_total`, `n_comments_in_class`, `n_comments_with_emoji`, `pct_comments_with_emoji`, `emoji_per_1000_comments`, `pct_of_class_emoji` | Emoji theo lớp (Hình 09). ⚠️ `emoji_per_1000_comments` là mật độ của **cả lớp** — giống nhau ở mọi dòng cùng lớp; suy ra mật độ **theo từng emoji** = `1000 × n_emoji / n_comments_in_class` |
+| `eda_sentiment_per_minute.csv` | `window_start`, `window_end`, `n_comments`, `n_negative`, `n_neutral`, `n_positive`, `n_synthetic`, `n_replay`, `share_negative`, `share_neutral`, `share_positive` | Cửa sổ nhảy 1 phút của Task 8 (Hình 10) |
+| `eda_sentiment_per_10s.csv` | như trên, **không có** `n_replay` | Cửa sổ trượt 10 giây (Hình 10) — dùng để thấy diễn biến **bên trong** phút |
+| `eda_throughput_per_second.csv` | `second_utc`, `n_comments`, `mean_per_sec`, `sd_per_sec`, `burst_threshold`, `peak_per_sec`, `n_seconds_with_data`, `is_burst`, `configured_burst_ceiling` | Số bình luận mỗi giây; `burst_threshold` = `mean_per_sec + burst.sigma × sd_per_sec` (Hình 11). Các cột thống kê lặp lại trên mọi dòng (chỉ để vẽ) |
+| `eda_negative_share_alert.csv` | `window_start`, `window_end`, `n_comments`, `n_negative`, `share_negative`, `alert_threshold`, `min_comments`, `has_enough_volume`, `is_alert` | Quy tắc cảnh báo: `is_alert = share_negative > alert_threshold AND n_comments >= min_comments` (Hình 12) |
+| `eda_latency_quantiles.csv` | `label` (`all`/`injected_late`), `n_comments`, `min_ms`, `p50_ms`, `p90_ms`, `p95_ms`, `p99_ms`, `max_ms`, `mean_ms`, `kafka_p50_ms`, `kafka_p95_ms`, `queue_p50_ms`, `queue_p95_ms`, `queue_min_ms` | Phân vị độ trễ end-to-end và từng chặng (Hình 13). Đơn vị **mili giây** |
+| `eda_latency_histogram.csv` | `bin_idx`, `bin_lower_ms`, `bin_upper_ms`, `n_comments`, `n_injected_late` | Histogram độ trễ, bin theo **bậc 10** (Hình 13); `n_injected_late` = số bản ghi cố tình đẩy trễ nằm trong bin |
+| `eda_model_quality.csv` | `true_label`, `pred_label`, `count`, `row_share`, `model` | Ma trận nhầm lẫn của Task 7 ở **dạng dài** (mỗi ô một dòng) để vẽ Hình 14. F1/precision/recall từng lớp lấy từ `per_class_metrics.csv` — hình 14 dùng **cả ba** file |
+| `eda_token_vocab.csv` | `n_token_occurrences`, `n_vocab_raw`, `n_vocab_stripped`, `n_occurrences_with_edge_punct`, `pct_occurrences_with_edge_punct` | Hạn chế bước tách từ: token còn dính dấu câu ở hai đầu (không vẽ hình) |
+
+**Ngưỡng/định nghĩa đọc từ `config.yaml` mục `eda`**, không hard-code trong SQL:
+`streaming_run`, `top_words_n`/`min_count`, `log_odds_prior`, `emoji_per_class_n`,
+`length_bin_width`/`max`, `latency_bins_per_decade`, `burst.sigma`, `alert.*`.
+
+**Chạy thử** bằng `queries.py --sample N` ghi ra `*_sample.csv` (không ghi đè bảng thật)
+để không ai nhầm số liệu chạy thử với số liệu báo cáo.
 
 ---
 
