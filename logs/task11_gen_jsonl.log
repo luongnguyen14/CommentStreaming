@@ -1,0 +1,7 @@
+subsample_pct từ config = 64
+[12:51:12] Đang chuyển part-01.json -> JSONL (cắt review_detail ở 20000 ký tự, giữ 64% theo crc32(review_id)) ...
+[12:51:19]   ... 200,000 bản ghi giữ lại (7s)
+[12:51:28]   ... 400,000 bản ghi giữ lại (16s)
+[12:51:35]   ... 600,000 bản ghi giữ lại (23s)
+[12:51:36] Xong JSONL: 646,249/1,010,293 bản ghi giữ lại (64.0%), 609 MB, 24s -> /home/hadoop/capstone/data/processed/imdb_jsonl/part-000.jsonl
+KẾT QUẢ: 646,249 bản ghi | 608.8 MB | 24s

@@ -1,0 +1,121 @@
+26/10/15 12:53:45 WARN Utils: Your hostname, luongnguyen-VMware20-1 resolves to a loopback address: 127.0.1.1; using 172.16.99.138 instead (on interface ens160)
+26/10/15 12:53:45 WARN Utils: Set SPARK_LOCAL_IP if you need to bind to another address
+26/10/15 12:53:46 INFO SparkContext: Running Spark version 3.5.9
+26/10/15 12:53:46 INFO SparkContext: OS info Linux, 7.0.0-38-generic, aarch64
+26/10/15 12:53:46 INFO SparkContext: Java version 1.8.0_504
+26/10/15 12:53:46 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+26/10/15 12:53:46 INFO ResourceUtils: ==============================================================
+26/10/15 12:53:46 INFO ResourceUtils: No custom resources configured for spark.driver.
+26/10/15 12:53:46 INFO ResourceUtils: ==============================================================
+26/10/15 12:53:46 INFO SparkContext: Submitted application: capstone-task7-train
+26/10/15 12:53:46 INFO ResourceProfile: Default ResourceProfile created, executor resources: Map(cores -> name: cores, amount: 1, script: , vendor: , memory -> name: memory, amount: 1024, script: , vendor: , offHeap -> name: offHeap, amount: 0, script: , vendor: ), task resources: Map(cpus -> name: cpus, amount: 1.0)
+26/10/15 12:53:46 INFO ResourceProfile: Limiting resource is cpu
+26/10/15 12:53:46 INFO ResourceProfileManager: Added ResourceProfile id: 0
+26/10/15 12:53:46 INFO SecurityManager: Changing view acls to: hadoop
+26/10/15 12:53:46 INFO SecurityManager: Changing modify acls to: hadoop
+26/10/15 12:53:46 INFO SecurityManager: Changing view acls groups to: 
+26/10/15 12:53:46 INFO SecurityManager: Changing modify acls groups to: 
+26/10/15 12:53:46 INFO SecurityManager: SecurityManager: authentication disabled; ui acls disabled; users with view permissions: hadoop; groups with view permissions: EMPTY; users with modify permissions: hadoop; groups with modify permissions: EMPTY
+26/10/15 12:53:46 INFO Utils: Successfully started service 'sparkDriver' on port 35573.
+26/10/15 12:53:46 INFO SparkEnv: Registering MapOutputTracker
+26/10/15 12:53:46 INFO SparkEnv: Registering BlockManagerMaster
+26/10/15 12:53:46 INFO BlockManagerMasterEndpoint: Using org.apache.spark.storage.DefaultTopologyMapper for getting topology information
+26/10/15 12:53:46 INFO BlockManagerMasterEndpoint: BlockManagerMasterEndpoint up
+26/10/15 12:53:46 INFO SparkEnv: Registering BlockManagerMasterHeartbeat
+26/10/15 12:53:47 INFO DiskBlockManager: Created local directory at /home/hadoop/spark-tmp/blockmgr-5c3af6e9-9d65-44e4-a4ab-eebff6176fb1
+26/10/15 12:53:47 INFO MemoryStore: MemoryStore started with capacity 912.3 MiB
+26/10/15 12:53:47 INFO SparkEnv: Registering OutputCommitCoordinator
+26/10/15 12:53:47 INFO JettyUtils: Start Jetty 0.0.0.0:4040 for SparkUI
+26/10/15 12:53:47 INFO Utils: Successfully started service 'SparkUI' on port 4040.
+26/10/15 12:53:47 INFO Executor: Starting executor ID driver on host 172.16.99.138
+26/10/15 12:53:47 INFO Executor: OS info Linux, 7.0.0-38-generic, aarch64
+26/10/15 12:53:47 INFO Executor: Java version 1.8.0_504
+26/10/15 12:53:47 INFO Executor: Starting executor with user classpath (userClassPathFirst = false): ''
+26/10/15 12:53:47 INFO Executor: Created or updated repl class loader org.apache.spark.util.MutableURLClassLoader@3526a5c7 for default.
+26/10/15 12:53:47 INFO Utils: Successfully started service 'org.apache.spark.network.netty.NettyBlockTransferService' on port 36227.
+26/10/15 12:53:47 INFO NettyBlockTransferService: Server created on 172.16.99.138:36227
+26/10/15 12:53:47 INFO BlockManager: Using org.apache.spark.storage.RandomBlockReplicationPolicy for block replication policy
+26/10/15 12:53:47 INFO BlockManagerMaster: Registering BlockManager BlockManagerId(driver, 172.16.99.138, 36227, None)
+26/10/15 12:53:47 INFO BlockManagerMasterEndpoint: Registering block manager 172.16.99.138:36227 with 912.3 MiB RAM, BlockManagerId(driver, 172.16.99.138, 36227, None)
+26/10/15 12:53:47 INFO BlockManagerMaster: Registered BlockManager BlockManagerId(driver, 172.16.99.138, 36227, None)
+26/10/15 12:53:47 INFO BlockManager: Initialized BlockManager: BlockManagerId(driver, 172.16.99.138, 36227, None)
+26/10/15 12:53:48 INFO SingleEventLogFileWriter: Logging events to hdfs://localhost:9000/spark-logs/local-1792043627586.inprogress
+[12:53:48] Spark 3.5.9 | seed 42 | mô hình: nb,lr,svc,rf | CHẾ ĐỘ CHẠY THỬ
+[12:53:54] Dữ liệu: train 12,954 | val 2,777 | test (bỏ qua)
+[12:53:55] Trọng số lớp (tính trên tập train): lớp 0: 1.354 (n=3,189), lớp 1: 2.348 (n=1,839), lớp 2: 0.545 (n=7,926)
+[12:53:57] Kiểm tra rò rỉ (trùng văn bản sau chuẩn hóa): train↔val 0 | train↔test None | val↔test None
+[12:53:57] Stopword: 162 từ (giữ phủ định: True)
+[12:53:57] == MajorityBaseline: luôn đoán lớp positive ==
+[12:53:57]   Trên VALIDATION: acc 0.6118 | macro-F1 0.2531
+[12:53:57] == NaiveBayes: 2 tổ hợp siêu tham số ==
+[12:53:57]    - {'ngram': 1, 'smoothing': 1.0}
+[12:53:57]    - {'ngram': 2, 'smoothing': 1.0}
+26/10/15 12:54:09 WARN DAGScheduler: Broadcasting large task binary with size 1091.5 KiB
+26/10/15 12:54:17 WARN DAGScheduler: Broadcasting large task binary with size 1179.7 KiB
+[12:54:23]   TVS xong sau 25s | tốt nhất: n=1, smoothing=1 (weighted F1 nội bộ 0.6777)
+26/10/15 12:54:23 WARN DAGScheduler: Broadcasting large task binary with size 1071.7 KiB
+[12:54:24]   Trên VALIDATION: acc 0.6579 | macro-F1 0.6050 | weighted-F1 0.6856 | dự đoán 0.6s cho 2,777 dòng
+[12:54:24] == LogisticRegression: 4 tổ hợp siêu tham số ==
+[12:54:24]    - {'ngram': 1, 'reg_param': 0.01, 'max_iter': 20, 'elastic_net': 0.0}
+[12:54:24]    - {'ngram': 1, 'reg_param': 0.1, 'max_iter': 20, 'elastic_net': 0.0}
+[12:54:24]    - {'ngram': 2, 'reg_param': 0.01, 'max_iter': 20, 'elastic_net': 0.0}
+[12:54:24]    - {'ngram': 2, 'reg_param': 0.1, 'max_iter': 20, 'elastic_net': 0.0}
+26/10/15 12:54:33 WARN DAGScheduler: Broadcasting large task binary with size 1096.1 KiB
+26/10/15 12:54:43 WARN DAGScheduler: Broadcasting large task binary with size 1096.1 KiB
+26/10/15 12:54:53 WARN DAGScheduler: Broadcasting large task binary with size 1184.3 KiB
+26/10/15 12:55:03 WARN DAGScheduler: Broadcasting large task binary with size 1184.3 KiB
+[12:55:11]   TVS xong sau 47s | tốt nhất: elasticNetParam=0, maxIter=20, n=1, regParam=0.1 (weighted F1 nội bộ 0.6974)
+26/10/15 12:55:11 WARN DAGScheduler: Broadcasting large task binary with size 1076.3 KiB
+[12:55:12]   Trên VALIDATION: acc 0.6792 | macro-F1 0.5607 | weighted-F1 0.6776 | dự đoán 0.5s cho 2,777 dòng
+[12:55:12] == LinearSVC(OvR): 2 tổ hợp siêu tham số ==
+[12:55:12]    - {'ngram': 1, 'reg_param': 0.01, 'max_iter': 20}
+[12:55:12]    - {'ngram': 1, 'reg_param': 0.1, 'max_iter': 20}
+26/10/15 12:55:22 WARN DAGScheduler: Broadcasting large task binary with size 1111.7 KiB
+26/10/15 12:55:33 WARN DAGScheduler: Broadcasting large task binary with size 1111.7 KiB
+[12:55:43]   TVS xong sau 32s | tốt nhất: maxIter=20, n=1, regParam=0.01 (weighted F1 nội bộ 0.7035)
+26/10/15 12:55:44 WARN DAGScheduler: Broadcasting large task binary with size 1109.5 KiB
+[12:55:45]   SVC: prediction của OneVsRest khớp argmax(rawPrediction) ở 100.00% dòng -> dùng argmax
+[12:55:46]   Trên VALIDATION: acc 0.6896 | macro-F1 0.5673 | weighted-F1 0.6863 | dự đoán 1.6s cho 2,777 dòng
+[12:55:46] == RandomForest: 2 tổ hợp siêu tham số ==
+[12:55:46]    - {'ngram': 1, 'vocab_size': 5000, 'num_trees': 30, 'max_depth': 8}
+[12:55:46]    - {'ngram': 1, 'vocab_size': 5000, 'num_trees': 30, 'max_depth': 12}
+26/10/15 12:55:57 WARN DAGScheduler: Broadcasting large task binary with size 1415.1 KiB
+26/10/15 12:56:01 WARN DAGScheduler: Broadcasting large task binary with size 1433.2 KiB
+26/10/15 12:56:01 WARN DAGScheduler: Broadcasting large task binary with size 1463.6 KiB
+26/10/15 12:56:01 WARN DAGScheduler: Broadcasting large task binary with size 1509.6 KiB
+26/10/15 12:56:02 WARN DAGScheduler: Broadcasting large task binary with size 1572.6 KiB
+26/10/15 12:56:02 WARN DAGScheduler: Broadcasting large task binary with size 1660.3 KiB
+26/10/15 12:56:03 WARN DAGScheduler: Broadcasting large task binary with size 1769.6 KiB
+26/10/15 12:56:04 WARN DAGScheduler: Broadcasting large task binary with size 1905.0 KiB
+26/10/15 12:56:15 WARN DAGScheduler: Broadcasting large task binary with size 1415.0 KiB
+26/10/15 12:56:18 WARN DAGScheduler: Broadcasting large task binary with size 1433.1 KiB
+26/10/15 12:56:18 WARN DAGScheduler: Broadcasting large task binary with size 1463.6 KiB
+26/10/15 12:56:18 WARN DAGScheduler: Broadcasting large task binary with size 1509.6 KiB
+26/10/15 12:56:18 WARN DAGScheduler: Broadcasting large task binary with size 1572.6 KiB
+26/10/15 12:56:19 WARN DAGScheduler: Broadcasting large task binary with size 1660.3 KiB
+26/10/15 12:56:20 WARN DAGScheduler: Broadcasting large task binary with size 1769.6 KiB
+26/10/15 12:56:20 WARN DAGScheduler: Broadcasting large task binary with size 1905.0 KiB
+26/10/15 12:56:22 WARN DAGScheduler: Broadcasting large task binary with size 2.0 MiB
+26/10/15 12:56:23 WARN DAGScheduler: Broadcasting large task binary with size 2.2 MiB
+26/10/15 12:56:24 WARN DAGScheduler: Broadcasting large task binary with size 2.4 MiB
+26/10/15 12:56:25 WARN DAGScheduler: Broadcasting large task binary with size 2.6 MiB
+26/10/15 12:56:28 WARN DAGScheduler: Broadcasting large task binary with size 1013.7 KiB
+26/10/15 12:56:38 WARN DAGScheduler: Broadcasting large task binary with size 1407.7 KiB
+26/10/15 12:56:41 WARN DAGScheduler: Broadcasting large task binary with size 1426.1 KiB
+26/10/15 12:56:41 WARN DAGScheduler: Broadcasting large task binary with size 1458.7 KiB
+26/10/15 12:56:42 WARN DAGScheduler: Broadcasting large task binary with size 1506.8 KiB
+26/10/15 12:56:42 WARN DAGScheduler: Broadcasting large task binary with size 1581.2 KiB
+26/10/15 12:56:43 WARN DAGScheduler: Broadcasting large task binary with size 1679.0 KiB
+26/10/15 12:56:44 WARN DAGScheduler: Broadcasting large task binary with size 1801.0 KiB
+26/10/15 12:56:45 WARN DAGScheduler: Broadcasting large task binary with size 1953.2 KiB
+26/10/15 12:56:46 WARN DAGScheduler: Broadcasting large task binary with size 2.1 MiB
+26/10/15 12:56:47 WARN DAGScheduler: Broadcasting large task binary with size 2.3 MiB
+26/10/15 12:56:48 WARN DAGScheduler: Broadcasting large task binary with size 2.5 MiB
+26/10/15 12:56:51 WARN DAGScheduler: Broadcasting large task binary with size 2.7 MiB
+[12:56:52]   TVS xong sau 67s | tốt nhất: maxDepth=12, n=1, numTrees=30, vocabSize=5000 (weighted F1 nội bộ 0.6405)
+26/10/15 12:56:53 WARN DAGScheduler: Broadcasting large task binary with size 1070.4 KiB
+[12:56:53]   Trên VALIDATION: acc 0.5949 | macro-F1 0.5262 | weighted-F1 0.6100 | dự đoán 0.7s cho 2,777 dòng
+[12:56:53] Xếp hạng trên validation (macro-F1): NaiveBayes 0.6050 | LinearSVC(OvR) 0.5673 | LogisticRegression 0.5607 | RandomForest 0.5262 | MajorityBaseline 0.2531
+[12:56:53] Mô hình chọn: NaiveBayes (n=1, smoothing=1)
+[12:56:54] Bỏ qua lưu mô hình (--no-test = chế độ chạy thử)
+[12:56:56] HOÀN TẤT.

@@ -4,7 +4,7 @@
 Các bước (đúng theo yêu cầu Task 6):
  1. Chuyển `data/raw/part-01.json` (mảng JSON 1,1 GB) sang JSONL để Spark đọc
     song song được (JSON gốc là 1 mảng lớn, `multiLine=true` sẽ dồn 1 task).
-    Chỉ giữ tập con ~20% (~200 MB) theo `prepare.subsample_mod` cho vừa máy ảo;
+    Chỉ giữ tập con theo `prepare.subsample_pct` (phần trăm) cho vừa máy ảo;
     cách chọn tất định theo crc32(review_id) nên chạy lại ra đúng tập con đó.
  2. Làm sạch văn bản bằng hàm dùng chung `src/common/text_cleaning.py`.
  3. Ánh xạ `rating` -> 3 lớp theo `labels.mapping` trong config.yaml.
@@ -59,6 +59,33 @@ OUT_COLS = ["comment_id", "stream_id", "user_hash", "label", "rating",
 
 SALT_LEN = 16        # độ dài user_hash — phải khớp src/common/utils.salted_hash
 
+# Mẫu số của phép lấy mẫu theo phần trăm. Chọn 1000 để biểu diễn được mọi mốc phần
+# trăm nguyên (1% -> 0,1% độ phân giải). ĐÃ ĐO phân bố crc32(review_id) % 1000 trên
+# 120.000 bản ghi thật của nguồn: chi² = 967 với 999 độ tự do (kỳ vọng 999 ± 45)
+# -> đều, không lệch; tỷ lệ giữ lại thực tế khớp mục tiêu (64 -> 64,14%).
+_PCT_SCALE = 1000
+
+
+def keep_record(review_id: str, pct: int) -> bool:
+    """Có giữ bản ghi này không, khi chỉ lấy `pct` phần trăm nguồn.
+
+    TẤT ĐỊNH theo `review_id` (không theo vị trí trong file), nên chạy lại ra đúng
+    tập con cũ và không lệch theo thứ tự phim của bộ dữ liệu gốc.
+
+    Dùng dải TIỀN TỐ `crc32 % 1000 < pct * 10`, nên các mức LỒNG NHAU:
+    20% ⊂ 64% ⊂ 100% — "thêm dữ liệu" luôn là thêm vào, không phải đổi tập.
+
+    Lưu ý khi đọc lại lịch sử: bản cũ dùng `crc32(review_id) % subsample_mod == 0`
+    (một CẤP SỐ CỘNG các số dư: 0, 5, 10, ...), khác hẳn dải tiền tố này — hai cách
+    cho ra hai tập con CÙNG CỠ nhưng KHÁC NHAU. Tập 20% cũ chỉ tái lập được bằng code
+    cũ (xem git history), không bằng `subsample_pct: 20`.
+    """
+    if pct >= 100:
+        return True
+    if pct <= 0:
+        return False
+    return zlib.crc32(review_id.encode("utf-8")) % _PCT_SCALE < pct * (_PCT_SCALE // 100)
+
 
 def log(msg: str) -> None:
     print(f"[{time.strftime('%H:%M:%S')}] {msg}", flush=True)
@@ -73,7 +100,7 @@ def local_uri(p: Path) -> str:
 # --------------------------------------------------------------------------- #
 # 1. Chuyển mảng JSON -> JSONL (một lần; lần sau đọc manifest để bỏ qua)
 # --------------------------------------------------------------------------- #
-def ensure_jsonl(raw_path: Path, jsonl_dir: Path, truncate: int, subsample_mod: int = 1) -> tuple[Path, int]:
+def ensure_jsonl(raw_path: Path, jsonl_dir: Path, truncate: int, subsample_pct: int = 100) -> tuple[Path, int]:
     # Tên bắt đầu bằng "_" để Spark BỎ QUA khi đọc cả thư mục: nếu đặt là
     # manifest.json, `spark.read.json(dir)` sẽ đọc luôn nó thành 1 bản ghi rỗng
     # (đã từng xảy ra: Spark đếm 1.010.294 trong khi file có 1.010.293 dòng).
@@ -81,7 +108,9 @@ def ensure_jsonl(raw_path: Path, jsonl_dir: Path, truncate: int, subsample_mod: 
     if manifest_path.exists():
         m = json.loads(manifest_path.read_text(encoding="utf-8"))
         if (m.get("source") == raw_path.name and m.get("source_size") == raw_path.stat().st_size
-                and m.get("truncate") == truncate and m.get("subsample_mod") == subsample_mod):
+                and m.get("truncate") == truncate
+                and m.get("subsample_pct") == subsample_pct
+                and (jsonl_dir / "part-000.jsonl").exists()):
             log(f"JSONL đã có sẵn: {m['n_records']:,} bản ghi -> {jsonl_dir}")
             return jsonl_dir, m["n_records"]
 
@@ -90,16 +119,16 @@ def ensure_jsonl(raw_path: Path, jsonl_dir: Path, truncate: int, subsample_mod: 
     n = 0
     n_seen = 0
     t0 = time.time()
-    subsample_mod = max(1, int(subsample_mod))
+    subsample_pct = min(100, max(1, int(subsample_pct)))
     log(f"Đang chuyển {raw_path.name} -> JSONL (cắt review_detail ở {truncate} ký tự, "
-        f"giữ crc32(review_id) %% {subsample_mod} == 0) ...")
+        f"giữ {subsample_pct}% theo crc32(review_id)) ...")
     with open(out_path, "w", encoding="utf-8") as out:
         for rec in iter_json_array(raw_path):
             n_seen += 1
             rid = rec.get("review_id") or ""
             # Chọn tập con TẤT ĐỊNH theo id (không theo vị trí trong file) để
             # không lệch theo thứ tự phim của bộ dữ liệu gốc.
-            if subsample_mod > 1 and zlib.crc32(rid.encode("utf-8")) % subsample_mod != 0:
+            if not keep_record(rid, subsample_pct):
                 continue
             detail = rec.get("review_detail") or ""
             row = {
@@ -116,7 +145,7 @@ def ensure_jsonl(raw_path: Path, jsonl_dir: Path, truncate: int, subsample_mod: 
                 log(f"  ... {n:,} bản ghi giữ lại ({time.time() - t0:.0f}s)")
     manifest_path.write_text(json.dumps({
         "source": raw_path.name, "source_size": raw_path.stat().st_size,
-        "truncate": truncate, "subsample_mod": subsample_mod,
+        "truncate": truncate, "subsample_pct": subsample_pct,
         "n_records": n, "n_seen": n_seen,
     }), encoding="utf-8")
     size_mb = out_path.stat().st_size / 1024 / 1024
@@ -291,6 +320,24 @@ def write_class_distribution(path: Path, dist_rows: list[dict]) -> None:
 
 
 # --------------------------------------------------------------------------- #
+# Đọc tham số lấy mẫu từ config (có tương thích ngược)
+# --------------------------------------------------------------------------- #
+def subsample_pct_from_config(cfg: dict) -> int:
+    """`prepare.subsample_pct` — hoặc quy đổi từ khóa cũ `subsample_mod`."""
+    prep = cfg["prepare"]
+    if "subsample_pct" in prep:
+        return min(100, max(1, int(prep["subsample_pct"])))
+    if "subsample_mod" in prep:                  # config kiểu cũ (trước 15/10/2026)
+        mod = max(1, int(prep["subsample_mod"]))
+        pct = max(1, min(100, round(100 / mod)))
+        log(f"CẢNH BÁO: config còn khóa cũ `subsample_mod: {mod}` — quy đổi thành "
+            f"`subsample_pct: {pct}`. Tập con sinh ra KHÁC tập con mà khóa cũ tạo ra "
+            f"(dải tiền tố vs cấp số cộng) — xem `keep_record`.")
+        return pct
+    return 100
+
+
+# --------------------------------------------------------------------------- #
 # main
 # --------------------------------------------------------------------------- #
 def main() -> int:
@@ -320,7 +367,7 @@ def main() -> int:
 
     t_start = time.time()
     jsonl_dir, n_manifest = ensure_jsonl(raw_path, jsonl_dir, cfg["prepare"]["truncate_raw_detail"],
-                                        cfg["prepare"].get("subsample_mod", 1))
+                                        subsample_pct_from_config(cfg))
 
     spark = (SparkSession.builder
              .appName("prepare-training-data")

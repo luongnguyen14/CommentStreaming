@@ -1,6 +1,7 @@
 # src/training — Chuẩn bị dữ liệu và huấn luyện
 
-- `prepare.py` — nạp dữ liệu thô, chuyển sang JSONL (**tập con ~200 MB**), chuẩn hóa
+- `prepare.py` — nạp dữ liệu thô, chuyển sang JSONL (**tập con theo `prepare.subsample_pct`**;
+  hiện trên đĩa là tập 20% ~190 MB, config đã đổi sang 64%), chuẩn hóa
   nhãn 3 lớp từ `rating`, làm sạch bằng hàm dùng chung, **loại trùng (kể cả gần trùng)**,
   rồi mới chia train/val/test; ghi parquet + nhãn test + các bảng thống kê (Task 6)
 - `train.py` — Spark ML Pipeline (RegexTokenizer -> StopWordsRemover -> NGram ->
@@ -26,7 +27,7 @@ PYSPARK_DRIVER_PYTHON=$VENV_PY PYSPARK_PYTHON=$VENV_PY spark-submit \
 
 | Tham số | Ý nghĩa |
 |---|---|
-| `--sample N` | dùng ~N bản ghi (chạy thử); bỏ trống = dùng cả tập con trong `prepare.subsample_mod` |
+| `--sample N` | dùng ~N bản ghi (chạy thử); bỏ trống = dùng cả tập con trong `prepare.subsample_pct`. ⚠️ Cờ này **vẫn ghi đè** `data/processed/*.parquet` bằng bản N dòng — chạy thử SAU khi chạy đầy đủ sẽ phá tập thật |
 | `--method` | ghi đè `split.method` (`group_movie_balanced` hoặc `stratified`) |
 | `--config`, `--seed` | như tên gọi (mặc định `config.yaml`, seed 42) |
 
@@ -37,9 +38,12 @@ source scripts/env.sh
 # chạy thử — TỰ ĐỘNG bỏ qua tập test (--sample luôn kèm --no-test)
 PYSPARK_DRIVER_PYTHON=$VENV_PY PYSPARK_PYTHON=$VENV_PY spark-submit \
     --driver-memory 2g --master 'local[2]' src/training/train.py --sample 20000
-# bản đầy đủ (~13 phút): chọn mô hình trên val, đánh giá test MỘT LẦN, lưu model
+# bản đầy đủ (~13 phút ở 130k dòng): chọn mô hình trên val, đánh giá test MỘT LẦN, lưu model
+# ⚠️ với `prepare.subsample_pct: 64` (~415k dòng train) nên nâng lên --driver-memory 4g:
+#    log Task 7 cho thấy cache 912 MiB đã KHÔNG vừa ở 130k dòng (70 dòng
+#    "Not enough space to cache" rải suốt quá trình huấn luyện, block bị đẩy ra đĩa).
 PYSPARK_DRIVER_PYTHON=$VENV_PY PYSPARK_PYTHON=$VENV_PY spark-submit \
-    --driver-memory 2g --master 'local[2]' src/training/train.py
+    --driver-memory 4g --master 'local[2]' src/training/train.py
 # vẽ lại hình từ bảng đã lưu (không huấn luyện lại, không chạm test)
 $VENV_PY src/training/train.py --figures-only
 ```

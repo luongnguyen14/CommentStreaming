@@ -85,11 +85,15 @@ split:
 
 prepare:
   truncate_raw_detail: 20000  # cắt bớt review_detail khi chuyển JSONL (tiết kiệm đĩa)
-  # Chỉ dùng một tập con của nguồn cho vừa máy ảo (~200 MB thay vì 1,1 GB):
-  # giữ bản ghi có crc32(review_id) % subsample_mod == 0. Cách này TẤT ĐỊNH
-  # (chạy lại ra đúng tập con cũ), trải đều theo review_id nên không lệch theo
-  # thứ tự phim trong file. mod = 5 -> ~20% -> ~202.000 dòng ~ 200 MB (đo thật).
-  subsample_mod: 5
+  # Chỉ dùng một tập con của nguồn cho vừa máy ảo: giữ bản ghi có
+  # crc32(review_id) % 1000 < pct * 10 (xem `keep_record` trong prepare.py).
+  # TẤT ĐỊNH (chạy lại ra đúng tập con cũ), trải đều theo review_id nên không
+  # lệch theo thứ tự phim trong file, và các mức LỒNG NHAU (20% ⊂ 64% ⊂ 100%).
+  # ĐO THẬT 15/10/2026 với pct = 64: giữ 646.249/1.010.293 bản ghi (64,0%),
+  # JSONL 608,8 MB, sinh mất 24 s (~988 byte/bản ghi). Nguồn 1.045 MB.
+  # LƯU Ý: khóa `subsample_mod` (kiểu cũ) cho ra tập con CÙNG CỠ nhưng KHÁC;
+  # tập 20% cũ chỉ tái lập được bằng code cũ (git history), không bằng pct: 20.
+  subsample_pct: 64
   sample_rows_out: 1000       # số dòng mẫu ghi ra outputs/tables/clean_sample.csv
   emoji_top_n: 30             # số emoji phổ biến nhất ghi ra outputs/tables/emoji_frequency.csv
 

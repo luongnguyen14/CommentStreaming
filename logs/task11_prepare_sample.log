@@ -1,0 +1,64 @@
+26/10/15 12:52:20 WARN Utils: Your hostname, luongnguyen-VMware20-1 resolves to a loopback address: 127.0.1.1; using 172.16.99.138 instead (on interface ens160)
+26/10/15 12:52:20 WARN Utils: Set SPARK_LOCAL_IP if you need to bind to another address
+[12:52:21] JSONL đã có sẵn: 646,249 bản ghi -> /home/hadoop/capstone/data/processed/imdb_jsonl
+26/10/15 12:52:21 INFO SparkContext: Running Spark version 3.5.9
+26/10/15 12:52:21 INFO SparkContext: OS info Linux, 7.0.0-38-generic, aarch64
+26/10/15 12:52:21 INFO SparkContext: Java version 1.8.0_504
+26/10/15 12:52:21 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+26/10/15 12:52:21 INFO ResourceUtils: ==============================================================
+26/10/15 12:52:21 INFO ResourceUtils: No custom resources configured for spark.driver.
+26/10/15 12:52:21 INFO ResourceUtils: ==============================================================
+26/10/15 12:52:21 INFO SparkContext: Submitted application: prepare-training-data
+26/10/15 12:52:21 INFO ResourceProfile: Default ResourceProfile created, executor resources: Map(cores -> name: cores, amount: 1, script: , vendor: , memory -> name: memory, amount: 1024, script: , vendor: , offHeap -> name: offHeap, amount: 0, script: , vendor: ), task resources: Map(cpus -> name: cpus, amount: 1.0)
+26/10/15 12:52:21 INFO ResourceProfile: Limiting resource is cpu
+26/10/15 12:52:21 INFO ResourceProfileManager: Added ResourceProfile id: 0
+26/10/15 12:52:21 INFO SecurityManager: Changing view acls to: hadoop
+26/10/15 12:52:21 INFO SecurityManager: Changing modify acls to: hadoop
+26/10/15 12:52:21 INFO SecurityManager: Changing view acls groups to: 
+26/10/15 12:52:21 INFO SecurityManager: Changing modify acls groups to: 
+26/10/15 12:52:21 INFO SecurityManager: SecurityManager: authentication disabled; ui acls disabled; users with view permissions: hadoop; groups with view permissions: EMPTY; users with modify permissions: hadoop; groups with modify permissions: EMPTY
+26/10/15 12:52:21 INFO Utils: Successfully started service 'sparkDriver' on port 38697.
+26/10/15 12:52:21 INFO SparkEnv: Registering MapOutputTracker
+26/10/15 12:52:21 INFO SparkEnv: Registering BlockManagerMaster
+26/10/15 12:52:21 INFO BlockManagerMasterEndpoint: Using org.apache.spark.storage.DefaultTopologyMapper for getting topology information
+26/10/15 12:52:21 INFO BlockManagerMasterEndpoint: BlockManagerMasterEndpoint up
+26/10/15 12:52:21 INFO SparkEnv: Registering BlockManagerMasterHeartbeat
+26/10/15 12:52:21 INFO DiskBlockManager: Created local directory at /home/hadoop/spark-tmp/blockmgr-21003af6-af31-470d-8b46-2bf9a6268549
+26/10/15 12:52:21 INFO MemoryStore: MemoryStore started with capacity 912.3 MiB
+26/10/15 12:52:21 INFO SparkEnv: Registering OutputCommitCoordinator
+26/10/15 12:52:22 INFO JettyUtils: Start Jetty 0.0.0.0:4040 for SparkUI
+26/10/15 12:52:22 INFO Utils: Successfully started service 'SparkUI' on port 4040.
+26/10/15 12:52:22 INFO Executor: Starting executor ID driver on host 172.16.99.138
+26/10/15 12:52:22 INFO Executor: OS info Linux, 7.0.0-38-generic, aarch64
+26/10/15 12:52:22 INFO Executor: Java version 1.8.0_504
+26/10/15 12:52:22 INFO Executor: Starting executor with user classpath (userClassPathFirst = false): ''
+26/10/15 12:52:22 INFO Executor: Created or updated repl class loader org.apache.spark.util.MutableURLClassLoader@3fb888f1 for default.
+26/10/15 12:52:22 INFO Utils: Successfully started service 'org.apache.spark.network.netty.NettyBlockTransferService' on port 38387.
+26/10/15 12:52:22 INFO NettyBlockTransferService: Server created on 172.16.99.138:38387
+26/10/15 12:52:22 INFO BlockManager: Using org.apache.spark.storage.RandomBlockReplicationPolicy for block replication policy
+26/10/15 12:52:22 INFO BlockManagerMaster: Registering BlockManager BlockManagerId(driver, 172.16.99.138, 38387, None)
+26/10/15 12:52:22 INFO BlockManagerMasterEndpoint: Registering block manager 172.16.99.138:38387 with 912.3 MiB RAM, BlockManagerId(driver, 172.16.99.138, 38387, None)
+26/10/15 12:52:22 INFO BlockManagerMaster: Registered BlockManager BlockManagerId(driver, 172.16.99.138, 38387, None)
+26/10/15 12:52:22 INFO BlockManager: Initialized BlockManager: BlockManagerId(driver, 172.16.99.138, 38387, None)
+26/10/15 12:52:22 INFO SingleEventLogFileWriter: Logging events to hdfs://localhost:9000/spark-logs/local-1792043542116.inprogress
+[12:52:27] CHẠY THỬ: lấy 20,000 bản ghi có crc32(review_id) nhỏ nhất (tất định, trải đều trong 646,249 bản ghi)
+[12:52:38] Tổng 20,000 | rỗng 0 | thiếu nhãn 1,026 | quá ngắn 1 | quá dài 160
+[12:53:13] Trùng mã (comment_id): bỏ 297 -> còn 18,516
+[12:53:13] Trùng chính xác: bỏ 8 -> còn 18,508
+[12:53:17] Gần trùng: bỏ 2 -> còn 18,506
+[12:53:17] Chia tập theo phương thức: group_movie_balanced
+[12:53:21] Chia theo nhóm phim: 10,756 phim, 32 lần thử, lệch 2.68% so với mục tiêu (tính trong 4s)
+[12:53:23]   hoán đổi cục bộ: nhận 270/200,000 lần -> lệch 0.01%
+[12:53:23]   train:    12,954 dòng (100.0% mục tiêu) (neg=3,189 neu=1,839 pos=7,926)
+[12:53:23]   val  :     2,777 dòng (100.0% mục tiêu) (neg=684 neu=394 pos=1,699)
+[12:53:23]   test :     2,775 dòng (100.0% mục tiêu) (neg=683 neu=394 pos=1,698)
+[12:53:27] Kiểm tra rò rỉ: phim nằm ở >1 tập: 0 | người dùng ở >1 tập: 814
+[12:53:28] Đã ghi train: data/processed/train.parquet
+[12:53:29] Đã ghi val: data/processed/val.parquet
+[12:53:29] Đã ghi test: data/processed/test.parquet
+[12:53:30] Đã ghi nhãn test: data/processed/eval_labels.parquet
+[12:53:31] Đã ghi bảng phân bố lớp: 12 dòng
+[12:53:31] Đã ghi nhật ký làm sạch: outputs/tables/cleaning_log.csv
+[12:53:34] Đã ghi mẫu: 1000 dòng -> outputs/tables/clean_sample.csv
+[12:53:35] Đã ghi tần suất emoji: top 30 -> outputs/tables/emoji_frequency.csv
+[12:53:35] HOÀN TẤT sau 74s

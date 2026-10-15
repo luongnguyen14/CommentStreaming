@@ -43,7 +43,7 @@ vì Spark đọc mảng JSON phải bật `multiLine=true` → dồn hết vào 
 | File | `part-000.jsonl` |
 | Số bản ghi | **201.074** / 1.010.293 (giữ **19,9%**) |
 | Dung lượng | **~190 MB** (thay vì ~998 MB nếu giữ tất cả) |
-| Cách chọn tập con | `prepare.subsample_mod: 5` — giữ bản ghi có `crc32(review_id) % 5 == 0` |
+| Cách chọn tập con | Giữ bản ghi có `crc32(review_id) % subsample_mod == 0` — bản sinh ra tập đang nằm trên đĩa dùng `subsample_mod: 5`. **Từ 15/10/2026** config đổi sang `prepare.subsample_pct` (dải tiền tố `crc32 % 1000 < pct * 10`) để chọn được mọi mốc phần trăm, xem `keep_record` trong `prepare.py` |
 | Vì sao chọn theo `review_id` | **Tất định** (chạy lại ra đúng tập con cũ) và **không lệch theo thứ tự phim** trong file gốc (bộ dữ liệu xếp theo phim; cắt N dòng đầu sẽ chỉ lấy được một số phim) |
 | Cột trong mỗi dòng | `review_id`, `reviewer`, `movie`, `rating`, `review_date`, `review_detail` (cắt ở `prepare.truncate_raw_detail` = 20.000 ký tự) |
 | `_manifest.json` | Ghi nguồn + kích thước nguồn + tham số + số bản ghi để lần sau **bỏ qua bước chuyển đổi**. Tên **bắt đầu bằng `_`** để Spark bỏ qua khi đọc cả thư mục — đặt tên `manifest.json` sẽ bị đọc thành 1 bản ghi rỗng (đã từng xảy ra: Spark đếm 1.010.294 trong khi file có 1.010.293 dòng) |
@@ -51,6 +51,12 @@ vì Spark đọc mảng JSON phải bật `multiLine=true` → dồn hết vào 
 > ⚠️ **Đây là tập con do nhóm tự chọn, không phải toàn bộ bộ dữ liệu.** Báo cáo phải
 > nói rõ: nhóm dùng 201.074 review (1 shard, lấy mẫu 20%) chứ không phải 5.571.499
 > review của bộ Kaggle đầy đủ.
+
+> 📌 **Số liệu ở mục này mô tả tập đang nằm trên đĩa (sinh 14/10/2026 với `subsample_mod: 5`).**
+> Config đã đổi sang `prepare.subsample_pct: 64` nhưng **chưa chạy lại** `prepare.py`, nên
+> 201.074 vẫn là con số đúng. Chạy lại với 64% **đã đo được** 646.249 bản ghi / 608,8 MB —
+> khi đó **mục này phải cập nhật**, cùng `data/processed/README.md` và `src/training/README.md`.
+> Kế hoạch huấn luyện lại: `docs/huong_dan_huan_luyen.docx`.
 
 ---
 
