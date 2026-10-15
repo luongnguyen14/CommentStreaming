@@ -12,6 +12,19 @@ rõ ràng nếu thiếu.
 
 Chạy lại được nhiều lần, mỗi lần ghi đè bản cũ (tiền lệ: `scripts/make_pipeline_diagram.py`).
 
+## Ba đường chạy
+
+Tài liệu trình bày BA nơi có thể huấn luyện, không phải một:
+
+- **Đường A — máy ảo capstone** (mặc định, đã chạy thật ở mức 20%)
+- **Đường B — Google Colab** (nhiều RAM hơn nhưng ít nhân hơn)
+- **Đường C — laptop cấu hình thấp**
+
+Phần `prepare.py` **luôn chạy trên máy ảo** trong cả ba đường (Mục 5), vì dữ liệu
+thô 1,1 GB nằm ở đó và prepare nhẹ hơn train nhiều. Colab/laptop chỉ chạy `train.py`.
+Đây là điểm khiến việc chuyển sang Colab đơn giản hơn tưởng tượng: chỉ phải mang
+3 file parquet (~310 MB ở mức 64%) sang, và mang 1 file zip model (~1 MB) về.
+
 ## Vài quyết định đã kiểm chứng trên chính máy này
 
 - **Thân bài dùng `Calibri`**: có sẵn trên Word của nhóm; khi render PDF ở đây,
@@ -71,6 +84,28 @@ DO_THAT = {
     "mb_jsonl": 608.8,
     "giay_sinh_jsonl": 24,
     "ngay": "15/10/2026",
+}
+
+# Số đo THẬT của bản đang chạy trên máy ảo (mức 20%) — dùng để ngoại suy.
+DO_THAT_20 = {
+    "n_train": 129_701,
+    "n_val": 27_793,
+    "n_test": 27_792,
+    "mb_parquet": 96,
+    "phut_train": 13.5,
+    "giay_theo_mo_hinh": "NB 108 s · LR 245 s · SVC 116 s · RF 282 s",
+}
+
+# Thông số Colab bản miễn phí — NGUỒN CỘNG ĐỒNG ĐO, Google KHÔNG công bố cố định.
+# Ghi rõ nguồn trong tài liệu để nhóm không đối xử với mấy số này như số chính thức.
+COLAB = {
+    "ram_gb": "~12 GB",
+    "nhan": "2",
+    "phien_gio": "~12 giờ",
+    "ranh_phut": "~90 phút",
+    "pyspark": "3.5.9",
+    "repo": "https://github.com/luongnguyen14/CommentStreaming.git",
+    "cham_hon": "1,5–2 lần",
 }
 
 
@@ -277,7 +312,7 @@ def tom_tat_trang_thai(m: dict) -> list:
                                       f"({man['n_records'] / man['n_seen'] * 100:.1f}%), "
                                       f"subsample_pct = {pct}"))
     else:
-        rows.append(("JSONL hiện có", "chưa có — chạy Bước 2"))
+        rows.append(("JSONL hiện có", "chưa có — chạy Mục 5"))
     cl = m.get("cleaning")
     if cl:
         cuoi = cl[-1]
@@ -309,6 +344,7 @@ def trang_bia(doc) -> None:
         ("Nhóm", "Nhóm 6 — Samsung Innovation Campus, Big Data"),
         ("Đề tài", "Mô hình phân loại cảm xúc dựa trên bình luận trực tuyến"),
         ("Phạm vi", "Chuẩn bị dữ liệu → huấn luyện → kiểm chứng mô hình"),
+        ("Nơi chạy", "Máy ảo capstone · Google Colab · laptop cá nhân"),
         ("Ngày", DO_THAT["ngay"]),
     ]:
         p = doc.add_paragraph()
@@ -324,16 +360,18 @@ def trang_bia(doc) -> None:
 
 MUC_LUC = [
     ("1", "Mục tiêu và phạm vi"),
-    ("2", "Trước khi bắt đầu: môi trường và RAM"),
+    ("2", "Chọn nơi huấn luyện: máy ảo, Colab hay laptop"),
     ("3", "Bước 0 — Sao lưu dữ liệu đang có (BẮT BUỘC)"),
     ("4", "Bước 1 — Chọn tỷ lệ dữ liệu trong config.yaml"),
-    ("5", "Bước 2 — Chạy prepare.py"),
-    ("6", "Bước 3 — Chạy train.py"),
-    ("7", "Bước 4 — Làm sao biết mô hình chạy đúng"),
-    ("8", "Bước 5 — Ghi lại kết quả"),
-    ("9", "Những gì sẽ lệch sau khi huấn luyện lại"),
-    ("10", "Xử lý sự cố"),
-    ("11", "Phụ lục — bảng tra nhanh"),
+    ("5", "Bước 2 — Chạy prepare.py (luôn trên máy ảo)"),
+    ("6", "Đường A — Huấn luyện trên máy ảo capstone"),
+    ("7", "Đường B — Huấn luyện trên Google Colab"),
+    ("8", "Đường C — Huấn luyện trên laptop cấu hình thấp"),
+    ("9", "Bước 4 — Làm sao biết mô hình chạy đúng"),
+    ("10", "Bước 5 — Ghi lại kết quả"),
+    ("11", "Những gì sẽ lệch sau khi huấn luyện lại"),
+    ("12", "Xử lý sự cố"),
+    ("13", "Phụ lục — bảng tra nhanh"),
 ]
 
 
@@ -345,8 +383,9 @@ def muc_1(doc) -> None:
     viet(doc, "Phạm vi", dam=True, cach_truoc=6, cach_sau=2)
     gach_dau_dong(doc, [
         "Chuẩn bị dữ liệu (prepare.py) và huấn luyện (train.py)",
-        "Cách kiểm chứng mô hình sau khi huấn luyện CHẠY ĐÚNG",
-        "Cảnh báo những tài liệu/số liệu sẽ lệch sau khi huấn luyện lại (Mục 9)",
+        "Ba nơi có thể chạy, và nên chọn nơi nào (Mục 2)",
+        "Cách kiểm chứng mô hình sau khi huấn luyện CHẠY ĐÚNG (Mục 9)",
+        "Cảnh báo những tài liệu/số liệu sẽ lệch sau khi huấn luyện lại (Mục 11)",
     ])
     viet(doc, "Ngoài phạm vi (chưa làm lần này)", dam=True, cach_truoc=6, cach_sau=2)
     gach_dau_dong(doc, [
@@ -361,9 +400,34 @@ def muc_1(doc) -> None:
 
 
 def muc_2(doc) -> None:
-    tieu_de(doc, "2", "Trước khi bắt đầu: môi trường và RAM")
-    viet(doc, "Đây là rủi ro số một. Máy ảo chỉ có 7.208 MB RAM, và bộ nhớ đệm của "
-              "Spark cho riêng tập train đã KHÔNG VỪA ở mức 20% — log Task 7 ghi rõ:")
+    tieu_de(doc, "2", "Chọn nơi huấn luyện: máy ảo, Colab hay laptop")
+    viet(doc, "Việc huấn luyện chạy được ở ba nơi. Ba nơi KHÔNG mạnh như nhau và "
+              "không thay thế nhau được một cách đơn giản, nên mục này nói thẳng "
+              "đánh đổi trước khi bạn chọn.")
+
+    bang(doc,
+         ["", "Máy ảo capstone", "Google Colab (bản miễn phí)", "Laptop của bạn"],
+         [["RAM", "7.208 MB (đo trên máy)",
+           f"{COLAB['ram_gb']} (cộng đồng đo, Google không công bố)",
+           "8–16 GB tuỳ máy"],
+          ["Nhân CPU", "4", f"{COLAB['nhan']} — ít hơn một nửa", "4–8 tuỳ máy"],
+          ["Dữ liệu thô 1,1 GB", "có sẵn trên đĩa", "phải mang sang",
+           "phải copy sang"],
+          ["Giới hạn phiên", "không",
+           f"{COLAB['phien_gio']}, tự ngắt sau {COLAB['ranh_phut']} không thao tác",
+           "không"],
+          ["Chạy nền (đóng tab vẫn chạy)", "có", "KHÔNG — đóng tab là mất máy", "có"],
+          ["Thời gian ở mức 64%", "45–60 phút (ngoại suy)",
+           f"chậm hơn {COLAB['cham_hon']} (ước tính, chưa đo)", "tuỳ máy"]],
+         [3.3, 4.0, 5.6, 4.1])
+
+    hop(doc, "GPU miễn phí của Colab KHÔNG dùng được cho việc này. Spark MLlib chạy "
+             "trên CPU, không có backend GPU — chọn Colab vì GPU là chọn sai lý do. "
+             "Thứ đáng giá ở Colab là RAM, không phải GPU.", "QUAN TRỌNG")
+
+    viet(doc, "Vì sao RAM là thứ đáng quan tâm nhất", dam=True, cach_truoc=8, cach_sau=2)
+    viet(doc, "Bộ nhớ đệm của Spark cho riêng tập train đã KHÔNG VỪA ở mức 20% "
+              "(129.701 dòng). Log Task 7 ghi rõ:")
     khoi_lenh(doc, [
         "26/10/14 23:51:44 INFO MemoryStore: MemoryStore started with capacity 912.3 MiB",
         "26/10/15 00:00:49 WARN MemoryStore: Not enough space to cache rdd_1604_1",
@@ -376,27 +440,27 @@ def muc_2(doc) -> None:
               "trình huấn luyện. Đây là số đếm được, không phải suy đoán.")
     viet(doc, f"Ở 64% lượng dữ liệu gấp ~3,2 lần, nên chắc chắn sẽ tràn nhiều hơn. "
               f"Spark vẫn chạy được (đẩy ra đĩa tại "
-              f"/home/hadoop/spark-tmp, còn 212 GB), nhưng CHẬM hơn đáng kể.")
+              f"/home/hadoop/spark-tmp, còn 212 GB), nhưng CHẬM hơn đáng kể. Đây chính "
+              f"là lý do Colab hấp dẫn: nhiều RAM hơn thì ít tràn ra đĩa hơn.")
 
-    viet(doc, "Kiểm tra trước khi chạy", dam=True, cach_truoc=8, cach_sau=2)
-    khoi_lenh(doc, [
-        "cd /home/hadoop/capstone",
-        "source scripts/env.sh          # Java 8 + Spark 3.5.9 + Python 3.11 cho PySpark",
-        "free -m                        # cần 'available' >= ~4000 MB",
-        "df -h /home                    # cần >= ~10 GB trống",
+    viet(doc, "Khuyến nghị", dam=True, cach_truoc=8, cach_sau=2)
+    gach_dau_dong(doc, [
+        ("Lần chạy ĐẦY ĐỦ ở mức 64%: dùng máy ảo (Đường A). ",
+         "Đây vẫn là máy tốt nhất cho việc này — 4 nhân, dữ liệu nằm sẵn, không bị "
+         "ngắt giữa chừng. Chỉ cần nâng --driver-memory lên 4g là đủ."),
+        ("Google Colab (Đường B): dùng khi không còn máy ảo, hoặc muốn chạy thử. ",
+         "Colab có gấp ~1,7 lần RAM nhưng chỉ bằng một nửa số nhân, nên job sẽ chạy "
+         "lâu hơn — mà chạy lâu hơn trên một phiên có thể bị ngắt là một rủi ro thật, "
+         "vì train.py không có cơ chế chạy tiếp. Nếu chạy Colab ở mức 64%, hãy giữ "
+         "tab mở suốt và đừng làm việc khác trên trình duyệt đó."),
+        ("Laptop (Đường C): chỉ nên nếu máy có từ 8 GB RAM trở lên. ",
+         "Mục 8 có bảng quyết định theo cấu hình máy bạn."),
     ])
-    hop(doc, "PHẢI TẮT DEMO TRƯỚC. Đo lúc demo Task 10 đang chạy (15/10/2026 12:40), "
-             "nó chiếm ~2,8 GB: Spark driver 1.875 MB + Streamlit 778 MB + job streaming "
-             "+ producer; khi đó chỉ còn 1.300 MB trống và swap đã dùng 2.814/3.090 MB. "
-             "Sau khi tắt, máy còn 5.124 MB trống. Dừng bằng:", "CẢNH BÁO")
-    khoi_lenh(doc, "bash scripts/run_demo.sh --stop        # dừng sạch, giữ nguyên checkpoint")
-    viet(doc, "HDFS và Kafka KHÔNG cần tắt: chúng chỉ chiếm ~370 MB và train.py không "
-              "dùng đến. HDFS trên máy này không tự chạy lại sau khi khởi động lại — "
-              "nếu Spark báo lỗi kết nối localhost:9000, xem Mục 10.")
 
 
 def muc_3(doc) -> None:
     tieu_de(doc, "3", "Bước 0 — Sao lưu dữ liệu đang có (BẮT BUỘC)")
+    viet(doc, "Mục này giống nhau ở cả ba đường. Làm TRƯỚC khi chạy bất cứ thứ gì.")
     viet(doc, "Có HAI lý do độc lập, mỗi lý do một mình đã đủ để bắt buộc sao lưu:")
     gach_dau_dong(doc, [
         ("Mọi lần chạy prepare.py đều GHI ĐÈ data/processed/. ",
@@ -423,8 +487,8 @@ def muc_3(doc) -> None:
 
 def muc_4(doc) -> None:
     tieu_de(doc, "4", "Bước 1 — Chọn tỷ lệ dữ liệu trong config.yaml")
-    viet(doc, "Mở config.yaml, mục prepare. Tham số quyết định lượng dữ liệu là "
-              "subsample_pct (phần trăm, 1–100):")
+    viet(doc, "Cũng giống nhau ở cả ba đường. Mở config.yaml, mục prepare. Tham số "
+              "quyết định lượng dữ liệu là subsample_pct (phần trăm, 1–100):")
     khoi_lenh(doc, [
         "prepare:",
         "  truncate_raw_detail: 20000",
@@ -446,14 +510,24 @@ def muc_4(doc) -> None:
     bang(doc,
          ["subsample_pct", "Số bản ghi (dự kiến)", "JSONL", "Ghi chú"],
          [["20", "~201.000", "~190 MB", "tập đang có trên đĩa (luật cũ)"],
+          ["32", "~323.000", "~305 MB", "nên dùng nếu RAM chỉ 8 GB (Mục 8)"],
           ["64", f"~{DO_THAT['n_giu']:,}", f"~{DO_THAT['mb_jsonl']} MB", "mức đang đặt"],
           ["70", "~707.000", "~666 MB", "nếu muốn đúng 700 MB JSONL"],
           ["100", "1.010.293", "~953 MB", "toàn bộ, nặng nhất"]],
          [3.0, 4.2, 2.8, 7.0])
+    hop(doc, "Đổi subsample_pct là đổi CẢ dữ liệu train lẫn tập test. Nếu bạn hạ tỷ lệ "
+             "xuống để vừa máy (ví dụ 32), tập test cũng nhỏ đi — vẫn hợp lệ, nhưng khi "
+             "báo cáo phải nói rõ đang ở mức nào.", "GHI CHÚ")
 
 
 def muc_5(doc) -> None:
-    tieu_de(doc, "5", "Bước 2 — Chạy prepare.py")
+    tieu_de(doc, "5", "Bước 2 — Chạy prepare.py (luôn trên máy ảo)")
+    viet(doc, "Trong CẢ BA đường, bước này chạy trên máy ảo. Lý do rất thực tế: dữ liệu "
+              "thô 1,1 GB nằm ở đó, và prepare.py nhẹ hơn train.py nhiều nên máy ảo "
+              "7.208 MB chạy được. Chỉ có train.py mới cần nhiều bộ nhớ.")
+    viet(doc, "Nhờ vậy, việc chuyển sang Colab hay laptop chỉ phải mang theo 3 file "
+              "parquet (kết quả của bước này), không phải mang dữ liệu thô.")
+
     hop(doc, "Chạy THỬ trước, chạy THẬT sau — không bao giờ ngược lại. "
              "--sample của prepare.py KHÔNG ghi ra thư mục riêng: nó ghi vào CÙNG "
              "data/processed/*.parquet (prepare.py dòng 436–447, mode \"overwrite\"). "
@@ -477,6 +551,9 @@ def muc_5(doc) -> None:
         "    src/training/prepare.py 2>&1 | tee logs/prepare_64.log",
     ], "Lần đầu sẽ sinh lại JSONL (mất ~24 giây, đã đo) vì manifest cũ không khớp khóa "
        "subsample_pct mới. Các lần sau đọc manifest nên bỏ qua bước này.")
+    hop(doc, "Ở mức 20% bước này chạy hết 74 giây (đo thật). Ở mức 64% lượng dữ liệu "
+             "gấp ~3,2 lần nên ước tính khoảng 5 phút — nhưng ĐÂY LÀ NGOẠI SUY, chưa "
+             "chạy thật ở 64%. Hãy bấm giờ và ghi lại số thật.", "GHI CHÚ")
 
     viet(doc, "Đọc kết quả", dam=True, cach_truoc=8, cach_sau=2)
     viet(doc, "prepare.py chạy 16 bước và in tiến độ ra log. Con số cần đối chiếu "
@@ -507,12 +584,33 @@ def muc_5(doc) -> None:
              dam=True, cach_truoc=8, cach_sau=2)
         bang(doc, ["Mục", "Giá trị đọc được"], tt, [5.0, 12.0])
         viet(doc, "Đây là số đọc trực tiếp từ file, không phải số dự kiến. Nếu "
-                  "subsample_pct vẫn là khóa cũ thì bạn chưa chạy lại Bước 2.",
+                  "subsample_pct vẫn là khóa cũ thì bạn chưa chạy lại Mục 5.",
              nghieng=True, co=9.5)
 
 
 def muc_6(doc) -> None:
-    tieu_de(doc, "6", "Bước 3 — Chạy train.py")
+    tieu_de(doc, "6", "Đường A — Huấn luyện trên máy ảo capstone")
+    viet(doc, "Đây là đường đã chạy thật và cho ra bộ số liệu đang có trong outputs/. "
+              "Nếu bạn chọn Colab hoặc laptop, đọc Mục 7 hoặc Mục 8 thay cho mục này — "
+              "phần kiểm chứng ở Mục 9 thì dùng chung.")
+
+    viet(doc, "Kiểm tra trước khi chạy", dam=True, cach_truoc=6, cach_sau=2)
+    khoi_lenh(doc, [
+        "cd /home/hadoop/capstone",
+        "source scripts/env.sh          # Java 8 + Spark 3.5.9 + Python 3.11 cho PySpark",
+        "free -m                        # cần 'available' >= ~4000 MB",
+        "df -h /home                    # cần >= ~10 GB trống",
+    ])
+    hop(doc, "PHẢI TẮT DEMO TRƯỚC. Đo lúc demo Task 10 đang chạy (15/10/2026 12:40), "
+             "nó chiếm ~2,8 GB: Spark driver 1.875 MB + Streamlit 778 MB + job streaming "
+             "+ producer; khi đó chỉ còn 1.300 MB trống và swap đã dùng 2.814/3.090 MB. "
+             "Sau khi tắt, máy còn 5.124 MB trống. Dừng bằng:", "CẢNH BÁO")
+    khoi_lenh(doc, "bash scripts/run_demo.sh --stop        # dừng sạch, giữ nguyên checkpoint")
+    viet(doc, "HDFS và Kafka KHÔNG cần tắt: chúng chỉ chiếm ~370 MB và train.py không "
+              "dùng đến. HDFS trên máy này không tự chạy lại sau khi khởi động lại — "
+              "nếu Spark báo lỗi kết nối localhost:9000, xem Mục 12.")
+
+    viet(doc, "Chạy train.py", dam=True, cach_truoc=8, cach_sau=2)
     viet(doc, "train.py dựng Pipeline (RegexTokenizer → StopWordsRemover → NGram → "
               "CountVectorizer → IDF → Normalizer → bộ phân loại), huấn luyện 4 mô "
               "hình + baseline đa số, chọn siêu tham số bằng TrainValidationSplit "
@@ -538,24 +636,268 @@ def muc_6(doc) -> None:
         "train.py giữ 5 bảng validation kéo về driver (toPandas, kèm NGUYÊN văn bản) "
         "cho 4 mô hình + baseline và không giải phóng — ở 64% ước tính ~400 MB.",
         "Tập train được cache() trong bộ nhớ, cộng vector TF-IDF thưa.",
-        "train.py đặt spark.sql.shuffle.partitions = 8 (dòng 679) — rất ít cho ~450.000 "
-        "dòng. Đây là nguyên nhân chính gây chậm/tràn bộ nhớ.",
+        "train.py đặt spark.sql.shuffle.partitions = 8 (dòng 679) — rất ít cho khoảng "
+        "415.000 dòng train ở mức 64%. Đây là nguyên nhân chính gây chậm/tràn bộ nhớ.",
     ])
     viet(doc, "Tiền lệ: src/eda/README.md đã dùng --driver-memory 4g trên chính máy này. "
-              "Nếu vẫn bị OOM, xem phương án lùi ở Mục 10.")
+              "Nếu vẫn bị OOM, xem phương án lùi ở Mục 12.")
 
     viet(doc, "Thời gian dự kiến", dam=True, cach_truoc=8, cach_sau=2)
-    viet(doc, "Bản 20% mất 13 phút 25 giây (đo từ log Task 7: 23:51:42 → 00:05:07), "
-              "chia ra NB 108 s · LR 245 s · SVC 116 s · RF 282 s. "
-              "Dữ liệu 64% gấp ~3,2 lần, nên ước tính 45–60 phút, có thể lâu hơn nếu "
-              "tràn bộ nhớ nhiều. Đây là NGOẠI SUY, chưa chạy thật ở 64% — hãy bấm "
-              "giờ và ghi lại số thật.")
+    viet(doc, f"Bản 20% mất 13 phút 25 giây (đo từ log Task 7: 23:51:42 → 00:05:07), "
+              f"chia ra {DO_THAT_20['giay_theo_mo_hinh']}. "
+              f"Dữ liệu 64% gấp ~3,2 lần, nên ước tính 45–60 phút, có thể lâu hơn nếu "
+              f"tràn bộ nhớ nhiều. Đây là NGOẠI SUY, chưa chạy thật ở 64% — hãy bấm "
+              f"giờ và ghi lại số thật.")
 
 
 def muc_7(doc) -> None:
-    tieu_de(doc, "7", "Bước 4 — Làm sao biết mô hình chạy đúng")
-    viet(doc, "Kiểm theo đúng thứ tự này. Mỗi dòng có cách kiểm riêng, không cần "
-              "đọc code.")
+    tieu_de(doc, "7", "Đường B — Huấn luyện trên Google Colab")
+    viet(doc, "Mục này hướng dẫn chạy train.py trên Colab. Đọc kỹ phần đánh đổi ở "
+              "Mục 2 trước: Colab có nhiều RAM hơn nhưng ít nhân hơn, và có thể bị "
+              "ngắt giữa chừng.")
+
+    hop(doc, f"BẮT BUỘC cài ĐÚNG pyspark=={COLAB['pyspark']}. File model lưu ra có ghi "
+             f"thẳng phiên bản Spark vào metadata: trong "
+             f"outputs/models/sentiment_pipeline/metadata/part-00000 có dòng "
+             f"\"sparkVersion\":\"{COLAB['pyspark']}\". Máy ảo nạp lại model này ở 4 chỗ "
+             f"(app.py dòng 329, stream_job.py dòng 575, verify_stream.py dòng 336, "
+             f"check_model.py dòng 44). Cài nhầm phiên bản khác thì model huấn luyện "
+             f"xong có thể KHÔNG nạp lại được trên máy ảo — và lúc đó đã mất cả tiếng "
+             f"chạy. Pin đúng phiên bản tốn đúng một dòng lệnh.", "QUAN TRỌNG")
+
+    viet(doc, "7.1 — Chuẩn bị dữ liệu trên máy ảo trước", dam=True, cach_truoc=8,
+         cach_sau=2)
+    viet(doc, "Chạy prepare.py trên máy ảo theo Mục 5 như bình thường. Sau đó bạn cần "
+              "đúng 3 file này (train.py chỉ đọc 3 file — đã kiểm ở dòng 686–689):")
+    khoi_lenh(doc, [
+        "cd /home/hadoop/capstone",
+        "du -sh data/processed/train.parquet data/processed/val.parquet \\",
+        "      data/processed/test.parquet",
+    ], "Ở mức 20% ba file này cộng lại là 96 MB. Ở mức 64% ước tính ~310 MB "
+       "(ngoại suy ×3,2). Không cần mang eval_labels.parquet — train.py không đọc file đó.")
+
+    viet(doc, "7.2 — Đưa 3 file parquet lên Google Drive", dam=True, cach_truoc=8,
+         cach_sau=2)
+    gach_dau_dong(doc, [
+        "Vào drive.google.com, tạo thư mục capstone_parquet.",
+        "Tải 3 file train.parquet, val.parquet, test.parquet từ máy ảo lên thư mục đó.",
+        "Cách tải: dùng scp về laptop rồi kéo thả lên Drive. Ví dụ từ laptop:",
+    ])
+    khoi_lenh(doc, [
+        "scp hadoop@<địa-chỉ-máy-ảo>:'/home/hadoop/capstone/data/processed/*.parquet' \\",
+        "    ~/Downloads/",
+    ])
+    hop(doc, "Google Drive miễn phí cho 15 GB — thừa sức chứa ~310 MB. Nhưng ĐỪNG đọc "
+             "trực tiếp từ Drive trong lúc huấn luyện: Drive là ổ đĩa mạng, đọc chậm và "
+             "có thể đứt kết nối giữa job. Notebook dưới đây COPY về đĩa cục bộ của "
+             "Colab trước rồi mới chạy.", "GHI CHÚ")
+
+    viet(doc, "7.3 — Notebook Colab, chạy lần lượt từng ô", dam=True, cach_truoc=8,
+         cach_sau=2)
+    viet(doc, "Mở colab.research.google.com, tạo notebook mới. Mỗi khối dưới đây là "
+              "MỘT Ô. Chạy từ trên xuống.")
+
+    viet(doc, "Ô 1 — xem Colab cho bạn máy gì", dam=True, cach_truoc=6, cach_sau=2)
+    khoi_lenh(doc, "!nproc && free -m | head -2 && java -version")
+    viet(doc, "Mong đợi: nproc ra 2; RAM khoảng 12.000 MB; java là openjdk 11 hoặc 17. "
+              "Spark 3.5 chạy được với Java 8, 11 và 17. Nếu java báo không tìm thấy, "
+              "xem Mục 12.")
+
+    viet(doc, "Ô 2 — cài đúng phiên bản PySpark", dam=True, cach_truoc=6, cach_sau=2)
+    khoi_lenh(doc, [
+        "!pip install -q pyspark==3.5.9",
+        "!python -c \"import pyspark; print('pyspark', pyspark.__version__)\"",
+    ], "Dòng thứ hai PHẢI in ra đúng 3.5.9. Cài xong là có luôn lệnh spark-submit — "
+       "gói pyspark qua pip đã kèm sẵn, không phải tải Spark riêng.")
+
+    viet(doc, "Ô 3 — lấy mã nguồn", dam=True, cach_truoc=6, cach_sau=2)
+    khoi_lenh(doc, [
+        f"!git clone -q {COLAB['repo']} /content/capstone",
+        "%cd /content/capstone",
+    ], "Repo này đang để public nên clone không cần token. Toàn bộ mã nguồn chỉ ~16 MB.")
+
+    viet(doc, "Ô 4 — lấy 3 file parquet từ Drive về đĩa cục bộ", dam=True, cach_truoc=6,
+         cach_sau=2)
+    khoi_lenh(doc, [
+        "from google.colab import drive",
+        "drive.mount('/content/drive')",
+        "",
+        "!mkdir -p /content/capstone/data/processed",
+        "!cp /content/drive/MyDrive/capstone_parquet/*.parquet \\",
+        "    /content/capstone/data/processed/",
+        "!ls -la /content/capstone/data/processed/",
+    ])
+    viet(doc, "Ô này sẽ hỏi quyền truy cập Drive — bấm cho phép. Kiểm lại: phải thấy đủ "
+              "3 file train/val/test.parquet với dung lượng như trên máy ảo.")
+
+    viet(doc, "Ô 5 — chạy thử (khoảng 5 phút)", dam=True, cach_truoc=6, cach_sau=2)
+    khoi_lenh(doc, [
+        "%%bash",
+        "cd /content/capstone",
+        "spark-submit --driver-memory 6g --master 'local[2]' \\",
+        "    src/training/train.py --sample 20000 2>&1 | tee /content/thu.log",
+    ], "Chạy thử tự bật --no-test nên không đụng tập test và không ghi đè model.")
+
+    viet(doc, "Ô 6 — chạy thật", dam=True, cach_truoc=6, cach_sau=2)
+    khoi_lenh(doc, [
+        "%%bash",
+        "cd /content/capstone",
+        "spark-submit --driver-memory 10g --master 'local[2]' \\",
+        "    src/training/train.py --models nb,lr,svc,rf 2>&1 | tee /content/train.log",
+    ], "Chừa ~2 GB cho hệ thống nên đặt 10g chứ không phải 12g. --master 'local[2]' "
+       "đúng bằng số nhân Colab cho bạn.")
+
+    hop(doc, "ĐỪNG RỜI TAB trong suốt Ô 6. Colab miễn phí KHÔNG chạy nền — đóng trình "
+             "duyệt hoặc để yên quá ~90 phút không thao tác là mất máy, và mọi thứ "
+             "trong /content biến mất. train.py không có cơ chế chạy tiếp, nên mất là "
+             "phải chạy lại từ đầu. Ước tính thời gian ở mức 64% là 1,5–2 giờ — đây là "
+             "NGOẠI SUY từ tốc độ máy ảo 4 nhân, chưa đo trên Colab.", "CẢNH BÁO")
+
+    viet(doc, "7.4 — Mang kết quả về máy ảo", dam=True, cach_truoc=8, cach_sau=2)
+    viet(doc, "Làm ngay sau khi Ô 6 xong, TRƯỚC khi đóng tab.")
+    khoi_lenh(doc, [
+        "%%bash",
+        "cd /content/capstone",
+        "zip -qr /content/ket_qua.zip outputs/models outputs/tables outputs/figures",
+        "du -sh /content/ket_qua.zip",
+    ])
+    khoi_lenh(doc, [
+        "from google.colab import files",
+        "files.download('/content/ket_qua.zip')",
+    ], "File zip chỉ khoảng 1–2 MB (model đã lưu là 904 KB).")
+    viet(doc, "Rồi trên LAPTOP (nơi trình duyệt vừa tải file về), chuyển sang máy ảo "
+              "và giải nén ĐÚNG VỊ TRÍ:")
+    khoi_lenh(doc, [
+        "# trên laptop",
+        "scp ~/Downloads/ket_qua.zip hadoop@<địa-chỉ-máy-ảo>:/tmp/",
+        "",
+        "# trên máy ảo — giải nén ngay tại thư mục gốc dự án",
+        "cd /home/hadoop/capstone",
+        "unzip -o /tmp/ket_qua.zip -d .",
+        "ls outputs/models/sentiment_pipeline/stages/   # phải thấy đủ 7 bước",
+    ])
+    hop(doc, "Giải nén SAI VỊ TRÍ là lỗi dễ gặp nhất. Cấu trúc trong zip là "
+             "outputs/models/..., nên phải giải nén tại /home/hadoop/capstone để ra "
+             "đúng /home/hadoop/capstone/outputs/models/sentiment_pipeline. Nếu giải "
+             "nén ra chỗ khác, dashboard và streaming sẽ không tìm thấy model.", "CẢNH BÁO")
+
+    viet(doc, "7.5 — Bốn chỗ dễ sai riêng của Colab", dam=True, cach_truoc=8, cach_sau=2)
+    gach_dau_dong(doc, [
+        ("Phiên là tạm thời. ", "Mỗi lần mở lại là một máy mới, /content trống trơn. "
+         "Notebook phải chạy lại được TỪ ĐẦU — đừng dựa vào việc lần trước đã cài gì."),
+        ("Không có HDFS. ", "Trên máy ảo, HDFS là filesystem mặc định nên thiếu tiền tố "
+         "file:// sẽ lỗi. Trên Colab không có HDFS nên chuyện đó không xảy ra; "
+         "local_uri() vẫn thêm file:// và điều đó vô hại."),
+        ("Số nhân ít hơn. ", "--master 'local[2]' là đúng bằng số nhân Colab cho bạn. "
+         "Đừng đặt local[4] — sẽ chỉ làm job chậm và dễ tràn bộ nhớ hơn."),
+        ("Đường dẫn tuyệt đối. ", "Luôn cd /content/capstone trước khi chạy, vì "
+         "train.py tự tìm thư mục gốc bằng vị trí file (parents[2] trong utils.py)."),
+    ])
+
+
+def muc_8(doc) -> None:
+    tieu_de(doc, "8", "Đường C — Huấn luyện trên laptop cấu hình thấp")
+    viet(doc, "Train.py chạy được trên laptop, nhưng \"cấu hình thấp\" là một khoảng "
+              "rất rộng. Mục này bắt đầu bằng việc xác định máy bạn thuộc nhóm nào.")
+
+    viet(doc, "8.1 — Máy bạn có đủ không", dam=True, cach_truoc=8, cach_sau=2)
+    viet(doc, "Chạy lệnh theo hệ điều hành để biết RAM và số nhân:")
+    khoi_lenh(doc, [
+        "# Linux / WSL2",
+        "free -m && nproc",
+        "",
+        "# macOS",
+        "sysctl hw.memsize && sysctl -n hw.ncpu",
+        "",
+        "# Windows (PowerShell)",
+        "Get-CimInstance Win32_ComputerSystem | Select TotalPhysicalMemory;",
+        "Get-CimInstance Win32_Processor | Select NumberOfCores",
+    ])
+    viet(doc, "Rồi tra bảng này:")
+    bang(doc,
+         ["RAM", "Nhân", "Nên làm", "subsample_pct", "Tham số chạy"],
+         [["dưới 8 GB", "—", "ĐỪNG chạy trên laptop", "—",
+           "Dùng Đường A hoặc Đường B"],
+          ["8 GB", "4", "Được, nhưng phải giảm dữ liệu", "32",
+           "--driver-memory 4g --master 'local[2]'"],
+          ["16 GB", "4–8", "Tốt — ngang hoặc hơn máy ảo", "64",
+           "--driver-memory 8g --master 'local[3]'"],
+          ["32 GB trở lên", "8+", "Thoải mái", "64 hoặc 100",
+           "--driver-memory 12g --master 'local[4]'"]],
+         [2.6, 1.5, 4.6, 2.8, 5.5])
+    hop(doc, "Ở cột cuối, --master luôn để ÍT HƠN số nhân một đơn vị: máy tính còn phải "
+             "chạy hệ điều hành, trình duyệt và chính tiến trình điều khiển Spark. Đặt "
+             "local[4] trên máy 4 nhân là tự bóp nghẹt lấy mình.", "GHI CHÚ")
+    viet(doc, "Nếu máy bạn chỉ có 8 GB, hãy đặt subsample_pct: 32 ở Mục 4 rồi chạy lại "
+              "prepare.py — bảng ở Mục 4 có số bản ghi và dung lượng tương ứng. Nhớ rằng "
+              "đổi tỷ lệ là đổi cả tập test, nên phải nói rõ mức đã dùng khi báo cáo.")
+
+    viet(doc, "8.2 — Cài đặt (một lần)", dam=True, cach_truoc=8, cach_sau=2)
+    viet(doc, "Cần đúng ba thứ: Java, Python, và pyspark. KHÔNG cần cài Hadoop và KHÔNG "
+              "cần HDFS — máy ảo cần chúng vì có sẵn cụm, laptop thì không.")
+    gach_dau_dong(doc, [
+        ("Java 17 (hoặc 11). ", "Spark 3.5 chạy được với Java 8, 11 và 17. Java 21 "
+         "KHÔNG được hỗ trợ ở bản này."),
+    ])
+    khoi_lenh(doc, [
+        "# Ubuntu / WSL2",
+        "sudo apt update && sudo apt install -y openjdk-17-jdk-headless",
+        "",
+        "# macOS (Homebrew)",
+        "brew install openjdk@17",
+    ])
+    khoi_lenh(doc, [
+        "python3 -m venv .venv",
+        ".venv/bin/pip install pyspark==3.5.9",
+        ".venv/bin/python -c \"import pyspark; print(pyspark.__version__)\"",
+    ], "Phải in ra 3.5.9 — cùng lý do đã nêu ở Mục 7: model lưu ra ghi kèm phiên bản "
+       "Spark, và máy ảo phải nạp lại được.")
+    hop(doc, "Dùng Windows? Hãy dùng WSL2 (wsl --install trong PowerShell, chọn Ubuntu) "
+             "rồi làm y hệt phần Ubuntu ở trên. Chạy PySpark trực tiếp trên Windows cần "
+             "thêm winutils.exe và biến HADOOP_HOME cho một số thao tác ghi file — "
+             "đây là chỗ hay mất thời gian và tôi CHƯA kiểm chứng trên Windows thật. "
+             "WSL2 tránh hẳn vấn đề đó.", "CẢNH BÁO")
+
+    viet(doc, "8.3 — Lấy mã nguồn và dữ liệu", dam=True, cach_truoc=8, cach_sau=2)
+    khoi_lenh(doc, [
+        "git clone https://github.com/luongnguyen14/CommentStreaming.git capstone",
+        "cd capstone",
+        "",
+        "# copy 3 file parquet từ máy ảo sang (Mục 5 phải đã chạy xong)",
+        "scp hadoop@<địa-chỉ-máy-ảo>:'/home/hadoop/capstone/data/processed/*.parquet' \\",
+        "    data/processed/",
+    ], "Chỉ 3 file parquet, không cần dữ liệu thô 1,1 GB — prepare.py đã chạy trên máy ảo.")
+
+    viet(doc, "8.4 — Chạy", dam=True, cach_truoc=8, cach_sau=2)
+    viet(doc, "Thay số trong hai dòng export và --driver-memory cho khớp bảng ở 8.1. "
+              "Không dùng scripts/env.sh — file đó viết riêng cho máy ảo.")
+    khoi_lenh(doc, [
+        "cd capstone",
+        "export PYSPARK_PYTHON=$PWD/.venv/bin/python",
+        "export PYSPARK_DRIVER_PYTHON=$PWD/.venv/bin/python",
+        "",
+        "# chạy thử trước",
+        ".venv/bin/spark-submit --driver-memory 4g --master 'local[2]' \\",
+        "    src/training/train.py --sample 20000",
+        "",
+        "# chạy thật",
+        ".venv/bin/spark-submit --driver-memory 8g --master 'local[3]' \\",
+        "    src/training/train.py --models nb,lr,svc,rf 2>&1 | tee train_64.log",
+    ])
+    hop(doc, "Nếu spark-submit báo lỗi Java, đặt JAVA_HOME trỏ tới thư mục JDK. Nếu báo "
+             "không tìm thấy python, kiểm lại hai dòng export ở trên — chúng phải trỏ "
+             "tuyệt đối vào .venv/bin/python, không dùng đường dẫn tương đối.",
+        "GHI CHÚ")
+    viet(doc, "Nhớ đặt SPARK_LOCAL_DIRS ra ngoài /tmp nếu bạn dùng Linux: /tmp thường là "
+              "tmpfs nằm trong RAM, và Spark ghi dữ liệu tạm rất nhiều khi tràn bộ nhớ.")
+    khoi_lenh(doc, "export SPARK_LOCAL_DIRS=$HOME/spark-tmp && mkdir -p $HOME/spark-tmp")
+
+
+def muc_9(doc) -> None:
+    tieu_de(doc, "9", "Bước 4 — Làm sao biết mô hình chạy đúng")
+    viet(doc, "Mục này dùng CHUNG cho cả ba đường — chạy ở đâu thì kết quả cũng phải "
+              "qua đúng danh sách kiểm tra này. Kiểm theo đúng thứ tự, mỗi dòng có cách "
+              "kiểm riêng, không cần đọc code.")
     bang(doc,
          ["Việc kiểm", "Cách kiểm", "Kết quả ĐÚNG"],
          [["Dữ liệu đúng cỡ",
@@ -570,6 +912,9 @@ def muc_7(doc) -> None:
           ["Metadata hợp lệ",
            "cat outputs/models/sentiment_pipeline_metadata.json",
            "label_index = {negative: 0, neutral: 1, positive: 2}; sizes.* khớp dữ liệu vừa tạo; 7 pipeline_stages"],
+          ["Phiên bản Spark khớp",
+           "grep sparkVersion outputs/models/sentiment_pipeline/metadata/part-00000",
+           "phải là 3.5.9 — lệch nghĩa là đã cài nhầm pyspark"],
           ["Không rò rỉ",
            "cat outputs/tables/leak_check.json",
            "cả ba số đều bằng 0"],
@@ -586,6 +931,8 @@ def muc_7(doc) -> None:
            "mở dashboard, tab \"Try It\"",
            "gõ một câu, ra nhãn + xác suất"]],
          [3.4, 6.2, 7.4])
+    viet(doc, "Dòng \"tập test chưa bị chạm\" là dòng quan trọng nhất: nó là bằng chứng "
+              "duy nhất cho thấy tập test vẫn chỉ được dùng một lần.")
 
     viet(doc, "Về test_eval_log.csv — cơ chế \"test dùng một lần\"", dam=True,
          cach_truoc=8, cach_sau=2)
@@ -597,7 +944,8 @@ def muc_7(doc) -> None:
              "xem nhiều lần — khi đó báo cáo phải nói rõ.")
     viet(doc, "Chốt danh sách mô hình TRƯỚC khi chạy: cờ --models không cộng dồn, mỗi "
               "lần chạy ghi đè model_results.csv, các hình, và cả "
-              "outputs/models/sentiment_pipeline.")
+              "outputs/models/sentiment_pipeline. Điều này đúng cả khi bạn chạy trên "
+              "Colab hay laptop rồi giải nén đè lên máy ảo.")
 
     viet(doc, "Nếu macro-F1 cao bất thường", dam=True, cach_truoc=8, cach_sau=2)
     viet(doc, "train.py có chốt an toàn: macro-F1 trên test vượt 0,95 thì nó coi là rò "
@@ -607,23 +955,27 @@ def muc_7(doc) -> None:
               "(CLAUDE.md §6).")
 
 
-def muc_8(doc) -> None:
-    tieu_de(doc, "8", "Bước 5 — Ghi lại kết quả")
+def muc_10(doc) -> None:
+    tieu_de(doc, "10", "Bước 5 — Ghi lại kết quả")
     gach_dau_dong(doc, [
         ("PROGRESS.md: ", "một dòng theo đúng định dạng bảng của file."),
         ("outputs/modeling_summary.md: ", "toàn bộ số liệu Task 7 trong file này đã cũ, "
          "phải viết lại từ outputs/tables/model_results.csv và "
          "sentiment_pipeline_metadata.json."),
+        ("Ghi rõ NƠI ĐÃ CHẠY: ", "nếu lần này chạy trên Colab hoặc laptop thay vì máy "
+         "ảo, phải ghi vào báo cáo — thời gian, RAM, số nhân đều khác, và người đọc có "
+         "quyền biết kết quả được tạo ra ở đâu."),
         ("outputs/models/README.md: ", "đang ghi đích danh \"Logistic Regression\" — nếu "
          "lần này mô hình thắng là mô hình khác thì phải sửa."),
         ("docs/data_dictionary.md: ", "mục tập con JSONL (số bản ghi, dung lượng, cách chọn)."),
         ("data/processed/README.md và src/training/README.md: ", "số liệu tập con."),
-        ("Git: ", "commit kèm thông điệp rõ ràng."),
+        ("Git: ", "commit kèm thông điệp rõ ràng. File model là thư mục 44 file, nên "
+         "thêm cả outputs/models/ vào commit nếu muốn người khác dùng lại được."),
     ])
 
 
-def muc_9(doc) -> None:
-    tieu_de(doc, "9", "Những gì sẽ lệch sau khi huấn luyện lại")
+def muc_11(doc) -> None:
+    tieu_de(doc, "11", "Những gì sẽ lệch sau khi huấn luyện lại")
     viet(doc, "Danh sách này để không ai vô tình báo cáo số cũ. Mỗi dòng là một file "
               "hoặc một chỗ cụ thể.")
     bang(doc,
@@ -660,8 +1012,8 @@ def muc_9(doc) -> None:
              "liệu và tập test ~89.000 dòng, macro-F1 là X\".", "QUAN TRỌNG")
 
 
-def muc_10(doc) -> None:
-    tieu_de(doc, "10", "Xử lý sự cố")
+def muc_12(doc) -> None:
+    tieu_de(doc, "12", "Xử lý sự cố")
     bang(doc,
          ["Hiện tượng", "Nguyên nhân", "Cách chữa"],
          [["Job bị kill, log có OutOfMemoryError hoặc máy đứng",
@@ -692,14 +1044,32 @@ def muc_10(doc) -> None:
            "prepare.py hai lần đan xen hoặc seed bị đổi."],
           ["pytest đổ ở test_dashboard.py",
            "Test khoá số liệu của lần chạy verify1 (Task 8)",
-           "Đúng như dự kiến sau khi đổi model — xem Mục 9. Phải chạy lại luồng "
-           "streaming và cập nhật số trong test."]],
-         [4.0, 5.0, 8.0])
+           "Đúng như dự kiến sau khi đổi model — xem Mục 11. Phải chạy lại luồng "
+           "streaming và cập nhật số trong test."],
+          ["Colab: java: command not found",
+           "Runtime hiếm khi thiếu Java, nhưng có thể",
+           "Chạy: !apt-get install -y openjdk-17-jdk-headless, rồi kiểm lại bằng "
+           "java -version trước khi cài pyspark."],
+          ["Colab: phiên bị ngắt giữa lúc huấn luyện",
+           "Hết 12 giờ, hoặc để yên quá ~90 phút không thao tác",
+           "Không có cách chạy tiếp — phải chạy lại từ đầu. Phòng ngừa: giữ tab mở, "
+           "thỉnh thoảng bấm vào trang, và cân nhắc hạ subsample_pct xuống để job ngắn "
+           "hơn vừa một phiên."],
+          ["Colab: model mang về nhưng dashboard không thấy",
+           "Zip được giải nén sai vị trí",
+           "Cấu trúc giải nén phải khớp thư mục gốc dự án. Kiểm bằng cách đếm thư mục "
+           "stages/ bên trong sentiment_pipeline — phải thấy đủ 7 bước."],
+          ["Laptop: lỗi liên quan winutils.exe hoặc HADOOP_HOME",
+           "PySpark chạy trực tiếp trên Windows",
+           "Dùng WSL2 thay vì chạy trên Windows (Mục 8.2). Đây là đường đi ít ma sát "
+           "nhất và tôi chưa kiểm chứng cách chữa winutils trên Windows thật."]],
+         [4.0, 4.6, 8.4])
 
 
-def muc_11(doc) -> None:
-    tieu_de(doc, "11", "Phụ lục — bảng tra nhanh")
-    viet(doc, "Toàn bộ quy trình, từ đầu đến khi có mô hình mới", dam=True, cach_sau=2)
+def muc_13(doc) -> None:
+    tieu_de(doc, "13", "Phụ lục — bảng tra nhanh")
+    viet(doc, "Toàn bộ quy trình trên MÁY ẢO (Đường A), từ đầu đến khi có mô hình mới",
+         dam=True, cach_sau=2)
     khoi_lenh(doc, [
         "cd /home/hadoop/capstone && source scripts/env.sh",
         "",
@@ -728,12 +1098,28 @@ def muc_11(doc) -> None:
         "    --driver-memory 2g --master 'local[2]' scripts/check_model.py",
         ".venv/bin/python -m pytest tests/ -q",
     ])
+
+    viet(doc, "Tham số theo từng nơi chạy", dam=True, cach_truoc=8, cach_sau=2)
+    bang(doc,
+         ["", "Đường A — máy ảo", "Đường B — Colab", "Đường C — laptop 16 GB"],
+         [["Cài pyspark", "đã có sẵn (3.5.9)", "pip install pyspark==3.5.9",
+           "pip install pyspark==3.5.9"],
+          ["--driver-memory", "4g", "10g", "8g"],
+          ["--master", "'local[2]'", "'local[2]'", "'local[3]'"],
+          ["prepare.py", "chạy ở đây", "chạy trên máy ảo trước", "chạy trên máy ảo trước"],
+          ["Dữ liệu vào", "có sẵn", "3 file parquet qua Drive (~310 MB)",
+           "3 file parquet qua scp"],
+          ["Kết quả ra", "ở nguyên chỗ", "zip rồi tải về, giải nén ở gốc dự án",
+           "ở nguyên chỗ"]],
+         [2.6, 4.2, 5.4, 4.8])
+
+    viet(doc, "Sinh ra cái gì, mất bao lâu", dam=True, cach_truoc=8, cach_sau=2)
     bang(doc,
          ["Script", "Sinh ra", "Thời gian"],
          [["prepare.py", "data/processed/ — 4 file parquet",
-           "~1–2 phút (đo: 74 s)"],
+           "~1–2 phút (đo: 74 s ở mức 20%)"],
           ["prepare.py", "outputs/tables/ — 4 bảng thống kê (Task 6)", "cùng lần chạy"],
-          ["train.py", "outputs/models/sentiment_pipeline/",
+          ["train.py", "outputs/models/sentiment_pipeline/ (44 file, 904 KB)",
            "45–60 phút (ước tính)"],
           ["train.py", "outputs/tables/ — 5 bảng kết quả (Task 7)", "cùng lần chạy"],
           ["train.py", "outputs/figures/01..05*.png", "cùng lần chạy"],
@@ -748,6 +1134,12 @@ def muc_11(doc) -> None:
         "pdfinfo /tmp/pdfcheck/huong_dan_huan_luyen.pdf | grep Pages",
         "pdffonts /tmp/pdfcheck/huong_dan_huan_luyen.pdf   # phải thấy Carlito",
     ])
+    viet(doc, "Nguồn thông số Colab trong tài liệu này", dam=True, cach_truoc=8,
+         cach_sau=2)
+    viet(doc, "Google KHÔNG công bố cố định cấu hình của bản miễn phí — các mức RAM, số "
+              "nhân và giới hạn thời gian đều thay đổi theo tải hệ thống. Các số ở Mục 2 "
+              "là mức cộng đồng đo được và Google ghi rõ là \"có thể thay đổi\". Vì vậy "
+              "Ô 1 của notebook kiểm lại bằng lệnh thay vì tin vào tài liệu này.")
 
 
 def main() -> int:
@@ -773,12 +1165,13 @@ def main() -> int:
         p.paragraph_format.left_indent = Cm(0.6)
         dat_font(p.add_run(f"{so:>2}."), dam=True, co=11)
         dat_font(p.add_run("   " + ten), co=11)
-    viet(doc, "Tài liệu này gồm 11 mục; mục 3–7 là các bước thực hiện, mục 7 là phần "
-              "kiểm chứng mô hình.", nghieng=True, co=9.5, cach_truoc=8)
+    viet(doc, "Tài liệu gồm 13 mục. Mục 3–5 làm chung một lần cho cả ba nơi chạy; "
+              "mục 6, 7, 8 là ba nơi chạy — chọn MỘT; từ mục 9 trở đi lại dùng chung.",
+         nghieng=True, co=9.5, cach_truoc=8)
     doc.add_page_break()
 
     for ham in (muc_1, muc_2, muc_3, muc_4, muc_5, muc_6, muc_7, muc_8, muc_9,
-                muc_10, muc_11):
+                muc_10, muc_11, muc_12, muc_13):
         ham(doc)
 
     OUT_DOCX.parent.mkdir(parents=True, exist_ok=True)
