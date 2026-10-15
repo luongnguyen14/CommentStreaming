@@ -523,6 +523,14 @@ def main() -> int:
                     help="all hoặc danh sách: detail,kafka,window,sliding,dlq_kafka,dlq_parquet")
     ap.add_argument("--duration-seconds", type=int, default=0,
                     help="tự dừng sau N giây (0 = chạy tới khi Ctrl+C/kill)")
+    # Ghi đè streaming.privacy.keep_text (mặc định false). Bật lên thì bảng chi tiết
+    # và topic comments_scored GIỮ văn bản đã làm sạch — cần cho dashboard Task 10
+    # (khung "bình luận mới nhất"). Chỉ bật khi demo trên dữ liệu công khai (IMDb),
+    # KHÔNG bật khi thu bình luận thật (CLAUDE.md §7).
+    ap.add_argument("--keep-text", dest="keep_text", action="store_true", default=None,
+                    help="giữ văn bản đã làm sạch trong kết quả (mặc định: theo config)")
+    ap.add_argument("--no-keep-text", dest="keep_text", action="store_false",
+                    help="không giữ văn bản (mặc định của dự án)")
     args = ap.parse_args()
 
     cfg = load_config(args.config)
@@ -532,6 +540,9 @@ def main() -> int:
         else int(scfg["max_offsets_per_trigger"])
     args.starting_offsets = args.starting_offsets or str(scfg["starting_offsets"])
     args.watermark = args.watermark or str(scfg["watermark"])
+    if args.keep_text is not None:      # cờ dòng lệnh thắng config (đã ghi rõ trong --help)
+        scfg["privacy"]["keep_text"] = bool(args.keep_text)
+        log(f"Ghi đè privacy.keep_text = {bool(args.keep_text)} (từ dòng lệnh)")
 
     global LABEL_INDEX, INDEX_LABEL
     LABEL_INDEX = {k: int(v) for k, v in cfg["labels"]["index"].items()}

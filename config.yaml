@@ -225,3 +225,37 @@ eda:
     # Bùng nổ = giây có số bình luận > mean + sigma * std của chính lần chạy.
     # Kèm đường tham chiếu "trần lý thuyết" = replay.rate * replay.burst_factor.
     sigma: 2.0
+
+# ---------------------------------------------------------------------------
+# Dashboard gần thời gian thực (Task 10) — src/app/app.py
+# ---------------------------------------------------------------------------
+dashboard:
+  # Lần chạy streaming mà dashboard đọc. `demo` là tên riêng của Task 10 (do
+  # scripts/run_demo.sh tạo) — KHÔNG dùng lại `verify1` để số liệu kiểm chứng của
+  # Task 8/9 không bị lẫn với dữ liệu demo. Nếu thư mục chưa có, dashboard báo rõ
+  # và cho chọn lần chạy khác trong sidebar.
+  streaming_run: demo
+  refresh_seconds: 5          # nhịp tự làm mới tab Live Monitor
+  recent_minutes: 30          # số phút gần nhất đưa lên biểu đồ theo phút
+  latest_comments_n: 10       # số bình luận mới nhất hiển thị (đã che)
+  # Cửa sổ "hiện tại" để tính tỷ lệ cảm xúc và xét cảnh báo (giây).
+  current_window_s: 30
+  # Danh sách che từ nhạy cảm khi hiển thị bình luận. ĐÂY LÀ DANH SÁCH MINH HOẠ để
+  # chứng minh cơ chế — danh sách đầy đủ phải do người kiểm duyệt cung cấp. So khớp
+  # theo ranh giới từ, không phân biệt hoa/thường; từ bị thay bằng ***.
+  mask_words:
+    - idiot
+    - stupid
+    - moron
+    - garbage
+    - trash
+  # Mẫu bổ sung luôn che (định dạng thật của dữ liệu, không phải từ vựng).
+  mask_patterns:
+    - '[\w.+-]+@[\w-]+\.[\w.]+'          # email
+    - '\b(?:\+?\d[\d .-]{7,}\d)\b'        # số điện thoại (>= 9 chữ số)
+  # Câu ví dụ cho tab "Try It" (bấm là điền vào ô nhập).
+  try_it_examples:
+    - "not bad at all actually, quite enjoyable"
+    - "it was okay, nothing special. 6/10"
+    - "the acting is good. the story is very much lacking"
+    - "his 'bad acting' had me crying with laughter, absolutely brilliant"

@@ -1,9 +1,33 @@
 # scripts/ — Script điều khiển
 
-- `run_demo.sh` — khởi động Kafka -> stream_job -> producer replay -> dashboard theo thứ tự
-- `run_all.sh` — chạy toàn bộ pipeline với tham số `--sample`
+## Demo toàn hệ thống (Task 10)
 
-Phải dừng sạch bằng một lệnh.
+- `run_demo.sh` — khởi động **cả hệ thống** theo đúng thứ tự bắt buộc và dừng sạch bằng một lệnh:
+
+  ```bash
+  bash scripts/run_demo.sh                    # Kafka → topic → job streaming → producer replay → dashboard
+  bash scripts/run_demo.sh --duration 600     # tự dừng sạch sau 10 phút
+  bash scripts/run_demo.sh --sample 5000 --rate 30
+  bash scripts/run_demo.sh --stop             # dừng sạch mọi thứ (kể cả Kafka)
+  bash scripts/run_demo.sh --stop --keep-kafka
+  bash scripts/run_demo.sh --help
+  ```
+
+  - **Thứ tự quan trọng**: Kafka phải sống trước; job streaming phải in `READY` trước khi
+    producer gửi bản ghi đầu (job đọc `startingOffsets=latest`, bản ghi gửi sớm hơn mốc gắn
+    offset sẽ bị bỏ qua); dashboard lên sau cùng (không cần Spark — chỉ đọc Parquet).
+  - Job demo chạy kèm `--keep-text` để dashboard có khung "bình luận mới nhất" — **chỉ hợp lệ
+    vì dữ liệu demo là review IMDb công khai**. Khi thu bình luận thật thì KHÔNG dùng cờ này
+    (CLAUDE.md §7).
+  - Dừng theo thứ tự ngược lại (dashboard → producer → job → Kafka) để không còn ai ghi vào
+    sink sau khi job tắt; SIGTERM cho job để nốt micro-batch và ghi checkpoint.
+  - PID/log: `logs/task10_dashboard_demo.{pid,log}`, `logs/task10_producer_demo.{pid,log}`,
+    `logs/task8_stream_demo.{pid,log}`. `Ctrl+C` ở tiền cảnh cũng dừng sạch (có trap).
+  - Chạy lại **cùng tên** sẽ tiếp tục từ checkpoint cũ và cộng dồn vào `outputs/stream/<tên>`;
+    muốn bắt đầu lại từ đầu thì xoá `outputs/stream/<tên>` + `checkpoints/streaming/<tên>`.
+
+  Hướng dẫn mở dashboard từ máy thật (port forwarding VirtualBox) và cách chụp ảnh/quay
+  màn hình cho báo cáo: xem `src/app/README.md`.
 
 ## Môi trường
 

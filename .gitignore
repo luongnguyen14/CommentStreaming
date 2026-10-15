@@ -19,6 +19,7 @@ logs/*
 !logs/task6_*.log
 !logs/task7_*.log
 !logs/task8_*.log
+!logs/task10_*.log
 
 # --- Môi trường / bí mật ---
 .venv/

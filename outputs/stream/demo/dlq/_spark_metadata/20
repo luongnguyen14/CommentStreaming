@@ -1,0 +1,2 @@
+v1
+{"path":"file:///home/hadoop/capstone/outputs/stream/demo/dlq/part-00000-177485e5-3df6-4961-a80c-9ee4d73b3000-c000.snappy.parquet","size":6858,"isDir":false,"modificationTime":1792029061259,"blockReplication":1,"blockSize":33554432,"action":"add"}
