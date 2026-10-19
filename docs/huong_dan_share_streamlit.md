@@ -269,8 +269,7 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-Nếu file `requirements.txt` chưa có trên GitHub (lần push gần nhất có thể chưa lên),
-cài trực tiếp:
+`requirements.txt` đã có trên GitHub. Nếu bản clone cũ chưa có file này, cài trực tiếp:
 
 ```bash
 pip install \

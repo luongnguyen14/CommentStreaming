@@ -311,9 +311,8 @@ pip install -r requirements.txt
 ```
 
 > `requirements.txt` ở gốc repo liệt kê đúng các phiên bản đã kiểm chứng
-> (`pyspark==3.5.9`, `streamlit==1.65.0`, ...). Nếu bản clone chưa có file này
-> (commit mới chưa push), cài trực tiếp theo lệnh trong
-> `docs/huong_dan_share_streamlit.md`, Mục 4.3.
+> (`pyspark==3.5.9`, `streamlit==1.65.0`, ...). Nếu bản clone cũ chưa có file này,
+> cài trực tiếp theo lệnh trong `docs/huong_dan_share_streamlit.md`, Mục 4.3.
 
 ### 5.3. Dữ liệu — điểm cần chú ý
 
