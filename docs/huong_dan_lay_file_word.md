@@ -298,14 +298,22 @@ git clone https://github.com/luongnguyen14/CommentStreaming.git
 | Spark | 3.5.9 | Đặt `SPARK_HOME` |
 | Kafka | 4.3.1 (KRaft) | Cần Java 17 |
 | Python cho Spark | 3.11 | `PYSPARK_PYTHON` |
-| Python cho venv | 3.11+ | Tạo `.venv` |
+| Python cho venv | **3.11** | Không dùng 3.14: PySpark 3.5.9 lỗi `cloudpickle` |
 
 ```bash
-python3 -m venv .venv
+python3.11 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-source scripts/env.sh
+# CHỈ chạy dòng dưới nếu đường dẫn giống máy gốc (/home/hadoop/...):
+# source scripts/env.sh
+# Trên máy mới, export JAVA_HOME/SPARK_HOME/PYSPARK_PYTHON theo đường dẫn thực tế
+# — xem docs/huong_dan_share_streamlit.md, Mục 4.5.
 ```
+
+> `requirements.txt` ở gốc repo liệt kê đúng các phiên bản đã kiểm chứng
+> (`pyspark==3.5.9`, `streamlit==1.65.0`, ...). Nếu bản clone chưa có file này
+> (commit mới chưa push), cài trực tiếp theo lệnh trong
+> `docs/huong_dan_share_streamlit.md`, Mục 4.3.
 
 ### 5.3. Dữ liệu — điểm cần chú ý
 

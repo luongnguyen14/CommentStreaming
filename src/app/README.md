@@ -93,6 +93,9 @@ Cảnh báo dùng **đúng quy tắc đã đo ở Task 9**: `share_negative > ng
 
 ## Hướng dẫn mở dashboard từ MÁY THẬT (port forwarding VirtualBox)
 
+> Muốn chia sẻ cho máy khác qua LAN, qua Internet (ngrok/Cloudflare) hoặc cài độc lập
+> trên máy mới? Xem [`docs/huong_dan_share_streamlit.md`](../../docs/huong_dan_share_streamlit.md).
+
 Máy ảo có IP riêng; trình duyệt trên máy thật không vào được `localhost:8501` của
 máy ảo. Ba cách, chọn **một**:
 

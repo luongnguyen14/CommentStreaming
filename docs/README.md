@@ -19,5 +19,9 @@
 - `huong_dan_lay_file_word.md` — **hướng dẫn lấy file Word về máy** (GitHub, `scp`,
   VirtualBox shared folder), mở bằng Word/LibreOffice, cài font, xuất PDF, và chạy
   lại chương trình trên máy gốc / máy mới
+- `huong_dan_share_streamlit.md` — **hướng dẫn chia sẻ dashboard Streamlit cho máy
+  khác**: cùng mạng LAN (Bridged/NAT port forwarding), qua Internet bằng ngrok hoặc
+  Cloudflare Tunnel, cài độc lập trên máy mới, bảo vệ bằng mật khẩu Nginx, và xử lý
+  lỗi kết nối thường gặp
 
 Tài liệu trong đây là **nội bộ**; tài liệu nộp cho cô nằm ở `deliverables/` (tiếng Anh).

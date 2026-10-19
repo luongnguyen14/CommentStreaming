@@ -1,0 +1,33 @@
+# Python packages for the dashboard, streaming producer and EDA.
+# Python 3.11 is required: PySpark 3.5.9 does not work with Python 3.14
+# (cloudpickle 2.2.1 raises RecursionError).
+#
+# Java 8 and Spark 3.5.9 are NOT pip packages. See docs/huong_dan_share_streamlit.md
+# and docs/huong_dan_lay_file_word.md for the system requirements.
+
+# Spark + streaming
+pyspark==3.5.9
+kafka-python==3.0.11
+pyarrow==25.0.1
+
+# Dashboard
+streamlit==1.65.0
+pandas==3.0.6
+numpy==2.4.6
+plotly==7.1.0
+altair==6.3.0
+watchdog==6.0.0
+PyYAML==6.0.3
+
+# EDA / figures
+matplotlib==3.11.2
+seaborn==0.13.2
+
+# Tests
+pytest==9.1.1
+
+# Document generation (Final Report / guides; optional for running the app)
+python-docx==1.2.0
+python-pptx==1.0.2
+openpyxl==3.1.5
+lxml==6.0.2
