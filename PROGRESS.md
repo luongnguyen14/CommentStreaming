@@ -40,7 +40,8 @@ Ngày Day N tính từ Day 1 = 15/09/2026.
 
 | # | Việc | Chặn task nào | Ghi chú |
 |---|---|---|---|
-| 1 | **Lịch thực tế vs mốc Day 20** | Toàn bộ | Day 1 = 15/09/2026 đã chốt ⇒ hôm nay 14/10 là **Day 30**, mọi hạn Day 5–20 đều đã qua. Cần thống nhất với cô hướng nộp bù / điều chỉnh mốc. |
+| 1 | **Lịch thực tế vs mốc Day 20** | Toàn bộ | Day 1 = 15/09/2026 đã chốt ⇒ hôm nay 19/10 là **Day 35**, mọi hạn Day 5–20 đều đã qua. Cần thống nhất với cô hướng nộp bù / điều chỉnh mốc. |
+| 1b | **Push GitHub bị chặn (chưa giải quyết)** | Nộp bài qua GitHub | Ngày 19/10/2026, `git push origin main` báo `git@github.com: Permission denied (publickey).` Máy đang có **các commit Task 11b–14 chưa đẩy** (mới nhất là commit báo cáo Task 13–14). Nguyên nhân: khóa `~/.ssh/id_ed25519` **chưa đăng ký** với GitHub; khóa `~/.ssh/id_rsa` có **passphrase** nhưng máy không có `ssh-askpass`. Cách sửa: thêm dòng public key `ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHErP6KvQs4ha/70jUkuvoxaKl5y9DKxYZyk/mpO2kJI hadoop@localhost-hdfs` tại GitHub → Settings → SSH and GPG keys → New SSH key, rồi chạy lại `git push origin main`. |
 | 2 | ~~Đo RAM khi chạy đồng thời Kafka + Spark~~ **ĐÃ ĐO 14/10/2026** | Task 8 (streaming) | Kafka (heap 512 MB) + Spark `local[2]` chạy đồng thời được; khả dụng thấp nhất ~1,9 GB (có dùng swap). Chốt cấu hình streaming: driver ~1g, `local[2]`, heap Kafka 512 MB. Số đo: `logs/task5_spark_kafka_memory.log`. |
 | 3 | **Xác minh vài `review_id` với trang Kaggle** | Trước Final Report | Xem `data/raw/SOURCE.md` (mục "Việc còn lại"). |
 | 3b | **Nhãn là SUY TỪ `rating`, không phải nhãn cảm xúc thật** | Báo cáo, slide, Task 8 | Ánh xạ 1–4 / 5–6 / 7–10 là **quy ước của nhóm** (ghi ở `config.yaml` + `docs/data_dictionary.md` §3). Mọi báo cáo phải gọi đúng là "nhãn suy từ rating"; kết quả lớp `neutral` thấp (**F1 0,3783** trên test, Task 7) là do **nhiễu nhãn**, không phải mô hình kém. |
