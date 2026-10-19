@@ -102,6 +102,18 @@ bash scripts/stop_stream.sh verify1
   chạy `clean_text()` rồi dự đoán 5 câu thử tiếng Anh, in lớp + xác suất. Dùng để xác nhận
   đường đi mà Task 8 (streaming) sẽ dùng:
   `PYSPARK_DRIVER_PYTHON=$VENV_PY PYSPARK_PYTHON=$VENV_PY spark-submit --driver-memory 2g --master 'local[2]' scripts/check_model.py`
+- `run_model_trial.sh` — **chương trình thử nghiệm mô hình** dùng khi báo cáo/demo, không cần
+  Kafka và không cần Streamlit. Chạy `src/app/model_trial.py` bằng Python của venv (không gọi
+  thẳng `spark-submit` vì lệnh đó nuốt stdin, làm chế độ tương tác không nhận được câu nhập):
+  ```bash
+  bash scripts/run_model_trial.sh                     # nhập bình luận tương tác
+  bash scripts/run_model_trial.sh --examples          # 4 câu ví dụ trong config.yaml
+  bash scripts/run_model_trial.sh --text "not bad"    # chấm một câu
+  bash scripts/run_model_trial.sh --test-sample 200   # đo trên 200 dòng tập test
+  ```
+  Chế độ `--test-sample` ghi `outputs/tables/model_trial_predictions.csv`,
+  `model_trial_summary.csv` và `outputs/model_trial_report.md`. Script tự tắt event log
+  (không cần HDFS) và dùng `conf/log4j2.properties` để bớt dòng INFO.
 
 ## Script vẽ biểu đồ
 

@@ -57,6 +57,7 @@ from pyspark.ml.functions import vector_to_array           # noqa: E402
 from pyspark.ml.tuning import TrainValidationSplit         # noqa: E402
 from pyspark.sql import SparkSession, functions as F       # noqa: E402
 
+from src.common.metrics import confusion_matrix, metrics_from_cm  # noqa: E402
 from src.common.plotting import SENTIMENT_COLORS, apply_style, save_fig  # noqa: E402
 from src.common.text_cleaning import dedup_key             # noqa: E402
 from src.common.utils import PROJECT_ROOT, load_config     # noqa: E402
@@ -109,50 +110,8 @@ def fmt_params(pmap: dict) -> str:
 
 
 # --- Chỉ số: TÍNH TỪ CONFUSION MATRIX --------------------------------------
-
-def confusion_matrix(y_true: np.ndarray, y_pred: np.ndarray, n_labels: int) -> np.ndarray:
-    cm = np.zeros((n_labels, n_labels), dtype=np.int64)
-    np.add.at(cm, (y_true, y_pred), 1)
-    return cm
-
-
-def metrics_from_cm(cm: np.ndarray, labels: list[str]) -> tuple[dict, dict]:
-    """Trả về (chỉ số tổng, chỉ số từng lớp) — TẤT CẢ tính từ confusion matrix.
-
-    precision = TP/(TP+FP); recall = TP/(TP+FN); F1 = 2PR/(P+R) (0 nếu mẫu số = 0).
-    macro-* = trung bình cộng đều các lớp; weighted-* = trung bình theo số mẫu.
-    """
-    total = int(cm.sum())
-    per_class: dict[str, dict] = {}
-    for i, lab in enumerate(labels):
-        tp = int(cm[i, i])
-        fp = int(cm[:, i].sum() - tp)
-        fn = int(cm[i, :].sum() - tp)
-        support = int(cm[i, :].sum())
-        precision = tp / (tp + fp) if tp + fp > 0 else 0.0
-        recall = tp / (tp + fn) if tp + fn > 0 else 0.0
-        f1 = 2 * precision * recall / (precision + recall) if precision + recall > 0 else 0.0
-        per_class[lab] = {
-            "precision": precision, "recall": recall, "f1": f1,
-            "support": support, "share": support / total if total else 0.0,
-        }
-    present = [lab for lab in labels if per_class[lab]["support"] > 0]
-    macro = {
-        m: float(np.mean([per_class[lab][m] for lab in present])) if present else 0.0
-        for m in ("precision", "recall", "f1")
-    }
-    weighted_f1 = float(sum(per_class[lab]["f1"] * per_class[lab]["support"]
-                            for lab in present) / total) if total else 0.0
-    overall = {
-        "n": total,
-        "accuracy": float(np.trace(cm) / total) if total else 0.0,
-        "weighted_f1": weighted_f1,
-        "macro_f1": macro["f1"],
-        "macro_precision": macro["precision"],
-        "macro_recall": macro["recall"],
-        "labels_in_macro": ",".join(present),
-    }
-    return overall, per_class
+# `confusion_matrix` và `metrics_from_cm` nằm ở src/common/metrics.py để
+# chương trình thử nghiệm (src/app/model_trial.py) dùng ĐÚNG công thức này.
 
 
 def with_argmax_prediction(df, raw_col: str = "rawPrediction", out_col: str = PRED_COL):

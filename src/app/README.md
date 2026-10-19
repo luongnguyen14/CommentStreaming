@@ -9,6 +9,28 @@ Dashboard **không dùng Spark ở tab Live Monitor** — nó chỉ đọc file 
 streaming (Task 8) đã ghi. Nhờ vậy xem dashboard không làm chậm job và ngược lại.
 Spark chỉ được dựng ở tab Try It, và chỉ khi người dùng thực sự bấm "Phân tích".
 
+## Chương trình thử nghiệm mô hình — `model_trial.py`
+
+Đây là phần **"thử nghiệm mô hình"** (prototype), tách khỏi app hoàn chỉnh: chạy
+được bằng một lệnh, **không cần Kafka, không cần Streamlit**, chỉ cần model đã lưu
+trong `outputs/models/`. Nó đi đúng đường của hệ thống thật:
+`văn bản thô → clean_text() → PipelineModel → nhãn + xác suất`.
+
+```bash
+bash scripts/run_model_trial.sh                     # nhập bình luận tương tác (:q thoát, :sample ví dụ)
+bash scripts/run_model_trial.sh --examples          # 4 câu ví dụ trong config.yaml
+bash scripts/run_model_trial.sh --text "not bad"    # chấm một câu
+bash scripts/run_model_trial.sh --test-sample 200   # đo trên 200 dòng tập test (có nhãn thật)
+```
+
+Chế độ `--test-sample` sinh báo cáo tiếng Anh `outputs/model_trial_report.md` + hai
+bảng trong `outputs/tables/`; mọi số lấy từ chính lần chạy. Quy tắc loại văn bản
+(rỗng / quá ngắn / quá dài) giống hệt DLQ của streaming. Mặc định **không ghi văn
+bản** vào file; chỉ dùng `--keep-text` với dữ liệu công khai.
+
+> Đây vẫn là **review IMDb phát lại**, không phải bình luận livestream thật. Báo cáo
+> phải nói rõ (xem `docs/huong_dan_bao_cao.md`).
+
 ## Cách chạy
 
 ### Cách 1 — cả hệ thống bằng một lệnh (khuyến nghị khi demo)

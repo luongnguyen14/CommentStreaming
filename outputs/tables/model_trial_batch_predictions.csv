@@ -1,0 +1,5 @@
+run_at,mode,split,row,comment_id,label_true,label_pred,prob_negative,prob_neutral,prob_positive,confidence,correct
+2026-10-19T11:53:20+07:00,batch,-,1,,,neutral,0.083775,0.795273,0.120953,0.795273,
+2026-10-19T11:53:20+07:00,batch,-,2,,,neutral,0.00684,0.992716,0.000444,0.992716,
+2026-10-19T11:53:20+07:00,batch,-,3,,,neutral,0.279648,0.657097,0.063255,0.657097,
+2026-10-19T11:53:20+07:00,batch,-,4,,,positive,0.053785,0.083071,0.863143,0.863143,

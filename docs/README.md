@@ -5,5 +5,8 @@
 - `scenario.md` — kịch bản sử dụng (Task 13)
 - `self_assessment.md`, `qa_prep.md` — tự chấm và chuẩn bị hỏi đáp (Task 16)
 - `talk_script_vi.md` — kịch bản nói tiếng Việt cho slide cuối
+- `huong_dan_bao_cao.md` — **hướng dẫn báo cáo trước hội đồng**: trạng thái GitHub,
+  cách dùng chương trình thử nghiệm mô hình (`src/app/model_trial.py`), bản đồ số liệu
+  → từng mục Final Report, kịch bản demo 5 phút, được nói/không được nói, Q&A, checklist
 
 Tài liệu trong đây là **nội bộ**; tài liệu nộp cho cô nằm ở `deliverables/` (tiếng Anh).

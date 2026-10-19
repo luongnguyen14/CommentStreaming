@@ -263,3 +263,29 @@ dashboard:
     - "it was okay, nothing special. 6/10"
     - "the acting is good. the story is very much lacking"
     - "his 'bad acting' had me crying with laughter, absolutely brilliant"
+
+# ---------------------------------------------------------------------------
+# Chương trình thử nghiệm mô hình (prototype) — src/app/model_trial.py
+# Chạy: bash scripts/run_model_trial.sh [--test-sample N | --examples | --text ...]
+# Đây là phần "thử nghiệm mô hình", KHÔNG phải app hoàn chỉnh. Không cần Kafka,
+# không cần Streamlit; chỉ dùng Spark local để nạp PipelineModel đã lưu.
+# ---------------------------------------------------------------------------
+model_trial:
+  # --test-sample không truyền thì mặc định dùng tập nào (test | val).
+  split: test
+  # Trần số dòng cho --test-sample; vượt trần thì báo lỗi thay vì chạy rất lâu.
+  max_sample_rows: 5000
+  # Trần số câu cho chế độ --text/--file (chống vô tình nạp cả file lớn).
+  max_batch_rows: 10000
+  # Số ví dụ dự đoán đưa vào báo cáo Markdown.
+  examples_n: 8
+  # false = KHÔNG ghi văn bản vào CSV/report (CLAUDE.md §7). Chỉ bật bằng
+  # --keep-text với dữ liệu công khai (IMDb CC0).
+  keep_text: false
+  # Kết quả của --test-sample (bằng chứng cho báo cáo).
+  predictions_out: outputs/tables/model_trial_predictions.csv
+  summary_out: outputs/tables/model_trial_summary.csv
+  report_out: outputs/model_trial_report.md
+  # Kết quả của chế độ --text/--file/--examples (tách riêng để không ghi đè
+  # bằng chứng của --test-sample).
+  batch_predictions_out: outputs/tables/model_trial_batch_predictions.csv
