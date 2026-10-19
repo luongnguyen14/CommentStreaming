@@ -11,5 +11,13 @@
 - `bao_cao_tien_do.md` — **kịch bản báo cáo tiến độ**: từng bước đã làm (dữ liệu →
   chuẩn bị → huấn luyện → đánh giá → streaming → EDA → dashboard), cách train/test chi
   tiết, kết quả thật, hạn chế, kế hoạch và **30 câu hỏi–đáp án** cho buổi báo cáo
+- `bao_cao_ky_thuat_vi.docx` / `.pdf` — **báo cáo kỹ thuật chi tiết bằng tiếng Việt**
+  (33 trang): kiến trúc, dữ liệu, mô hình, kết quả, phân tích lỗi, streaming, EDA,
+  dashboard, chương trình thử nghiệm, cách chạy lại, hạn chế và phụ lục. Sinh bằng
+  `scripts/make_vi_technical_report.py`
+- `bao_cao_ky_thuat_vi.md` — bản tóm tắt Markdown của báo cáo kỹ thuật, để đọc trên GitHub
+- `huong_dan_lay_file_word.md` — **hướng dẫn lấy file Word về máy** (GitHub, `scp`,
+  VirtualBox shared folder), mở bằng Word/LibreOffice, cài font, xuất PDF, và chạy
+  lại chương trình trên máy gốc / máy mới
 
 Tài liệu trong đây là **nội bộ**; tài liệu nộp cho cô nằm ở `deliverables/` (tiếng Anh).
