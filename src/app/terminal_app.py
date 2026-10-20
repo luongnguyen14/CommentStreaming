@@ -1,42 +1,23 @@
 #!/usr/bin/env python3
-"""terminal_app.py — Chạy TOÀN BỘ quy trình ngay trong terminal Ubuntu.
+"""terminal_app.py — Quy trình chạy của dự án, hiển thị trong terminal Ubuntu.
 
-Mục đích: nhìn rõ từng giai đoạn của dự án, theo đúng thứ tự và bằng chính code
-thật của hệ thống — không phải sơ đồ vẽ tay, không phải số liệu viết sẵn:
+Quy trình 8 bước:
 
-    (1) Thu thập dữ liệu giả lập (replay IMDb, KHÔNG phải livestream thật)
-    (2) Đóng gói message 5 trường + tách nhãn đánh giá ra khỏi luồng
-    (3) Parse JSON bằng schema tường minh + kiểm tra + DLQ
-    (4) Làm sạch bằng ĐÚNG hàm dùng lúc huấn luyện (clean_text)
-    (5) Chấm điểm TỪNG bình luận bằng PipelineModel đã lưu
-    (6) Gộp cửa sổ theo event time + xét cảnh báo
-    (7) Ghi sink Parquet + kiểm tra Kafka (nếu đang chạy)
-    (8) Tổng kết, nêu rõ điều đã đo và điều CHƯA kiểm chứng
+    Thu thập → Đóng gói → Parse/DLQ → Làm sạch
+    → Phân tích → Cửa sổ → Ghi → Tổng kết
 
-Ba cách dùng:
+Cách chạy:
 
-    # 1) Đi từng giai đoạn, nhấn Enter để chạy tiếp (mặc định)
-    bash scripts/run_terminal_app.sh
-
-    # 2) Tự chạy liên tục, không cần bấm
-    bash scripts/run_terminal_app.sh --auto
-    bash scripts/run_terminal_app.sh --fast          # không chờ giữa các giai đoạn
-
-    # 3) Chỉ xem một giai đoạn (vẫn dựng ngầm các bước trước)
-    bash scripts/run_terminal_app.sh --stage 5
-
-    # 4) Theo dõi Kafka đang chạy (cần bash scripts/run_demo.sh ở terminal khác)
+    bash scripts/run_terminal_app.sh                 # từng bước, nhấn Enter
+    bash scripts/run_terminal_app.sh --auto          # tự chạy
+    bash scripts/run_comment_stream.sh               # từng comment, kết quả ngay
+    bash scripts/run_terminal_app.sh --stage 5       # chỉ một bước
+    bash scripts/run_terminal_app.sh --text "..."    # chấm một câu
     bash scripts/run_terminal_app.sh --live --duration 60
 
-    # 5) Chấm thử một câu tự nhập
-    bash scripts/run_terminal_app.sh --text "not bad at all actually"
-
-Quy ước (CLAUDE.md):
-  - Dùng chung `clean_text()` với huấn luyện/streaming (§4) — không viết lại.
-  - Nhãn KHÔNG đi vào message; chỉ ghép lại theo `comment_id` để đánh giá (§6).
-  - Dữ liệu là replay IMDb; không gọi là livestream thật (§9).
-  - Không hard-code đường dẫn tuyệt đối: mọi đường dẫn suy ra từ config.yaml.
-  - Không ghi văn bản ra file trừ khi có `--keep-text` (dữ liệu IMDb công khai).
+Dùng đúng code của hệ thống: parse_stream, add_cleaning_and_reason, clean_text,
+PipelineModel, windows_from_detail, eval_alerts. Dữ liệu là replay IMDb, không
+phải livestream thật; exactly-once chưa kiểm chứng (chỉ at-least-once).
 """
 
 from __future__ import annotations
@@ -65,6 +46,8 @@ from src.common.utils import load_config  # noqa: E402
 LABELS = ["negative", "neutral", "positive"]
 LABEL_VI = {"negative": "tiêu cực", "neutral": "trung lập", "positive": "tích cực"}
 STAGE_TOTAL = 8
+PIPELINE = ["Thu thập", "Đóng gói", "Parse/DLQ", "Làm sạch",
+            "Phân tích", "Cửa sổ", "Ghi", "Tổng kết"]
 
 RESET = "\033[0m"
 
@@ -161,6 +144,11 @@ class UI:
 
     def stage(self, n: int, title: str, desc: str = "") -> None:
         print()
+        line = self.c.gray(" → ").join(
+            (self.c.bold(self.c.yellow(name)) if i == n else self.c.gray(name))
+            for i, name in enumerate(PIPELINE, 1)
+        )
+        print("  " + line)
         self.banner(f"GIAI ĐOẠN {n}/{STAGE_TOTAL}", title, desc)
 
     def section(self, title: str) -> None:
@@ -572,11 +560,10 @@ class Walkthrough:
         self.ui.kv("Nguồn gốc", f"{rel(raw_path)} ({human_size(raw_path)}, review IMDb công khai)")
         self.ui.kv("Bản đã xử lý", f"{rel(jsonl_path)} ({human_size(jsonl_path)})")
         self.ui.kv("Mẫu đang dùng", "outputs/tables/clean_sample.csv")
-        self.ui.kv("Tập được lấy", f"{self.cfg.get('model_trial', {}).get('split', 'test')} "
-                                    f"(test chỉ dùng MỘT lần để đánh giá)")
+        self.ui.kv("Tập được lấy", str(self.cfg.get("model_trial", {}).get("split", "test")))
         self.ui.kv("Số dòng lấy", f"{len(df)} (seed={self.seed})")
 
-        self.ui.section("Các bản ghi vừa 'thu thập'")
+        self.ui.section("Bản ghi lấy được")
         rows = []
         for i, r in df.head(10).iterrows():
             rows.append([i + 1, r["comment_id"], one_line(r.get("stream_id", ""), 30),
@@ -587,12 +574,6 @@ class Walkthrough:
         if len(df) > 10:
             self.ui.note("info", f"… và {len(df) - 10} bản ghi nữa (tổng {len(df)}).")
 
-        self.ui.note("info", "`rating` 1–4 → negative, 5–6 → neutral, 7–10 → positive. "
-                             "Nhãn này CHƯA được dùng ở đây; nó chỉ đi theo đường riêng "
-                             "để đánh giá ở giai đoạn 5.")
-        self.ui.note("warn", "Đây là dữ liệu REPLAY từ review IMDb, KHÔNG phải bình luận "
-                             "livestream thật. Mọi con số trong app đều từ dữ liệu này.")
-
     def stage_2(self) -> None:
         msgs = self.ensure_messages()
         df = self.ensure_sample()
@@ -602,25 +583,18 @@ class Walkthrough:
         parts = topic_partitions()
         raw_topic = self.cfg["kafka"]["topic_raw"]
 
-        self.ui.section("Message gửi lên Kafka — CHỈ 5 trường")
+        self.ui.section("Message gửi Kafka (5 trường)")
         shown = dict(first)
         shown["text"] = one_line(first["text"], 220)      # chỉ rút gọn khi in
         print(self.ui.c.cyan(json.dumps(shown, ensure_ascii=False, indent=2)))
-        self.ui.note("info", "`text` là văn bản THÔ (review_detail); producer không làm sạch "
-                             "trước khi gửi. Việc làm sạch nằm trong job streaming, dùng "
-                             "chung hàm với lúc huấn luyện. Bản in rút gọn 220 ký tự; "
-                             "message thật giữ nguyên văn bản đầy đủ.")
-        self.ui.kv("Topic", f"{raw_topic} "
-                            f"({parts.get(raw_topic, '?')} partition theo kafka/create_topics.sh)")
-        self.ui.kv("Key", f"{cid} (Kafka băm key để giữ thứ tự theo bình luận)")
-        self.ui.kv("user_hash", first["user_hash"] + "  ← băm có muối, không có tên người dùng")
-        self.ui.kv("event_ts", first["event_ts"] + "  ← ISO-8601 UTC, do producer ghi ngay trước khi gửi")
+        self.ui.kv("Topic", f"{raw_topic} · {parts.get(raw_topic, '?')} partition")
+        self.ui.kv("Key", cid)
+        self.ui.kv("user_hash", first["user_hash"] + "  (băm có muối)")
+        self.ui.kv("event_ts", first["event_ts"] + "  (UTC)")
 
-        self.ui.section("Nhãn đánh giá đi ĐƯỜNG RIÊNG — không vào message")
+        self.ui.section("Nhãn đánh giá (sidecar)")
         side = {"comment_id": cid, "label": label, "rating": rating}
         print(self.ui.c.magenta(json.dumps(side, ensure_ascii=False, indent=2)))
-        self.ui.note("ok", "Message không có `label`. Nhãn chỉ được ghép lại theo "
-                           "`comment_id` ở bước đánh giá — đúng CLAUDE.md §6.")
         self.ui.table(["#", "comment_id", "phòng", "nhãn (sidecar)", "rating"],
                       [[i + 1, m["comment_id"], one_line(m["stream_id"], 28),
                         self.true_lut.get(m["comment_id"], ("", ""))[0],
@@ -634,14 +608,12 @@ class Walkthrough:
         rows = self.ensure_parsed()
         from src.streaming.stream_job import RAW_SCHEMA
 
-        self.ui.section("Schema khai báo TƯỜNG MINH (không suy luận từ dữ liệu)")
+        self.ui.section("Schema")
         schema_rows = [[f.name, f.dataType.simpleString(), "có" if f.nullable else "không"]
                        for f in RAW_SCHEMA.fields]
         self.ui.table(["trường", "kiểu", "nullable"], schema_rows, max_widths=[20, 22, 8])
-        self.ui.note("info", "`from_json` chạy ở PERMISSIVE với columnNameOfCorruptRecord="
-                             "`_corrupt`; JSON hỏng không làm chết job mà vào DLQ.")
 
-        self.ui.section("Kết quả kiểm tra từng bản ghi")
+        self.ui.section("Kiểm tra từng bản ghi")
         tbl = []
         for r in rows:
             off = int(r["kafka_offset"])
@@ -655,36 +627,23 @@ class Walkthrough:
 
         n_ok = sum(1 for r in rows if not r.get("dlq_reason"))
         n_dlq = len(rows) - n_ok
-        self.ui.section("Đối soát — không bản ghi nào bị bỏ im lặng")
+        self.ui.section("Đối soát")
         self.ui.kv("Nhận vào", f"{len(rows)} message "
                                f"({len(self.messages)} thật + {len(self.bad)} lỗi cố ý)")
         self.ui.kv("Hợp lệ", f"{n_ok}")
-        self.ui.kv("DLQ", f"{n_dlq} (kèm lý do, sẽ ghi ra topic comments_dlq + Parquet)")
+        self.ui.kv("DLQ", f"{n_dlq}")
         self.ui.kv("Tổng kiểm tra", f"{n_ok} + {n_dlq} = {len(rows)} ✔")
-        self.ui.note("ok", "Mỗi bản ghi đi vào ĐÚNG MỘT nhánh: hợp lệ → chấm điểm; "
-                           "lỗi → DLQ kèm lý do. Không có nhánh thứ ba im lặng.")
 
     def stage_4(self) -> None:
         rows = self.ensure_parsed()
         valid = [r for r in rows if not r.get("dlq_reason")]
 
-        self.ui.section("Một hàm làm sạch — dùng chung cho huấn luyện và streaming")
+        self.ui.section("Hàm làm sạch")
         self.ui.kv("Hàm", "src/common/text_cleaning.py :: clean_text()")
-        self.ui.kv("Cách viết", "Spark SQL column (lower, regexp_replace, trim…) — KHÔNG dùng Python UDF")
         self.ui.kv("Quy tắc", "lowercase · bỏ HTML · URL→<url> · @user→<user> · "
-                              "chuẩn hoá dấu câu · viết tắt · gộp ký tự lặp · tách emoji · gộp khoảng trắng")
+                              "dấu câu · viết tắt · ký tự lặp · emoji · khoảng trắng")
 
-        self.ui.section("Phòng thí nghiệm: câu tổng hợp đủ mọi quy tắc (cố ý)")
-        lab_raw = ("WOW!!! I can't believe it 😡😡😡 check https://example.com NOW, "
-                   "<b>this</b> is soooooo gud... u r right @john_doe 100%")
-        lab_clean = self.clean_one(lab_raw)
-        self.ui.card("Câu tổng hợp — trước và sau clean_text()", [
-            ("RAW   : " + lab_raw, self.ui.c.dim),
-            ("CLEAN : " + lab_clean, self.ui.c.green),
-            ("ĐÃ ĐỔI: " + ", ".join(self.corrections(lab_raw, lab_clean)), self.ui.c.yellow),
-        ])
-
-        self.ui.section("Áp dụng lên các bình luận thật của mẫu")
+        self.ui.section("Làm sạch các bình luận")
         tbl = []
         for i, r in enumerate(valid):
             raw = str(r.get("text") or "")
@@ -696,34 +655,26 @@ class Walkthrough:
         self.ui.table(["#", "comment_id", "thô", "sạch", "khớp", "quy tắc đã đổi"],
                       tbl, aligns=[">", "<", ">", ">", "<", "<"],
                       max_widths=[3, 14, 7, 7, 6, 52])
-        if valid:
-            self.ui.note("info", "`thô`/`sạch` là số ký tự trước/sau; `khớp` so với `text` "
-                                 "trong clean_sample.csv (bản prepare.py đã làm sạch). "
-                                 "Khớp = cùng một hàm, cùng kết quả.")
-            for i, r in enumerate(valid[:2]):
-                self.ui.card(f"Ví dụ {i + 1} — {r.get('comment_id')}", [
-                    ("RAW   : " + one_line(r.get("text"), 240), self.ui.c.dim),
-                    ("CLEAN : " + one_line(r.get("text_clean"), 240), self.ui.c.green),
-                ])
-        self.ui.note("ok", "Job streaming gọi đúng hàm này trên cột `text` vừa nhận; "
-                           "model chỉ thấy `text_clean`.")
+        for i, r in enumerate(valid[:2]):
+            self.ui.card(f"Ví dụ {i + 1} — {r.get('comment_id')}", [
+                ("RAW   : " + one_line(r.get("text"), 240), self.ui.c.dim),
+                ("CLEAN : " + one_line(r.get("text_clean"), 240), self.ui.c.green),
+            ])
 
     def stage_5(self) -> None:
         rows = self.ensure_scored()
         meta = self.meta or {}
         test = meta.get("metrics", {}).get("test", {})
-        self.ui.section("Mô hình đang chấm điểm")
+        self.ui.section("Model")
         self.ui.kv("Tên", str(meta.get("model_name", "?")))
         self.ui.kv("Lưu lúc", str(meta.get("saved_at", "?")) + f" (Spark {meta.get('spark_version', '?')})")
         self.ui.kv("Pipeline", " → ".join(meta.get("pipeline_stages", [])) or "?")
         if test:
-            self.ui.kv("Khi huấn luyện — test", f"accuracy {test.get('accuracy', 0):.4f} · "
-                                               f"macro-F1 {test.get('macro_f1', 0):.4f} · "
-                                               f"{fmt_int(test.get('n', 0))} dòng")
-        self.ui.note("info", "Số trên là kết quả trên TOÀN tập test lúc huấn luyện, "
-                             "không phải điểm của mẫu nhỏ bên dưới.")
+            self.ui.kv("Test lúc huấn luyện", f"accuracy {test.get('accuracy', 0):.4f} · "
+                                              f"macro-F1 {test.get('macro_f1', 0):.4f} · "
+                                              f"{fmt_int(test.get('n', 0))} dòng")
 
-        self.ui.section("Phân tích TỪNG bình luận")
+        self.ui.section("Từng bình luận")
         n_cards = max(0, min(int(self.args.cards), len(rows)))
         color_of = {"negative": self.ui.c.red, "neutral": self.ui.c.yellow,
                     "positive": self.ui.c.green}
@@ -732,8 +683,8 @@ class Walkthrough:
             true_txt = "—"
             if r["label_true"]:
                 ok = r["label_true"] == r["label_pred"]
-                true_txt = (f"{r['label_true']} (rating {r['rating_true']}) — "
-                            f"{'✔ đúng' if ok else '✘ sai'} · chỉ để đánh giá, không đi qua luồng")
+                true_txt = (f"{r['label_true']} (rating {r['rating_true']}) "
+                            f"{'✔' if ok else '✘'}")
             lines: list = [
                 ("RAW   : " + one_line(r["text_raw"], 220), self.ui.c.dim),
                 ("CLEAN : " + one_line(r["text_clean"], 220), self.ui.c.dim),
@@ -750,16 +701,11 @@ class Walkthrough:
                 lines.append(("TỪ    : " + " · ".join(f"“{w}” {v:+.2f}" for w, v in contrib),
                               self.ui.c.cyan))
             if r["latency_ms"] is not None:
-                lines.append((f"ĐỘ TRỄ: {r['latency_ms'] / 1000:.2f}s từ event_ts đến khi chấm xong "
-                              f"(mô phỏng offline, gồm cả thời gian khởi động Spark)",
-                              self.ui.c.gray))
+                lines.append((f"ĐỘ TRỄ: {r['latency_ms'] / 1000:.2f}s (mô phỏng)", self.ui.c.gray))
             self.ui.card(f"[{i + 1}/{len(rows)}] {r['comment_id']} · "
                          f"{trunc(r['stream_id'], 40)}", lines)
-        if n_cards < len(rows):
-            self.ui.note("info", f"Đã in {n_cards}/{len(rows)} thẻ chi tiết "
-                                 f"(--cards {n_cards}); bảng dưới có đủ {len(rows)} dòng.")
 
-        self.ui.section("Bảng đủ mọi bình luận đã chấm")
+        self.ui.section("Bảng kết quả")
         tbl = []
         for i, r in enumerate(rows):
             correct = "—" if not r["label_true"] else ("✔" if r["label_true"] == r["label_pred"] else "✘")
@@ -774,10 +720,7 @@ class Walkthrough:
             hit = sum(1 for r in labelled if r["label_true"] == r["label_pred"])
             self.ui.note("ok" if hit == len(labelled) else "warn",
                          f"Mẫu {len(labelled)} dòng: đúng {hit}/{len(labelled)} "
-                         f"(accuracy {hit / len(labelled):.1%}). "
-                         "Mẫu quá nhỏ để kết luận — chỉ để minh hoạ luồng.")
-        self.ui.note("info", "Nhãn thật chỉ được ghép theo comment_id ở đây để đối chiếu; "
-                             "nó không hề có trong message hay cột đầu vào của model.")
+                         f"({hit / len(labelled):.1%})")
 
     def stage_6(self) -> None:
         rows = self.ensure_scored()
@@ -790,7 +733,7 @@ class Walkthrough:
         thr = float(self.cfg["eda"]["alert"]["negative_share_threshold"])
         min_c = int(self.cfg["eda"]["alert"]["min_comments"])
 
-        self.ui.section("Cửa sổ 1 phút trên mẫu nhỏ — cùng định nghĩa với job streaming")
+        self.ui.section("Cửa sổ 1 phút trên mẫu")
         detail = pd.DataFrame([{
             "comment_id": r["comment_id"],
             "event_time": r["event_time"],
@@ -799,12 +742,9 @@ class Walkthrough:
         } for r in rows])
         self.sample_agg = windows_from_detail(detail, 60)
         self.sample_state = eval_alerts(self.sample_agg, thr, min_c, recent_s=10 ** 9)
-        self._print_windows(self.sample_agg, self.sample_state, title="mẫu nhỏ")
-        self.ui.note("warn", "Mẫu chỉ vài bình luận nên một cửa sổ là bình thường. "
-                             "Quy tắc cảnh báo vẫn là: tỷ lệ tiêu cực > "
-                             f"{thr:.0%} VÀ ≥ {min_c} bình luận.")
+        self._print_windows(self.sample_agg, self.sample_state, title="mẫu thử")
 
-        self.ui.section("Cửa sổ THẬT của lần chạy verify1")
+        self.ui.section("Cửa sổ thật · verify1")
         base = PROJECT_ROOT / "outputs" / "stream" / "verify1"
         w1_path = base / "window_1min"
         ws_path = base / "window_sliding_10s"
@@ -822,18 +762,16 @@ class Walkthrough:
             self.real_state_1min = eval_alerts(self.real_agg_1min, thr, min_c, recent_s=10 ** 9)
             self._print_windows(
                 self.real_agg_1min.tail(8), self.real_state_1min,
-                title=f"verify1 · cửa sổ 1 phút ({len(self.real_agg_1min)} cửa sổ)")
+                title="verify1 · cửa sổ 1 phút")
             top = self.real_agg_1min.loc[self.real_agg_1min.n_comments.idxmax()]
             crossed = (float(top["share_negative"]) > thr
                        and int(top["n_comments"]) >= min_c)
             self.ui.note("info",
-                         f"Ở mức 1 phút, cửa sổ lớn nhất "
-                         f"({pd.to_datetime(top['window_start']):%H:%M}–"
-                         f"{pd.to_datetime(top['window_end']):%H:%M} UTC) có "
-                         f"{fmt_int(top['n_comments'])} bình luận với "
-                         f"{fmt_pct(top['share_negative'])} tiêu cực → "
-                         f"{'vượt ngưỡng' if crossed else 'KHÔNG vượt ngưỡng'}. "
-                         "Cửa sổ 1 phút gộp nhiều phút lại nên dễ san phẳng đợt bùng phát ngắn.")
+                         f"1 phút · cửa sổ lớn nhất {pd.to_datetime(top['window_start']):%H:%M}–"
+                         f"{pd.to_datetime(top['window_end']):%H:%M} UTC · "
+                         f"{fmt_int(top['n_comments'])} bình luận · "
+                         f"{fmt_pct(top['share_negative'])} tiêu cực · cảnh báo "
+                         f"{'CÓ' if crossed else 'KHÔNG'}")
 
         # --- 10 giây trượt: nơi phát hiện cảnh báo thật ------------------
         if ws_path.exists():
@@ -842,7 +780,7 @@ class Walkthrough:
             self.real_state_slide = eval_alerts(self.real_agg_slide, thr, min_c, recent_s=10 ** 9)
             hits = self.real_agg_slide[(self.real_agg_slide.share_negative > thr)
                                        & (self.real_agg_slide.n_comments >= min_c)]
-            self.ui.section("Cửa sổ trượt 10 giây — nơi phát hiện cảnh báo thật")
+            self.ui.section("Cửa sổ trượt 10 giây · verify1")
             if not hits.empty:
                 h = hits.iloc[-1]
                 h_start = pd.to_datetime(h["window_start"])
@@ -850,22 +788,17 @@ class Walkthrough:
                     (pd.to_datetime(self.real_agg_slide.window_start) >= h_start - pd.Timedelta(seconds=20))
                     & (pd.to_datetime(self.real_agg_slide.window_start) <= h_start + pd.Timedelta(seconds=20))]
                 self._print_windows(around, self.real_state_slide,
-                                    title="verify1 · 10 giây · quanh cửa sổ vượt ngưỡng",
-                                    overlap=True)
+                                    title="quanh cảnh báo", overlap=True)
                 self.ui.note("warn",
-                             f"Cảnh báo thật: {pd.to_datetime(h['window_start']):%H:%M:%S}–"
-                             f"{pd.to_datetime(h['window_end']):%H:%M:%S} UTC, "
-                             f"{fmt_pct(h['share_negative'])} tiêu cực "
-                             f"({int(h['n_negative'])}/{int(h['n_comments'])} bình luận) — vượt "
-                             f"ngưỡng {thr:.0%} và đủ {min_c} bình luận.")
+                             f"CẢNH BÁO · {pd.to_datetime(h['window_start']):%H:%M:%S}–"
+                             f"{pd.to_datetime(h['window_end']):%H:%M:%S} UTC · "
+                             f"{int(h['n_negative'])}/{int(h['n_comments'])} = "
+                             f"{fmt_pct(h['share_negative'])} tiêu cực")
             else:
                 self._print_windows(self.real_agg_slide.tail(10), self.real_state_slide,
-                                    title="verify1 · 10 giây · 10 cửa sổ cuối",
-                                    overlap=True)
-            self.ui.note("info", f"{len(self.real_agg_slide)} cửa sổ trượt 10 giây; "
-                                 f"{len(hits)} cửa sổ vượt ngưỡng. Cửa sổ 10 giây nhạy hơn "
-                                 "cửa sổ 1 phút — đây là lý do dashboard dùng nó cho trạng thái "
-                                 "'hiện tại'.")
+                                    title="10 cửa sổ cuối", overlap=True)
+            self.ui.note("info", f"10 giây · {len(self.real_agg_slide)} cửa sổ · "
+                                 f"{len(hits)} cảnh báo")
 
         # --- số dòng + độ trễ thật --------------------------------------
         self.real_counts = {
@@ -876,27 +809,24 @@ class Walkthrough:
             "window_sliding_gop": len(self.real_agg_slide) if self.real_agg_slide is not None else None,
             "dlq": self._parquet_rows(dlq_path, "comment_id"),
         }
-        self.ui.kv("Bảng chi tiết đã chấm", fmt_int(self.real_counts["scored_detail"] or 0) + " dòng")
-        self.ui.kv("Cửa sổ 1 phút (theo phòng)",
+        self.ui.section("Số dòng · độ trễ")
+        self.ui.kv("scored_detail", fmt_int(self.real_counts["scored_detail"] or 0) + " dòng")
+        self.ui.kv("window_1min",
                    fmt_int(self.real_counts["window_1min"] or 0) +
-                   f" dòng → gộp còn {self.real_counts['window_1min_gop']}")
-        self.ui.kv("Cửa sổ 10 giây (theo phòng)",
+                   f" dòng → {self.real_counts['window_1min_gop']} cửa sổ")
+        self.ui.kv("window_sliding_10s",
                    fmt_int(self.real_counts["window_sliding_10s"] or 0) +
-                   f" dòng → gộp còn {self.real_counts['window_sliding_gop']}")
+                   f" dòng → {self.real_counts['window_sliding_gop']} cửa sổ")
         if detail_path.exists():
             lat = pd.read_parquet(detail_path, columns=["latency_ms"])["latency_ms"].dropna()
             if len(lat):
                 q = lat.quantile([0.5, 0.95, 0.99])
                 self.real_latency = {f"p{int(p * 100)}": float(v) for p, v in q.items()}
-                self.ui.kv("Độ trễ thật trên verify1",
+                self.ui.kv("Độ trễ thật",
                            f"p50 {self.real_latency['p50'] / 1000:.1f}s · "
                            f"p95 {self.real_latency['p95'] / 1000:.1f}s · "
                            f"p99 {self.real_latency['p99'] / 1000:.1f}s "
                            f"({fmt_int(len(lat))} bình luận)")
-        self.ui.note("info", "Job có watermark 2 phút: cửa sổ chỉ được ghi SAU khi watermark "
-                             "vượt mốc kết thúc. Vì vậy cửa sổ luôn chậm hơn bảng chi tiết "
-                             "vài phút — đúng ngữ nghĩa event time, không phải lỗi.")
-        self.ui.note("warn", "Mốc thời gian là thời gian DỮ LIỆU (UTC), không phải giờ hệ thống.")
 
     def _print_windows(self, agg: pd.DataFrame, state: dict, title: str,
                        overlap: bool = False) -> None:
@@ -920,15 +850,11 @@ class Walkthrough:
                       tbl, aligns=["<", ">", ">", ">", ">", ">", "<"],
                       max_widths=[19, 5, 6, 6, 6, 9, 8])
         if state and state.get("has_data"):
-            unit = "lượt bình luận trong các cửa sổ" if overlap else "bình luận"
-            self.ui.note("info", f"{title}: {state['n_recent']} cửa sổ, "
-                                 f"{fmt_int(state['n_comments'])} {unit}, "
-                                 f"tỷ lệ tiêu cực tổng {fmt_pct(state.get('share_negative'))}, "
-                                 f"cảnh báo={'CÓ' if state.get('alert') else 'KHÔNG'}.")
-            if overlap:
-                self.ui.note("warn", "Cửa sổ trượt chồng lấn: một bình luận nằm trong nhiều "
-                                     "cửa sổ nên tổng trên là số LƯỢT đếm, không phải số "
-                                     "bình luận duy nhất.")
+            unit = "lượt (chồng lấn)" if overlap else "bình luận"
+            self.ui.note("info", f"{title} · {state['n_recent']} cửa sổ · "
+                                 f"{fmt_int(state['n_comments'])} {unit} · "
+                                 f"{fmt_pct(state.get('share_negative'))} tiêu cực · cảnh báo "
+                                 f"{'CÓ' if state.get('alert') else 'KHÔNG'}")
 
     @staticmethod
     def _parquet_rows(path: Path, column: str) -> int | None:
@@ -941,7 +867,7 @@ class Walkthrough:
 
     def stage_7(self) -> None:
         self.ensure_scored()
-        self.ui.section("Sink Parquet của lần chạy verify1 (dữ liệu THẬT)")
+        self.ui.section("Sink Parquet · verify1")
         base = PROJECT_ROOT / "outputs" / "stream" / "verify1"
         items = [
             ("scored_detail/", "mỗi bình luận đã chấm: nhãn, xác suất, độ trễ", "comment_id"),
@@ -953,13 +879,13 @@ class Walkthrough:
             n = self._parquet_rows(base / name, col)
             self.ui.kv(name, f"{fmt_int(n) if n is not None else '—':>8} dòng · {desc}")
 
-        self.ui.section("Kafka — chỉ kiểm tra nếu broker đang chạy")
+        self.ui.section("Kafka")
         if self.args.no_kafka_check:
             self.ui.note("info", "Đã tắt kiểm tra Kafka (--no-kafka-check).")
         else:
             self._kafka_status()
 
-        self.ui.section("Ghi kết quả lần chạy này")
+        self.ui.section("Ghi kết quả")
         if self.args.no_write:
             self.ui.note("info", "Đã tắt ghi file (--no-write).")
             return
@@ -1083,7 +1009,7 @@ class Walkthrough:
         lat = [r["latency_ms"] for r in rows if r["latency_ms"] is not None]
         test = (self.meta or {}).get("metrics", {}).get("test", {})
 
-        self.ui.section("Tóm tắt bằng số — tất cả lấy từ lần chạy này và file thật")
+        self.ui.section("Tóm tắt")
         tbl = [
             ["Bản ghi lấy từ tập " + str(self.cfg.get("model_trial", {}).get("split", "test")),
              fmt_int(len(self.ensure_sample()))],
@@ -1113,35 +1039,145 @@ class Walkthrough:
         ]
         self.ui.table(["hạng mục", "giá trị"], tbl, max_widths=[42, 34])
         if test:
-            self.ui.section("Chỉ số mô hình trên tập test đầy đủ (lúc huấn luyện)")
+            self.ui.section("Model trên tập test")
             self.ui.kv("Accuracy", f"{test.get('accuracy', 0):.4f}")
             self.ui.kv("Macro-F1", f"{test.get('macro_f1', 0):.4f}")
             self.ui.kv("Weighted-F1", f"{test.get('weighted_f1', 0):.4f}")
             self.ui.kv("Số dòng test", fmt_int(test.get("n", 0)))
 
-        self.ui.section("Điều đã đo — và điều CHƯA kiểm chứng")
-        self.ui.note("ok", "Đã đo: parse schema tường minh, DLQ có lý do, clean_text dùng "
-                           "chung, model.transform trên từng bình luận, cửa sổ theo event time.")
-        self.ui.note("warn", "Dữ liệu là REPLAY từ IMDb — không phải bình luận livestream thật. "
-                             "Không được trích số trong app như số của livestream.")
-        self.ui.note("warn", "Exactly-once CHƯA kiểm chứng; hệ thống chỉ khẳng định "
-                             "at-least-once.")
-        self.ui.note("warn", f"Mẫu {len(rows)} dòng quá nhỏ để kết luận chất lượng mô hình; "
-                             "dùng bảng test đầy đủ ở trên.")
-        self.ui.note("warn", "Nhãn được suy từ rating IMDb (1–4/5–6/7–10), không phải nhãn "
-                             "cảm xúc gán tay; lớp neutral rất nhiễu.")
+        self.ui.note("warn", "Replay IMDb, không phải livestream thật · exactly-once chưa "
+                             "kiểm chứng · nhãn suy từ rating, lớp neutral nhiễu.")
 
-        self.ui.section("Chạy lại / xem tiếp")
+        self.ui.section("Chạy lại")
         for cmd, desc in [
-            ("bash scripts/run_terminal_app.sh", "đi từng giai đoạn, nhấn Enter"),
-            ("bash scripts/run_terminal_app.sh --auto", "tự chạy liên tục"),
-            ("bash scripts/run_terminal_app.sh --stage 5", "chỉ xem giai đoạn chấm điểm"),
+            ("bash scripts/run_terminal_app.sh", "từng giai đoạn, nhấn Enter"),
+            ("bash scripts/run_terminal_app.sh --auto", "tự chạy"),
+            ("bash scripts/run_comment_stream.sh", "từng comment, phân tích ngay"),
+            ("bash scripts/run_terminal_app.sh --stage 5", "chỉ giai đoạn phân tích"),
             ("bash scripts/run_terminal_app.sh --text \"not bad at all\"", "chấm một câu"),
-            ("bash scripts/run_terminal_app.sh --live --duration 60", "theo dõi Kafka thật"),
-            ("bash scripts/run_demo.sh", "chạy cả hệ thống Kafka → job → dashboard"),
+            ("bash scripts/run_terminal_app.sh --live --duration 60", "theo dõi Kafka"),
+            ("bash scripts/run_demo.sh", "Kafka → job → dashboard"),
         ]:
             print("  " + self.ui.c.cyan("▸ " + cmd))
             print("    " + self.ui.c.gray(desc))
+
+    # ======================================================================
+    # Chạy từng comment: comment đến -> parse -> clean -> model -> kết quả
+    # ======================================================================
+    def one_by_one(self) -> None:
+        from pyspark.sql import functions as F
+        from src.streaming.stream_job import parse_stream, add_cleaning_and_reason
+
+        msgs = self.ensure_messages()
+        bad = [] if self.args.no_bad else self._bad_messages()
+        spark = self.ensure_spark()
+        model, meta, idx2lab = self.ensure_model()
+        interval = 0.0 if self.args.fast else max(0.0, float(self.args.interval))
+
+        items = [("comment", m["comment_id"], json.dumps(m, ensure_ascii=False), "")
+                 for m in msgs]
+        items += [("error", cid, raw, note) for cid, raw, note in bad]
+
+        self.ui.banner("SENTIMENTGUARD — NHÓM 6", "Phân tích từng comment",
+                       f"{len(msgs)} comment · {len(bad)} bản ghi lỗi · "
+                       "mỗi comment: parse → clean → model")
+        self.ui.kv("Model", str(meta.get("model_name", "?")))
+        self.ui.kv("Tốc độ", "nhanh (không nghỉ)" if interval == 0 else f"{interval:.1f}s/comment")
+
+        color_of = {"negative": self.ui.c.red, "neutral": self.ui.c.yellow,
+                    "positive": self.ui.c.green}
+        results: list[dict] = []
+        counts = {"ok": 0, "dlq": 0, "right": 0, "labelled": 0}
+        n = len(items)
+
+        for i, (_kind, cid, raw, note) in enumerate(items, 1):
+            t0 = time.perf_counter()
+            raw_df = spark.createDataFrame(
+                [(raw, 0, i - 1, datetime.now())],
+                "json_raw string, kafka_partition int, kafka_offset long, kafka_ts timestamp")
+            # Một Spark action duy nhất cho mỗi comment: bản ghi lỗi vẫn đi qua
+            # model với text rỗng để không phải chạy job thứ hai chỉ để lấy lý do DLQ.
+            cleaned = (add_cleaning_and_reason(parse_stream(raw_df), self.cfg)
+                       .withColumn("text_raw", F.col("text")))
+            safe_text = (F.when(F.col("dlq_reason").isNull(), F.col("text_clean"))
+                         .otherwise(F.lit("")))
+            scored = model.transform(cleaned.withColumn("text", safe_text))
+            sr = scored.select(
+                "comment_id", "stream_id", "text_raw", "text_clean", "dlq_reason",
+                "prediction", "probability", "features",
+                F.unix_millis(F.col("event_time")).alias("event_ms"),
+            ).first()
+            reason = sr["dlq_reason"]
+
+            if reason:
+                counts["dlq"] += 1
+                self.ui.card(f"[{i}/{n}] LỖI · {cid}", [
+                    ("RAW   : " + one_line(raw, 180), self.ui.c.dim),
+                    ("KẾT QUẢ: DLQ · " + reason, self.ui.c.red),
+                    ("GHI CHÚ: " + (note or "—"), self.ui.c.gray),
+                ])
+            else:
+                pred_idx = int(sr["prediction"])
+                probs = {idx2lab[k]: float(p) for k, p in enumerate(list(sr["probability"]))}
+                label = idx2lab.get(pred_idx, f"lớp #{pred_idx}")
+                contrib = self.contributions({"pred_idx": pred_idx, "features": sr["features"]})
+                true_label, rating = self.true_lut.get(cid, ("", ""))
+                true_txt = ""
+                if true_label:
+                    ok = true_label == label
+                    counts["labelled"] += 1
+                    counts["right"] += int(ok)
+                    true_txt = f"{true_label} (rating {rating}) {'✔' if ok else '✘'}"
+                elapsed = time.perf_counter() - t0
+                counts["ok"] += 1
+
+                lines: list = [
+                    ("RAW   : " + one_line(sr["text_raw"], 220), self.ui.c.dim),
+                    ("CLEAN : " + one_line(sr["text_clean"], 220), self.ui.c.green),
+                    (f"KẾT QUẢ: {label.upper()}  "
+                     f"neg {probs.get('negative', float('nan')):.3f} | "
+                     f"neu {probs.get('neutral', float('nan')):.3f} | "
+                     f"pos {probs.get('positive', float('nan')):.3f}",
+                     color_of.get(label, self.ui.c.bold)),
+                ]
+                if contrib:
+                    lines.append(("TỪ    : " + " · ".join(f"“{w}” {v:+.2f}" for w, v in contrib),
+                                  self.ui.c.cyan))
+                if true_txt:
+                    lines.append(("THẬT  : " + true_txt, self.ui.c.magenta))
+                lines.append((f"XỬ LÝ : {elapsed * 1000:.0f} ms", self.ui.c.gray))
+                self.ui.card(f"[{i}/{n}] {cid} · {trunc(sr['stream_id'], 36)}", lines)
+
+                if sr["event_ms"] is not None:
+                    event_dt = datetime.fromtimestamp(sr["event_ms"] / 1000.0, tz=timezone.utc
+                                                      ).replace(tzinfo=None)
+                    results.append({"comment_id": cid, "event_time": event_dt,
+                                    "pred_label": label, "latency_ms": elapsed * 1000})
+
+            if interval and i < n:
+                time.sleep(interval)
+
+        self.ui.section("Kết thúc")
+        self.ui.kv("Comment đã phân tích", fmt_int(counts["ok"]))
+        self.ui.kv("DLQ", fmt_int(counts["dlq"]))
+        if counts["labelled"]:
+            self.ui.kv("Đúng trên mẫu", f"{counts['right']}/{counts['labelled']} "
+                                       f"({counts['right'] / counts['labelled']:.1%})")
+        if results:
+            try:
+                from src.app.app import eval_alerts, windows_from_detail
+                detail = pd.DataFrame(results)
+                agg = windows_from_detail(detail, 60)
+                thr = float(self.cfg["eda"]["alert"]["negative_share_threshold"])
+                min_c = int(self.cfg["eda"]["alert"]["min_comments"])
+                state = eval_alerts(agg, thr, min_c, recent_s=10 ** 9)
+                self._print_windows(agg, state, title="phiên này")
+                if int(state.get("n_comments", 0)) < min_c:
+                    self.ui.note("warn", f"Cảnh báo chỉ bật khi cửa sổ có ≥ {min_c} "
+                                         f"bình luận; phiên này mới "
+                                         f"{int(state.get('n_comments', 0))}.")
+            except Exception as e:                   # noqa: BLE001
+                self.ui.note("err", f"Không gộp được cửa sổ: {e}")
 
     # ======================================================================
     # Chấm một câu nhập tay (dùng cùng model + cùng clean_text)
@@ -1199,22 +1235,14 @@ class Walkthrough:
     # ======================================================================
     def run(self) -> None:
         stages = [
-            (1, "THU THẬP DỮ LIỆU GIẢ LẬP",
-             "Lấy mẫu review IMDb từ bản đã chuẩn bị. Đây là REPLAY, không phải livestream thật."),
-            (2, "ĐÓNG GÓI MESSAGE & GỬI KAFKA",
-             "5 trường bắt buộc; nhãn đánh giá tách riêng, không đi vào luồng."),
-            (3, "PARSE SCHEMA + KIỂM TRA + DLQ",
-             "from_json với schema tường minh; bản ghi lỗi vào DLQ kèm lý do."),
-            (4, "LÀM SẠCH VĂN BẢN",
-             "clean_text() — đúng hàm dùng lúc huấn luyện và streaming."),
-            (5, "CHẤM ĐIỂM TỪNG BÌNH LUẬN",
-             "PipelineModel đã lưu; xác suất từng lớp + từ đóng góp."),
-            (6, "GỘP CỬA SỔ + CẢNH BÁO",
-             "Event time + watermark; so sánh mẫu nhỏ với lần chạy thật verify1."),
-            (7, "GHI SINK + KIỂM TRA KAFKA",
-             "Parquet cho từng bảng; kiểm tra topic nếu broker đang chạy."),
-            (8, "TỔNG KẾT",
-             "Số liệu thật của lần chạy + các điều CHƯA kiểm chứng."),
+            (1, "THU THẬP DỮ LIỆU GIẢ LẬP", ""),
+            (2, "ĐÓNG GÓI MESSAGE", ""),
+            (3, "PARSE SCHEMA + KIỂM TRA + DLQ", ""),
+            (4, "LÀM SẠCH VĂN BẢN", ""),
+            (5, "CHẤM ĐIỂM TỪNG BÌNH LUẬN", ""),
+            (6, "GỘP CỬA SỔ + CẢNH BÁO", ""),
+            (7, "GHI SINK + KIỂM TRA KAFKA", ""),
+            (8, "TỔNG KẾT", ""),
         ]
         selected = [s for s in stages if self.args.stage in (None, s[0])]
         t_all = time.perf_counter()
@@ -1305,8 +1333,9 @@ def live_mode(cfg: dict, ui: UI, duration: int) -> int:
     ui.section("Đã nhận trong phiên live")
     for t in topics:
         ui.kv(t, fmt_int(counts.get(t, 0)) + " message")
-    ui.note("info", "Đây là message thật trên Kafka của lần chạy hiện tại; dữ liệu vẫn là "
-                    "replay IMDb, không phải livestream thật.")
+    ui.note("info", "Message lấy từ Kafka; nếu job đang xử lý backlog thì `latency` có thể "
+                    "rất lớn — đó là độ trễ thật của job. Dữ liệu vẫn là replay IMDb, "
+                    "không phải livestream thật.")
     return 0
 
 
@@ -1321,7 +1350,7 @@ def parse_args(argv=None) -> argparse.Namespace:
             Ví dụ:
               bash scripts/run_terminal_app.sh                    # từng giai đoạn
               bash scripts/run_terminal_app.sh --auto             # tự chạy
-              bash scripts/run_terminal_app.sh --fast --limit 20  # nhanh, 20 bình luận
+              bash scripts/run_comment_stream.sh                  # từng comment
               bash scripts/run_terminal_app.sh --stage 5          # chỉ chấm điểm
               bash scripts/run_terminal_app.sh --text "not bad"   # chấm một câu
               bash scripts/run_terminal_app.sh --live --duration 60
@@ -1348,6 +1377,12 @@ def parse_args(argv=None) -> argparse.Namespace:
     ap.add_argument("--keep-text", action="store_true",
                     help="ghi thêm đoạn văn bản đã làm sạch vào CSV (chỉ dùng với dữ liệu công khai)")
     ap.add_argument("--no-kafka-check", action="store_true", help="bỏ qua kiểm tra Kafka ở giai đoạn 7")
+    ap.add_argument("--one-by-one", action="store_true",
+                    help="chạy từng comment: đến đâu phân tích và trả kết quả ngay")
+    ap.add_argument("--interval", type=float, default=1.0,
+                    help="giây nghỉ giữa các comment ở chế độ --one-by-one (mặc định 1.0)")
+    ap.add_argument("--no-bad", action="store_true",
+                    help="không chèn 4 bản ghi lỗi cố ý ở chế độ --one-by-one")
     return ap.parse_args(argv)
 
 
@@ -1366,6 +1401,21 @@ def main(argv=None) -> int:
 
     if args.live:
         return live_mode(cfg, ui, args.duration)
+
+    if args.one_by_one:
+        wt = Walkthrough(cfg, args, ui)
+        try:
+            wt.one_by_one()
+            return 0
+        except KeyboardInterrupt:
+            print()
+            ui.note("warn", "Đã dừng bằng Ctrl+C.")
+            return 130
+        except FileNotFoundError as e:
+            ui.note("err", str(e))
+            return 2
+        finally:
+            wt.close()
 
     # --text / --interactive một mình = chỉ chấm câu, không chạy lại 8 giai đoạn.
     # Thêm --auto (hoặc --fast) để chạy walkthrough trước rồi mới chấm.
@@ -1393,10 +1443,19 @@ def main(argv=None) -> int:
         finally:
             wt.close()
 
-    ui.banner("SENTIMENTGUARD — NHÓM 6",
-              "Chạy toàn bộ quy trình ngay trong terminal",
-              "Dữ liệu: REPLAY từ review IMDb công khai — KHÔNG phải bình luận livestream thật. "
-              "Exactly-once CHƯA kiểm chứng; chỉ khẳng định at-least-once.")
+    ui.banner("SENTIMENTGUARD — NHÓM 6", "Quy trình chạy trong terminal",
+              "Replay IMDb · LogisticRegression · at-least-once")
+    print("  " + ui.c.bold("QUY TRÌNH"))
+    print(ui.c.gray("    " + "   ".join(f"{i} {name}" for i, name in enumerate(PIPELINE[:4], 1))))
+    print(ui.c.gray("    " + "   ".join(f"{i} {name}" for i, name in enumerate(PIPELINE[4:], 5))))
+    print("  " + ui.c.bold("CÁCH CHẠY"))
+    for cmd, desc in [
+        ("bash scripts/run_terminal_app.sh", "từng giai đoạn, Enter"),
+        ("bash scripts/run_comment_stream.sh", "từng comment, phân tích ngay"),
+        ("bash scripts/run_terminal_app.sh --auto", "tự chạy"),
+    ]:
+        print("    " + ui.c.cyan("▸ " + cmd) + ui.c.gray("  " + desc))
+    print()
     ui.kv("Gốc dự án", str(PROJECT_ROOT))
     ui.kv("Cấu hình", rel(Path(args.config)))
     ui.kv("Chế độ", "từng giai đoạn (Enter)" if not args.auto else

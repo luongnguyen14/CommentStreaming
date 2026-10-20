@@ -44,12 +44,14 @@ dashboard (`outputs/stream/`, ~71 MB). **Không cần** tải dữ liệu thô �
 
 App terminal đi qua **8 giai đoạn** bằng đúng code của hệ thống: lấy mẫu replay →
 đóng gói message → `from_json` + DLQ → `clean_text()` → chấm từng bình luận bằng
-`PipelineModel` → cửa sổ event time + cảnh báo → sink Parquet → tổng kết.
+`PipelineModel` → cửa sổ event time + cảnh báo → sink Parquet → tổng kết. Mỗi bước
+có breadcrumb để nhìn là biết đang ở đâu.
 
 ```bash
 bash scripts/run_terminal_app.sh                     # nhấn Enter sau mỗi giai đoạn
 bash scripts/run_terminal_app.sh --auto              # tự chạy liên tục
 bash scripts/run_terminal_app.sh --fast --limit 20   # nhanh
+bash scripts/run_comment_stream.sh                   # từng comment: đến đâu, kết quả ngay
 bash scripts/run_terminal_app.sh --stage 5           # chỉ chấm điểm
 bash scripts/run_terminal_app.sh --text "not bad at all actually"  # chấm một câu
 bash scripts/run_terminal_app.sh --live --duration 60  # theo dõi Kafka (nếu đang chạy)

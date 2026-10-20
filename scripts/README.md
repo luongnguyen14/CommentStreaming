@@ -29,6 +29,31 @@
   Hướng dẫn mở dashboard từ máy thật (port forwarding VirtualBox) và cách chụp ảnh/quay
   màn hình cho báo cáo: xem `src/app/README.md`.
 
+## App terminal — xem quy trình không cần Kafka
+
+- `run_terminal_app.sh [tham số]` — chạy `src/app/terminal_app.py` bằng Python của
+  `.venv`, tự đặt `PYSPARK_*` và tắt event log (không cần HDFS):
+
+  ```bash
+  bash scripts/run_terminal_app.sh                    # 8 giai đoạn, Enter sau mỗi bước
+  bash scripts/run_terminal_app.sh --auto             # tự chạy
+  bash scripts/run_terminal_app.sh --fast --limit 20  # nhanh
+  bash scripts/run_terminal_app.sh --stage 5          # chỉ chấm điểm
+  bash scripts/run_terminal_app.sh --text "not bad"   # chấm một câu
+  bash scripts/run_terminal_app.sh --live --duration 60  # cần Kafka
+  ```
+
+- `run_comment_stream.sh [tham số]` — chế độ `--one-by-one`: mỗi comment đến thì
+  parse → clean → model → in kết quả ngay, rồi sang comment kế tiếp.
+
+  ```bash
+  bash scripts/run_comment_stream.sh                  # 12 comment, nghỉ 1s/comment
+  bash scripts/run_comment_stream.sh --limit 20 --fast
+  bash scripts/run_comment_stream.sh --no-bad         # bỏ 4 bản ghi lỗi cố ý
+  ```
+
+Chi tiết từng giai đoạn: `docs/huong_dan_terminal_app.md`.
+
 ## Môi trường
 
 - `env.sh` — biến môi trường dùng chung: Java 8, Spark 3.5.9, Python 3.11 cho PySpark.

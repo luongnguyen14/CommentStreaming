@@ -36,12 +36,15 @@ bản** vào file; chỉ dùng `--keep-text` với dữ liệu công khai.
 `terminal_app.py` là bản **walkthrough 8 giai đoạn** chạy thẳng trong terminal Ubuntu,
 dùng đúng code của hệ thống (không viết lại logic): lấy mẫu review → đóng gói message
 → `from_json` + DLQ → `clean_text()` → `PipelineModel` → cửa sổ event time → sink
-Parquet → tổng kết. Mỗi giai đoạn in ra dữ liệu thật của chính lần chạy đó.
+Parquet → tổng kết. Mỗi giai đoạn in ra dữ liệu thật của chính lần chạy đó; mỗi bước
+có breadcrumb `Thu thập → Đóng gói → Parse/DLQ → …` để nhìn là biết đang ở đâu.
 
 ```bash
 bash scripts/run_terminal_app.sh                     # từng giai đoạn, nhấn Enter
 bash scripts/run_terminal_app.sh --auto              # tự chạy liên tục
 bash scripts/run_terminal_app.sh --fast --limit 20   # nhanh, 20 bình luận
+bash scripts/run_comment_stream.sh                   # từng comment: đến đâu, kết quả ngay
+bash scripts/run_comment_stream.sh --limit 20 --fast # 20 comment, không nghỉ
 bash scripts/run_terminal_app.sh --stage 5           # chỉ giai đoạn chấm điểm
 bash scripts/run_terminal_app.sh --text "not bad at all actually"   # chấm một câu
 bash scripts/run_terminal_app.sh --interactive       # nhập nhiều câu để chấm

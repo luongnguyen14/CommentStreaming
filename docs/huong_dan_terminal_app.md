@@ -19,6 +19,7 @@ cd /home/hadoop/capstone
 bash scripts/run_terminal_app.sh                      # từng giai đoạn, nhấn Enter
 bash scripts/run_terminal_app.sh --auto               # tự chạy, nghỉ 0.8s giữa giai đoạn
 bash scripts/run_terminal_app.sh --fast --limit 20    # nhanh, 20 bình luận
+bash scripts/run_comment_stream.sh                    # từng comment: đến đâu, kết quả ngay
 bash scripts/run_terminal_app.sh --stage 5            # chỉ giai đoạn chấm điểm
 bash scripts/run_terminal_app.sh --text "not bad at all actually"  # chấm một câu
 bash scripts/run_terminal_app.sh --interactive        # nhập nhiều câu để chấm
@@ -26,9 +27,14 @@ bash scripts/run_terminal_app.sh --live --duration 60 # theo dõi Kafka đang ch
 bash scripts/run_terminal_app.sh --help
 ```
 
+App in gọn: **quy trình 8 bước → cách chạy → kết quả từng bước**. Mỗi giai đoạn có
+breadcrumb `Thu thập → Đóng gói → Parse/DLQ → …` để biết đang ở đâu; không in giải
+thích dài.
+
 | Chế độ | Cần Kafka? | Cần Spark? | Thời gian điển hình |
 |---|---|---|---|
-| Walkthrough (mặc định / `--auto` / `--fast`) | Không | Có (từ giai đoạn 3) | 12–20s với `--fast` |
+| Walkthrough (mặc định / `--auto` / `--fast`) | Không | Có (từ giai đoạn 3) | 25–35s với `--fast` |
+| `run_comment_stream.sh` (`--one-by-one`) | Không | Có | ~1–2s/comment sau khi nạp model |
 | `--stage 1` | Không | Không | < 1s |
 | `--text`, `--interactive` | Không | Có (nạp model) | ~8–12s lần đầu |
 | `--live` | **Có** | Không | đúng `--duration` giây |
@@ -49,11 +55,54 @@ bash scripts/run_terminal_app.sh --help
 | 5 | Chấm điểm từng bình luận | Thông tin model, thẻ RAW/CLEAN/NHÃN/THẬT/TỪ/ĐỘ TRỄ, bảng đủ mọi dòng | `PipelineModel.transform()` + `linear_parts()` | Mẫu sau làm sạch; nhãn thật ghép từ sidecar |
 | 6 | Gộp cửa sổ + cảnh báo | Cửa sổ 1 phút trên mẫu; cửa sổ thật `verify1` (1 phút và 10 giây trượt); latency thật | `windows_from_detail()`, `aggregate_windows()`, `eval_alerts()` | Mẫu + `outputs/stream/verify1/` |
 | 7 | Ghi sink + kiểm tra Kafka | Số dòng 4 sink Parquet; offset 3 topic nếu broker chạy; ghi kết quả lần chạy | `_kafka_status()`, `_write_run_artifacts()` | `outputs/stream/verify1/` |
-| 8 | Tổng kết | Bảng số của lần chạy, chỉ số test đầy đủ, điều đã đo/chưa đo, lệnh chạy lại | Tổng hợp state của các giai đoạn | Tất cả ở trên |
+| 8 | Tổng kết | Bảng số của lần chạy, chỉ số test đầy đủ, một dòng lưu ý trung thực, lệnh chạy lại | Tổng hợp state của các giai đoạn | Tất cả ở trên |
 
 ---
 
-## 3. Chi tiết từng giai đoạn — nhìn gì khi demo
+## 3. Chạy từng comment — comment đến, kết quả ra ngay
+
+`scripts/run_comment_stream.sh` là chế độ `--one-by-one`: mỗi bình luận được đưa vào
+**một mình**, chạy đủ `parse_stream → add_cleaning_and_reason → clean_text →
+PipelineModel`, in kết quả, rồi mới sang bình luận tiếp theo — giống cách một consumer
+xử lý từng message khi nó đến.
+
+```bash
+bash scripts/run_comment_stream.sh                     # 12 comment, nghỉ 1s/comment
+bash scripts/run_comment_stream.sh --limit 20          # 20 comment
+bash scripts/run_comment_stream.sh --fast              # không nghỉ
+bash scripts/run_comment_stream.sh --no-bad            # bỏ 4 bản ghi lỗi cố ý
+bash scripts/run_comment_stream.sh --interval 0.5      # nghỉ 0,5s/comment
+```
+
+Mỗi comment in một thẻ:
+
+```
+┌─ [2/7] rw5512669 · Pokémon: Mewtwo Strikes Back - Evol… ─────────────────┐
+│ RAW   : Off the bat, it's almost a shot for shot remake of the original… │
+│ CLEAN : off the bat, it's almost a shot for shot remake of the original… │
+│ KẾT QUẢ: NEGATIVE  neg 0.493 | neu 0.453 | pos 0.054                     │
+│ TỪ    : “padding” +0.42 · “poor” +0.27 · “instead.” +0.25 …              │
+│ THẬT  : negative (rating 3) ✔                                            │
+│ XỬ LÝ : 2020 ms                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+- Bản ghi lỗi vẫn vào **DLQ** kèm lý do, in thẻ `LỖI` thay vì kết quả.
+- `XỬ LÝ` là thời gian **một lượt Spark job** (gồm cả khởi động job), không phải
+  latency streaming thật; latency thật của `verify1` ở giai đoạn 6.
+- Kết thúc in tổng: số comment, số DLQ, đúng/sai trên mẫu, và cửa sổ 1 phút của
+  **phiên này**. Cảnh báo chỉ bật khi cửa sổ có ≥ `min_comments` bình luận
+  (`config.yaml`, hiện là 5) — app nói rõ nếu phiên chưa đủ ngưỡng.
+- Mỗi comment chỉ chạy **một Spark action**: bản ghi lỗi vẫn đi qua model với text
+  rỗng để lấy luôn `dlq_reason`, tránh job thứ hai.
+
+Đây vẫn là **replay**: app không mở Kafka consumer; nó mô phỏng đúng đường đi của
+một message. Muốn xem consumer thật: `bash scripts/run_demo.sh` rồi
+`bash scripts/run_terminal_app.sh --live --duration 60`.
+
+---
+
+## 4. Chi tiết từng giai đoạn — nhìn gì khi demo
 
 ### Giai đoạn 1 — Thu thập dữ liệu giả lập
 
@@ -132,8 +181,8 @@ Mỗi thẻ chi tiết in:
 
 - **RAW** — văn bản gốc; **CLEAN** — sau `clean_text()`;
 - **NHÃN** — nhãn dự đoán + xác suất 3 lớp + độ tin cậy;
-- **THẬT** — nhãn suy từ rating, kèm ✔/✘; dòng này ghi rõ *chỉ để đánh giá, không đi
-  qua luồng*;
+- **THẬT** — nhãn suy từ rating, kèm ✔/✘; nhãn này **chỉ dùng để đối chiếu**, không
+  đi qua luồng;
 - **TỪ** — các từ đóng góp mạnh nhất, tính từ `feature × coefficient` của mô hình
   tuyến tính;
 - **ĐỘ TRỄ** — từ `event_ts` đến lúc chấm xong. Đây là **độ trễ mô phỏng offline**,
@@ -161,9 +210,9 @@ Ba phần:
 Bài học: cùng dữ liệu, cửa sổ 1 phút **san phẳng** đợt bùng phát ngắn; cửa sổ 10 giây
 trượt mới bắt được. Đó là lý do dashboard dùng cửa sổ 10 giây cho trạng thái "hiện tại".
 
-App cũng nhắc: job có **watermark 2 phút**, nên cửa sổ luôn ra chậm hơn bảng chi tiết
-vài phút — đúng ngữ nghĩa event time, không phải lỗi. Mốc thời gian là **giờ dữ liệu
-(UTC)**, không phải giờ hệ thống.
+Mốc thời gian trong app là **giờ dữ liệu (UTC)**, không phải giờ hệ thống. Trong job
+streaming thật, **watermark 2 phút** khiến cửa sổ ra chậm hơn bảng chi tiết vài phút —
+đúng ngữ nghĩa event time, không phải lỗi.
 
 ### Giai đoạn 7 — Ghi sink + kiểm tra Kafka
 
@@ -203,7 +252,12 @@ sổ, cảnh báo, latency thật), chỉ số test đầy đủ lúc huấn luy
 | Weighted-F1 | 0,7213 |
 | Số dòng test | 27.792 |
 
-và danh sách **điều đã đo — điều chưa kiểm chứng**:
+và **một dòng lưu ý trung thực** ở cuối:
+
+> Replay IMDb, không phải livestream thật · exactly-once chưa kiểm chứng · nhãn suy
+> từ rating, lớp neutral nhiễu.
+
+Các điều đã đo / chưa kiểm chứng, giải thích đầy đủ (app chỉ in dòng ngắn ở trên):
 
 - ✔ Đã đo: parse schema tường minh, DLQ có lý do, `clean_text` dùng chung,
   `model.transform` từng bình luận, cửa sổ theo event time.
@@ -214,7 +268,7 @@ và danh sách **điều đã đo — điều chưa kiểm chứng**:
 
 ---
 
-## 4. Phần nào là thật, phần nào là mô phỏng
+## 5. Phần nào là thật, phần nào là mô phỏng
 
 | Thành phần | Trong app | Thực tế |
 |---|---|---|
@@ -230,7 +284,7 @@ và danh sách **điều đã đo — điều chưa kiểm chứng**:
 
 ---
 
-## 5. Kịch bản demo 5 phút
+## 6. Kịch bản demo 5 phút
 
 1. **0:00** — `bash scripts/run_terminal_app.sh` (chế độ nhấn Enter).
 2. **Giai đoạn 1** — chỉ vào nguồn ~1,0 GB và mẫu test; nói rõ "đây là replay".
@@ -242,10 +296,12 @@ và danh sách **điều đã đo — điều chưa kiểm chứng**:
 7. **Giai đoạn 6** — đây là điểm nhấn: cửa sổ 1 phút **không** cảnh báo, cửa sổ 10
    giây **có** cảnh báo thật 38,5 % (5/13). Giải thích watermark 2 phút và giờ UTC.
 8. **Giai đoạn 7** — chỉ 4 sink và file kết quả vừa ghi.
-9. **Giai đoạn 8** — đọc bảng test đầy đủ + 4 điều chưa kiểm chứng.
-10. **Kết thúc** — `bash scripts/run_terminal_app.sh --text "not bad at all actually"`
-    để thấy mô hình túi từ sai với phủ định phức tạp (neg 0,86) — một hạn chế thật,
-    không phải lỗi che giấu.
+9. **Giai đoạn 8** — đọc bảng test đầy đủ + dòng lưu ý trung thực.
+10. **Kết thúc** — `bash scripts/run_comment_stream.sh --limit 5` để thấy đúng nhịp
+    "comment đến → phân tích → kết quả", rồi
+    `bash scripts/run_terminal_app.sh --text "not bad at all actually"` để thấy mô
+    hình túi từ sai với phủ định phức tạp (neg 0,86) — một hạn chế thật, không phải
+    lỗi che giấu.
 
 Nếu muốn chạy không cần nhấn Enter khi quay video:
 `bash scripts/run_terminal_app.sh --auto` (nghỉ 0,8s mỗi giai đoạn) hoặc
@@ -253,7 +309,7 @@ Nếu muốn chạy không cần nhấn Enter khi quay video:
 
 ---
 
-## 6. Tùy chọn đầy đủ
+## 7. Tùy chọn đầy đủ
 
 | Tùy chọn | Mặc định | Ý nghĩa |
 |---|---|---|
@@ -265,6 +321,9 @@ Nếu muốn chạy không cần nhấn Enter khi quay video:
 | `--fast` | tắt | như `--auto`, không nghỉ giữa giai đoạn |
 | `--delay S` | 0,8 | giây nghỉ giữa giai đoạn khi `--auto` |
 | `--stage N` | tắt | chỉ chạy một giai đoạn 1–8 |
+| `--one-by-one` | tắt | chạy từng comment, in kết quả ngay (dùng qua `run_comment_stream.sh`) |
+| `--interval S` | 1,0 | giây nghỉ giữa các comment ở `--one-by-one` |
+| `--no-bad` | tắt | không chèn 4 bản ghi lỗi cố ý ở `--one-by-one` |
 | `--text "..."` | — | chỉ chấm một câu rồi thoát; thêm `--auto` để walkthrough trước |
 | `--interactive` | tắt | nhập nhiều câu để chấm rồi thoát; thêm `--auto` để walkthrough trước |
 | `--live` | tắt | theo dõi 3 topic Kafka (không chạy walkthrough) |
@@ -276,7 +335,7 @@ Nếu muốn chạy không cần nhấn Enter khi quay video:
 
 ---
 
-## 7. Lỗi thường gặp
+## 8. Lỗi thường gặp
 
 | Hiện tượng | Nguyên nhân / cách xử lý |
 |---|---|
@@ -290,7 +349,7 @@ Nếu muốn chạy không cần nhấn Enter khi quay video:
 
 ---
 
-## 8. Liên hệ với dashboard Streamlit
+## 9. Liên hệ với dashboard Streamlit
 
 | | Streamlit (`src/app/app.py`) | Terminal (`src/app/terminal_app.py`) |
 |---|---|---|
