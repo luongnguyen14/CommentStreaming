@@ -1,2 +1,0 @@
-v1
-{"path":"file:///home/hadoop/capstone/outputs/stream/demo/window_sliding_10s/part-00000-c434f56a-f3e4-40b5-a968-bf222641634a-c000.snappy.parquet","size":1326,"isDir":false,"modificationTime":1792028889081,"blockReplication":1,"blockSize":33554432,"action":"add"}

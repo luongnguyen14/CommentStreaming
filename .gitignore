@@ -46,5 +46,9 @@ templates/
 # Muốn lưu bằng chứng một lần chạy cụ thể thì copy file cần thiết sang outputs/tables/.
 outputs/terminal_demo/run_*/
 
+# Dữ liệu demo là tạm thời và rất lớn (hàng trăm MB, tăng theo mỗi lần chạy);
+# chỉ outputs/stream/verify1 là bằng chứng được giữ trong git.
+outputs/stream/demo/
+
 # --- File checksum .crc của Hadoop (sinh tự động khi lưu model ra đĩa cục bộ) ---
 *.crc

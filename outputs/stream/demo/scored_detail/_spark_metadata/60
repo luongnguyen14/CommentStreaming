@@ -1,4 +1,0 @@
-v1
-{"path":"file:///home/hadoop/capstone/outputs/stream/demo/scored_detail/event_date=2026-10-15/event_hour=5/part-00000-ed7ab1d1-55d3-4eb5-8cd5-a89c1578f5c1.c000.snappy.parquet","size":400085,"isDir":false,"modificationTime":1792042424702,"blockReplication":1,"blockSize":33554432,"action":"add"}
-{"path":"file:///home/hadoop/capstone/outputs/stream/demo/scored_detail/event_date=2026-10-15/event_hour=5/part-00001-49af7c81-03fa-4aa8-b2bf-10c2e3383a9c.c000.snappy.parquet","size":394612,"isDir":false,"modificationTime":1792042424907,"blockReplication":1,"blockSize":33554432,"action":"add"}
-{"path":"file:///home/hadoop/capstone/outputs/stream/demo/scored_detail/event_date=2026-10-15/event_hour=5/part-00002-af2ad09b-536b-4d97-82eb-5ad6bd93f833.c000.snappy.parquet","size":432947,"isDir":false,"modificationTime":1792042428680,"blockReplication":1,"blockSize":33554432,"action":"add"}

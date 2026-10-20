@@ -1,15 +1,9 @@
-2026-10-15 12:30:31.920 Uvicorn server started on 0.0.0.0:8501
+2026-10-20 10:13:29.681 Uvicorn server started on 0.0.0.0:8501
 
   You can now view your Streamlit app in your browser.
 
   Local URL: http://localhost:8501
-  Network URL: http://172.16.99.138:8501
-  External URL: http://116.98.243.87:8501
+  Network URL: http://172.16.99.139:8501
+  External URL: http://116.110.107.66:8501
 
-26/10/15 12:34:59 WARN Utils: Your hostname, luongnguyen-VMware20-1 resolves to a loopback address: 127.0.1.1; using 172.16.99.138 instead (on interface ens160)
-26/10/15 12:34:59 WARN Utils: Set SPARK_LOCAL_IP if you need to bind to another address
-Setting default log level to "WARN".
-To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
-26/10/15 12:34:59 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-[Stage 0:>                                                          (0 + 1) / 1]                                                                                [Stage 10:>                                                         (0 + 1) / 1]                                                                                [Stage 11:>                                                         (0 + 1) / 1]                                                                                [Stage 24:>                                                         (0 + 1) / 1]                                                                                [Stage 26:>                                                         (0 + 1) / 1]                                                                                  Stopping...
   Stopping...

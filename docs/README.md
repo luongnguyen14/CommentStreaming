@@ -26,5 +26,10 @@
 - `huong_dan_terminal_app.md` — **hướng dẫn app terminal**: chạy walkthrough 8 giai
   đoạn ngay trong terminal (từ thu thập dữ liệu giả lập đến chấm từng bình luận), giải
   thích từng giai đoạn, phần nào thật/mô phỏng, kịch bản demo 5 phút và lỗi thường gặp
+- `giai_thich_chuong_trinh.docx` — **hướng dẫn đọc và hiểu toàn bộ chương trình**
+  (45 trang, tiếng Việt): mục đích, cách chạy, tham số, các bước, câu lệnh cốt lõi,
+  đầu ra của 11 shell script, 26 file Python, 13 truy vấn SQL, 5 bộ test; kèm bảng tra
+  lệnh, xử lý sự cố và lộ trình đọc code 30 phút. Sinh bằng
+  `scripts/make_program_guide.py` (chạy bằng `/usr/bin/python3`)
 
 Tài liệu trong đây là **nội bộ**; tài liệu nộp cho cô nằm ở `deliverables/` (tiếng Anh).

@@ -97,6 +97,7 @@ Dashboard: <http://localhost:8501>. Chi tiết: [`src/app/README.md`](src/app/RE
 | File | Nội dung |
 |---|---|
 | [`docs/huong_dan_terminal_app.md`](docs/huong_dan_terminal_app.md) | App terminal: walkthrough 8 giai đoạn, phần thật/mô phỏng, kịch bản demo |
+| [`docs/giai_thich_chuong_trinh.docx`](docs/giai_thich_chuong_trinh.docx) | Giải thích toàn bộ chương trình (45 trang): lệnh, tham số, luồng hoạt động, đầu ra, xử lý sự cố |
 | [`docs/huong_dan_share_streamlit.md`](docs/huong_dan_share_streamlit.md) | Chia sẻ dashboard cho máy khác: LAN, ngrok, Cloudflare, cài độc lập |
 | [`docs/huong_dan_lay_file_word.md`](docs/huong_dan_lay_file_word.md) | Tải file Word, mở bằng Word/LibreOffice, chạy lại trên máy gốc/máy mới |
 | [`docs/bao_cao_ky_thuat_vi.md`](docs/bao_cao_ky_thuat_vi.md) | Tóm tắt báo cáo kỹ thuật tiếng Việt (bản đầy đủ: `.docx`/`.pdf`) |
