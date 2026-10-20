@@ -23,5 +23,8 @@
   khác**: cùng mạng LAN (Bridged/NAT port forwarding), qua Internet bằng ngrok hoặc
   Cloudflare Tunnel, cài độc lập trên máy mới, bảo vệ bằng mật khẩu Nginx, và xử lý
   lỗi kết nối thường gặp
+- `huong_dan_terminal_app.md` — **hướng dẫn app terminal**: chạy walkthrough 8 giai
+  đoạn ngay trong terminal (từ thu thập dữ liệu giả lập đến chấm từng bình luận), giải
+  thích từng giai đoạn, phần nào thật/mô phỏng, kịch bản demo 5 phút và lỗi thường gặp
 
 Tài liệu trong đây là **nội bộ**; tài liệu nộp cho cô nằm ở `deliverables/` (tiếng Anh).

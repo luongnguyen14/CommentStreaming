@@ -31,6 +31,38 @@ bản** vào file; chỉ dùng `--keep-text` với dữ liệu công khai.
 > Đây vẫn là **review IMDb phát lại**, không phải bình luận livestream thật. Báo cáo
 > phải nói rõ (xem `docs/huong_dan_bao_cao.md`).
 
+## App terminal — xem toàn bộ quy trình ngay trong terminal
+
+`terminal_app.py` là bản **walkthrough 8 giai đoạn** chạy thẳng trong terminal Ubuntu,
+dùng đúng code của hệ thống (không viết lại logic): lấy mẫu review → đóng gói message
+→ `from_json` + DLQ → `clean_text()` → `PipelineModel` → cửa sổ event time → sink
+Parquet → tổng kết. Mỗi giai đoạn in ra dữ liệu thật của chính lần chạy đó.
+
+```bash
+bash scripts/run_terminal_app.sh                     # từng giai đoạn, nhấn Enter
+bash scripts/run_terminal_app.sh --auto              # tự chạy liên tục
+bash scripts/run_terminal_app.sh --fast --limit 20   # nhanh, 20 bình luận
+bash scripts/run_terminal_app.sh --stage 5           # chỉ giai đoạn chấm điểm
+bash scripts/run_terminal_app.sh --text "not bad at all actually"   # chấm một câu
+bash scripts/run_terminal_app.sh --interactive       # nhập nhiều câu để chấm
+bash scripts/run_terminal_app.sh --live --duration 60  # theo dõi 3 topic Kafka
+```
+
+- **Không cần Kafka** ở chế độ walkthrough (mặc định): chỉ cần model đã lưu và
+  `outputs/tables/clean_sample.csv`. Chế độ `--live` mới cần broker đang chạy.
+- Không chạy lại job streaming; app **mô phỏng** phần thu thập bằng replay và dùng
+  đúng `parse_stream`, `add_cleaning_and_reason`, `clean_text`, `PipelineModel`,
+  `windows_from_detail`, `eval_alerts` của hệ thống.
+- Kết quả mỗi lần chạy (trừ khi `--no-write`) ghi vào
+  `outputs/terminal_demo/run_YYYYmmdd_HHMMSS/`: `predictions.csv`, `dlq.csv`,
+  `windows_sample.csv`, `run_summary.md`.
+- **Độ trễ trong app là độ trễ mô phỏng offline** (gồm khởi động Spark/nạp model),
+  không phải latency streaming thật. Latency thật của `verify1` đo ở giai đoạn 6.
+- Nhãn thật chỉ hiện ở giai đoạn 5/8 để đối chiếu, lấy từ sidecar — **không đi vào
+  message, không đi vào model**.
+
+Hướng dẫn chi tiết từng giai đoạn + kịch bản demo: `docs/huong_dan_terminal_app.md`.
+
 ## Cách chạy
 
 ### Cách 1 — cả hệ thống bằng một lệnh (khuyến nghị khi demo)

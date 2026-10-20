@@ -40,6 +40,26 @@ dashboard (`outputs/stream/`, ~71 MB). **Không cần** tải dữ liệu thô �
 
 ---
 
+## Xem toàn bộ quy trình ngay trong terminal (không cần Kafka)
+
+App terminal đi qua **8 giai đoạn** bằng đúng code của hệ thống: lấy mẫu replay →
+đóng gói message → `from_json` + DLQ → `clean_text()` → chấm từng bình luận bằng
+`PipelineModel` → cửa sổ event time + cảnh báo → sink Parquet → tổng kết.
+
+```bash
+bash scripts/run_terminal_app.sh                     # nhấn Enter sau mỗi giai đoạn
+bash scripts/run_terminal_app.sh --auto              # tự chạy liên tục
+bash scripts/run_terminal_app.sh --fast --limit 20   # nhanh
+bash scripts/run_terminal_app.sh --stage 5           # chỉ chấm điểm
+bash scripts/run_terminal_app.sh --text "not bad at all actually"  # chấm một câu
+bash scripts/run_terminal_app.sh --live --duration 60  # theo dõi Kafka (nếu đang chạy)
+```
+
+Hướng dẫn từng giai đoạn + kịch bản demo 5 phút:
+[`docs/huong_dan_terminal_app.md`](docs/huong_dan_terminal_app.md).
+
+---
+
 ## Chạy toàn bộ demo (Kafka → Streaming → Dashboard)
 
 ```bash
@@ -61,7 +81,7 @@ Dashboard: <http://localhost:8501>. Chi tiết: [`src/app/README.md`](src/app/RE
 | `src/training/` | Chuẩn bị dữ liệu + huấn luyện Spark ML |
 | `src/streaming/` | Spark Structured Streaming (6 query, event time, watermark, DLQ) |
 | `src/producer/` | Kafka producer replay/live |
-| `src/app/` | Dashboard Streamlit 3 tab |
+| `src/app/` | Dashboard Streamlit 3 tab + app terminal walkthrough 8 giai đoạn |
 | `src/eda/` | Truy vấn Spark SQL + biểu đồ |
 | `src/common/` | Làm sạch văn bản dùng chung, schema, tiện ích |
 | `outputs/` | Model, bảng kết quả, biểu đồ, dữ liệu streaming |
@@ -74,6 +94,7 @@ Dashboard: <http://localhost:8501>. Chi tiết: [`src/app/README.md`](src/app/RE
 
 | File | Nội dung |
 |---|---|
+| [`docs/huong_dan_terminal_app.md`](docs/huong_dan_terminal_app.md) | App terminal: walkthrough 8 giai đoạn, phần thật/mô phỏng, kịch bản demo |
 | [`docs/huong_dan_share_streamlit.md`](docs/huong_dan_share_streamlit.md) | Chia sẻ dashboard cho máy khác: LAN, ngrok, Cloudflare, cài độc lập |
 | [`docs/huong_dan_lay_file_word.md`](docs/huong_dan_lay_file_word.md) | Tải file Word, mở bằng Word/LibreOffice, chạy lại trên máy gốc/máy mới |
 | [`docs/bao_cao_ky_thuat_vi.md`](docs/bao_cao_ky_thuat_vi.md) | Tóm tắt báo cáo kỹ thuật tiếng Việt (bản đầy đủ: `.docx`/`.pdf`) |

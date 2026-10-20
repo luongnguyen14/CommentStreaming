@@ -42,5 +42,9 @@ templates/
 # outputs/ ĐƯỢC commit: mọi con số trong báo cáo phải truy vết được về file thật.
 # Nhưng ảnh/CSV quá lớn thì cân nhắc Git LFS.
 
+# Kết quả app terminal là tạm thời (mỗi lần chạy một thư mục mới), chỉ giữ README.
+# Muốn lưu bằng chứng một lần chạy cụ thể thì copy file cần thiết sang outputs/tables/.
+outputs/terminal_demo/run_*/
+
 # --- File checksum .crc của Hadoop (sinh tự động khi lưu model ra đĩa cục bộ) ---
 *.crc
